@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8FAFC"
+    tools:context=".MainActivity">
+
+    <!-- Background Blobs (Reused/Similar to existing) -->
+    <View
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:background="@drawable/dot_indicator"
+        android:backgroundTint="#DDD6FE" 
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:alpha="0.4"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:translationX="-80dp"
+        android:translationY="-80dp" />
+
+    <View
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:background="@drawable/dot_indicator"
+        android:backgroundTint="#FBCFE8"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:alpha="0.4"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:translationX="80dp"
+        android:translationY="50dp" />
+
+    <!-- Main Content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="48dp">
+
+            <!-- Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="24dp">
+
+                <RelativeLayout
+                    android:layout_width="48dp"
+                    android:layout_height="48dp">
+                    <ImageView
+                        android:id="@+id/userAvatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_profile_placeholder" 
+                        />
+                    <!-- Green dot -->
+                    <View
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:background="@drawable/pulse_dot"
+                        android:backgroundTint="#4ADE80"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentEnd="true"/>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chào buổi sáng,"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary"
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hoàng Minh 👋"
+                        android:textSize="20sp"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+                <!-- Streak Counter -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/glass_card_bg"
+                    android:gravity="center"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_star"
+                        app:tint="#F97316"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12 Ngày"
+                        android:layout_marginStart="6dp"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Hero Quote -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/glass_card_bg"
+                android:padding="24dp"
+                android:layout_marginBottom="32dp">
+
+                <!-- Pseudo-element decoration replacement -->
+                <!-- Skipped blur blob for simplicity -->
+
+                <ImageView
+                    android:id="@+id/quoteIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_quote_placeholder" 
+                    app:tint="#DDD6FE"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/> 
+                <!-- Will use ic_chat or just invisible view if missing, will fix in Java if needed or create generic icon -->
+
+                <TextView
+                    android:id="@+id/quoteText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="&quot;Học tập không phải là hạt giống của kiến thức, mà là hạt giống của hạnh phúc.&quot;"
+                    android:textSize="16sp"
+                    android:textStyle="bold|italic"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginTop="8dp"
+                    android:lineSpacingExtra="4dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/quoteIcon"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="— TỤC NGỮ ZEN"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginTop="12dp"
+                    android:letterSpacing="0.1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/quoteText"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Section 2: Continue Learning -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="bottom"
+                android:layout_marginBottom="16dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Đang học dở"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tất cả"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary"/>
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/continueLearningRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:layout_marginBottom="32dp"/>
+
+            <!-- Section 3: Goals & Stats -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mục tiêu hôm nay"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="16dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false"
+                android:layout_marginBottom="32dp">
+
+                <!-- XP Card -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/glass_card_bg"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:layout_marginEnd="8dp">
+
+                    <FrameLayout
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_marginBottom="8dp">
+                         <ProgressBar
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:progressDrawable="@drawable/circular_progress" 
+                            android:progress="70"
+                            android:rotation="-90"/> 
+                            <!-- Note: native circular progress isn't easily ring-shaped without custom drawable. I'll stick to a simple TextView or standard PB for now -->
+                         <TextView
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:text="350"
+                             android:textStyle="bold"
+                             android:textSize="14sp"
+                             android:layout_gravity="center"/>
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="XP đạt được"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_secondary"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mục tiêu: 500 XP"
+                        android:textSize="10sp"
+                        android:textColor="#94A3B8"/>
+                </LinearLayout>
+
+                <!-- Daily Task Card -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:minHeight="132dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/glass_card_bg"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginStart="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="DAILY TASK"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#94A3B8"
+                        android:layout_marginBottom="12dp"
+                        android:letterSpacing="0.1"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp"
+                        android:alpha="0.5">
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_check_circle" 
+                            app:tint="#4ADE80"/> 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Xem 1 Video"
+                            android:textSize="12sp"
+                            android:layout_marginStart="8dp"
+                            android:textColor="@color/text_secondary"
+                            android:background="@drawable/strikethrough_line"/> <!-- Fake strikethrough -->
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_circle_outline" 
+                            app:tint="@color/primary"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Làm 1 Quiz"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:layout_marginStart="8dp"
+                            android:textColor="@color/text_primary"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Section 4: Recommended -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_star"
+                    app:tint="@color/primary"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gợi ý riêng cho bạn"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginStart="8dp"/>
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recommendedRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:orientation="vertical"/>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Floating Bottom Navigation -->
+    <include
+        layout="@layout/layout_floating_nav"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

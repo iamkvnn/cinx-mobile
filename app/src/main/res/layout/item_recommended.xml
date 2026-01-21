@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/glass_card_bg"
+    android:padding="10dp"
+    android:layout_marginBottom="12dp">
+
+    <!-- Course Image (Left) -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/courseImage"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/RoundedImageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:src="@tools:sample/backgrounds/scenic" />
+
+    <!-- Content (Right) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        app:layout_constraintStart_toEndOf="@id/courseImage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Top Row: Category + Price -->
+        <TextView
+            android:id="@+id/courseCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border_panel"
+            android:backgroundTint="#F0F9FF"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:text="Code"
+            android:textColor="#0EA5E9"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/coursePrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$49"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/courseCategory"/>
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/courseTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Python Data Science Pro"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/courseCategory" />
+
+        <!-- Description (Instructor/Subtitle) -->
+        <TextView
+            android:id="@+id/courseDesc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Build 5 real-world projects"
+            android:textSize="11sp"
+            android:textColor="#64748B"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/courseTitle" />
+
+        <!-- Bottom Row: Duration + Rating -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/courseDesc">
+
+            <!-- Duration -->
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_play"
+                app:tint="#94A3B8"
+                android:layout_marginEnd="4dp"/>
+            
+            <TextView
+                android:id="@+id/courseDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="22h"
+                android:textSize="10sp"
+                android:textColor="#94A3B8"
+                android:textStyle="bold"
+                android:layout_marginEnd="12dp"/>
+
+            <!-- Rating -->
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_star"
+                app:tint="#FBBF24"
+                android:layout_marginEnd="4dp"/>
+
+            <TextView
+                android:id="@+id/courseRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4.8"
+                android:textSize="10sp"
+                android:textColor="#94A3B8"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

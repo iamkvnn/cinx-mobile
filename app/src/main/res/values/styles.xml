@@ -1,0 +1,13 @@
+<resources>
+    <!-- Circle Image View -->
+    <style name="CircleImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <!-- Rounded Image View -->
+    <style name="RoundedImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+</resources>

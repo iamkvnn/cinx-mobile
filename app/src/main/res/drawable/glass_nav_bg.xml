@@ -1,0 +1,40 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- nền kính rất nhẹ -->
+    <item>
+        <shape>
+            <solid android:color="#25FFFFFF"/>
+            <corners android:radius="24dp"/>
+        </shape>
+    </item>
+
+    <!-- viền kính -->
+    <item>
+        <shape>
+            <solid android:color="@android:color/transparent"/>
+            <stroke
+                android:width="2dp"
+                android:color="#33FFFFFF"/>
+            <corners android:radius="24dp"/>
+        </shape>
+    </item>
+
+    <!-- highlight phía trên (inset shadow) -->
+    <item
+        android:top="1dp"
+        android:left="1dp"
+        android:right="1dp">
+        <shape>
+            <gradient
+                android:angle="270"
+                android:startColor="#43FFFFFF"
+                android:endColor="@android:color/transparent"/>
+            <corners android:radius="24dp"/>
+        </shape>
+    </item>
+
+    <item
+        android:drawable="@drawable/noise"
+        android:alpha="0.001"/>
+
+</layer-list>
