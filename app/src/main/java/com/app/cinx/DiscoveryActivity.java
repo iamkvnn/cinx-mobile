@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +25,8 @@ import java.util.List;
 
 public class DiscoveryActivity extends AppCompatActivity {
 
+    private DrawerLayout drawerLayout;
+    private ImageView btnFilter;
     private RecyclerView coursesRecyclerView;
     private RecyclerView categoriesRecyclerView;
 
@@ -37,8 +41,28 @@ public class DiscoveryActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        drawerLayout = findViewById(R.id.drawerLayout);
+        btnFilter = findViewById(R.id.btnFilter);
         coursesRecyclerView = findViewById(R.id.coursesRecyclerView);
         categoriesRecyclerView = findViewById(R.id.categoriesRecyclerView);
+        
+        // Setup Filter Button logic
+        btnFilter.setOnClickListener(v -> {
+            if (drawerLayout != null) {
+                drawerLayout.openDrawer(GravityCompat.END);
+            }
+        });
+
+        // Setup Drawer Buttons (Clear, Apply)
+        findViewById(R.id.btnClear).setOnClickListener(v -> {
+             // Logic to clear filters
+             if (drawerLayout != null) drawerLayout.closeDrawer(GravityCompat.END);
+        });
+        
+        findViewById(R.id.btnApply).setOnClickListener(v -> {
+             // Logic to apply filters
+             if (drawerLayout != null) drawerLayout.closeDrawer(GravityCompat.END);
+        });
         
         // Setup Featured Image
         ImageView featuredImage = findViewById(R.id.featuredImage);
@@ -89,18 +113,8 @@ public class DiscoveryActivity extends AppCompatActivity {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            TextView textView = new TextView(parent.getContext());
-            textView.setPadding(40, 20, 40, 20);
-            textView.setTextSize(12);
-            textView.setTypeface(null, android.graphics.Typeface.BOLD);
-            
-            ViewGroup.MarginLayoutParams params = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.setMargins(0, 0, 24, 0);
-            textView.setLayoutParams(params);
-            
-            // Set default background (generic drawable or shape created programmatically)
-            
-            return new ViewHolder(textView);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_category_chip, parent, false);
+            return new ViewHolder(view);
         }
 
         @Override
@@ -111,13 +125,17 @@ public class DiscoveryActivity extends AppCompatActivity {
             final int pos = position; // effectively final for lambda
 
             if (selectedPosition == pos) {
-                tv.setBackgroundResource(R.drawable.glass_nav_bg); // Reusing glass bg, but ideally specific active chib bg
+                // Active state: Gradient or solid bright color
+                tv.setBackgroundResource(R.drawable.glass_card_bg); // Reusing glass, but ideally specific active bg
                 tv.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#A78BFA"))); // Violet-ish
                 tv.setTextColor(Color.WHITE);
+                tv.setElevation(8f);
             } else {
-                tv.setBackgroundResource(R.drawable.glass_nav_bg); 
-                tv.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#80FFFFFF"))); 
-                tv.setTextColor(Color.parseColor("#475569"));
+                // Inactive state: Glassy white
+                tv.setBackgroundResource(R.drawable.glass_card_bg);
+                tv.setBackgroundTintList(null); // Clear tint to show original drawable
+                tv.setTextColor(Color.parseColor("#64748B"));
+                tv.setElevation(0f);
             }
 
             tv.setOnClickListener(v -> {

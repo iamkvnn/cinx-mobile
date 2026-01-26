@@ -25,6 +25,11 @@
         <activity
             android:name=".DiscoveryActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".MyLearningActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

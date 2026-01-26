@@ -40,6 +40,14 @@ public class NavHelper {
                 activity.startActivity(intent);
             }
         });
+
+        coursesBtn.setOnClickListener(v -> {
+            if (activeTabId != R.id.navCourses) {
+                Intent intent = new Intent(activity, com.app.cinx.MyLearningActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                activity.startActivity(intent);
+            }
+        });
         
         // Add others as needed
     }
