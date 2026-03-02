@@ -3,7 +3,7 @@
     <!-- nền kính rất nhẹ -->
     <item>
         <shape>
-            <solid android:color="#25FFFFFF"/>
+            <solid android:color="#20000000"/>
             <corners android:radius="24dp"/>
         </shape>
     </item>
@@ -13,7 +13,7 @@
         <shape>
             <solid android:color="@android:color/transparent"/>
             <stroke
-                android:width="2dp"
+                android:width="4dp"
                 android:color="#33FFFFFF"/>
             <corners android:radius="24dp"/>
         </shape>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EduFuture - Đăng ký</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F2F4F8;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+            overflow-y: auto; 
+            overflow-x: hidden;
+        }
+
+        /* Animations */
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 10s infinite alternate; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        /* Error Shake Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .shake { animation: shake 0.3s ease-in-out; }
+
+        /* Glass Components */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Input Styling */
+        .glass-input-wrapper {
+            position: relative;
+            transition: all 0.3s;
+        }
+        .glass-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 16px 16px 16px 48px;
+            border-radius: 16px;
+            font-size: 16px; 
+            font-weight: 500;
+            color: #1e293b;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .glass-input::placeholder { color: #94a3b8; font-weight: 400; font-size: 15px; }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+        }
+        /* Error State for Input */
+        .glass-input.error {
+            border-color: #ef4444;
+            background: rgba(254, 242, 242, 0.5);
+        }
+        .glass-input.error:focus {
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            transition: color 0.3s;
+            pointer-events: none;
+        }
+        .glass-input:focus ~ .input-icon { color: #8b5cf6; }
+
+        /* Primary Button */
+        .btn-primary {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            box-shadow: 0 10px 20px -5px rgba(30, 41, 59, 0.3);
+            transition: all 0.3s;
+            touch-action: manipulation; 
+        }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:hover { box-shadow: 0 15px 30px -5px rgba(30, 41, 59, 0.4); transform: translateY(-1px); }
+
+        /* Social Button */
+        .btn-social {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.2s;
+        }
+        .btn-social:hover { background: rgba(255, 255, 255, 0.9); transform: scale(1.05); }
+        .btn-social:active { transform: scale(0.95); background: rgba(255,255,255,0.7); }
+
+        /* Form Transition */
+        .form-container {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .active-form {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+            animation: fadeIn 0.4s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+
+    </style>
+</head>
+<body class="flex min-h-screen items-center justify-center p-4 sm:p-6 lg:p-8">
+
+    <!-- Dynamic Background -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[70%] h-[60%] bg-blue-200/40 rounded-full blur-[80px] mix-blend-multiply animate-blob"></div>
+        <div class="absolute top-[20%] right-[-20%] w-[70%] h-[60%] bg-violet-200/40 rounded-full blur-[80px] mix-blend-multiply animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-[-10%] left-[20%] w-[70%] h-[60%] bg-fuchsia-200/40 rounded-full blur-[80px] mix-blend-multiply animate-blob animation-delay-4000"></div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="glass-card w-full max-w-[420px] rounded-[2.5rem] p-6 sm:p-8 relative z-10 animate-fade-in-up my-auto">
+        
+        <!-- Logo Section -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-lg shadow-violet-500/30 mb-4">
+                <i data-lucide="zap" class="text-white fill-current w-8 h-8"></i>
+            </div>
+            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Edu<span class="text-violet-600">Future</span></h1>
+            <p class="text-slate-500 text-sm mt-1 font-medium">Học tập không giới hạn</p>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div id="register-form" class="active-form form-container space-y-5">
+            <div class="glass-input-wrapper">
+                <input type="text" id="reg-name" placeholder="Họ và tên" class="glass-input" autocapitalize="words">
+                <i data-lucide="user" class="input-icon w-5 h-5"></i>
+            </div>
+
+            <div class="glass-input-wrapper">
+                <input type="email" id="reg-email" placeholder="Email" class="glass-input" inputmode="email">
+                <i data-lucide="mail" class="input-icon w-5 h-5"></i>
+            </div>
+            
+            <div class="glass-input-wrapper">
+                <input type="password" id="reg-pass" placeholder="Tạo mật khẩu" class="glass-input">
+                <i data-lucide="lock" class="input-icon w-5 h-5"></i>
+                <button onclick="togglePassword('reg-pass', this)" class="absolute right-0 top-0 h-full px-4 text-slate-400 hover:text-slate-600 focus:outline-none flex items-center justify-center" type="button">
+                    <i data-lucide="eye" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="glass-input-wrapper">
+                <input type="password" id="reg-repass" placeholder="Nhập lại mật khẩu" class="glass-input">
+                <i data-lucide="check-circle" class="input-icon w-5 h-5"></i>
+                 <button onclick="togglePassword('reg-repass', this)" class="absolute right-0 top-0 h-full px-4 text-slate-400 hover:text-slate-600 focus:outline-none flex items-center justify-center" type="button">
+                    <i data-lucide="eye" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <button class="btn-primary w-full py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-2" onclick="handleRegister()">
+                Tạo tài khoản
+            </button>
+            
+             <div class="text-center mt-4 pt-2">
+                <span class="text-sm text-slate-500 font-medium">Đã có tài khoản? </span>
+                <a href="login.html" class="text-sm font-bold text-violet-600 hover:text-violet-700">Đăng nhập</a>
+             </div>
+        </div>
+
+        <!-- Social Login -->
+        <div class="mt-8 text-center">
+            <div class="relative mb-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-slate-300/50"></div>
+                </div>
+                <div class="relative flex justify-center text-xs">
+                    <span class="bg-white/60 backdrop-blur-sm px-4 text-slate-500 font-bold rounded-full">Hoặc tiếp tục với</span>
+                </div>
+            </div>
+
+            <div class="flex justify-center gap-4">
+                <button class="btn-social w-14 h-14 rounded-full flex items-center justify-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" class="w-6 h-6">
+                </button>
+                <button class="btn-social w-14 h-14 rounded-full flex items-center justify-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" class="w-6 h-6">
+                </button>
+                <button class="btn-social w-14 h-14 rounded-full flex items-center justify-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Facebook_icon.svg" alt="Facebook" class="w-6 h-6">
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <p class="text-center text-[11px] text-slate-400 mt-8 font-medium leading-relaxed">
+            Bằng cách tiếp tục, bạn đồng ý với <a href="#" class="text-slate-600 underline px-1">Điều khoản</a> & <a href="#" class="text-slate-600 underline px-1">Chính sách bảo mật</a>
+        </p>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // UX Feature: Toggle Password
+        function togglePassword(fieldId, btn) {
+            const input = document.getElementById(fieldId);
+            const icon = btn.querySelector('svg');
+            
+            if (input.type === "password") {
+                input.type = "text";
+                // Change icon to eye-off (using lucide replace logic roughly)
+                btn.innerHTML = '<i data-lucide="eye-off" class="w-5 h-5"></i>';
+                btn.classList.add('text-violet-600');
+            } else {
+                input.type = "password";
+                btn.innerHTML = '<i data-lucide="eye" class="w-5 h-5"></i>';
+                btn.classList.remove('text-violet-600');
+            }
+            lucide.createIcons();
+        }
+
+        function handleRegister() {
+            const btn = document.querySelector('.btn-primary');
+            const originalContent = btn.innerHTML;
+            const nameInput = document.getElementById('reg-name');
+            const emailInput = document.getElementById('reg-email');
+            const passInput = document.getElementById('reg-pass');
+            const repassInput = document.getElementById('reg-repass');
+            let isValid = true;
+
+            // Simple Mock Validation
+            [nameInput, emailInput, passInput, repassInput].forEach(input => {
+                 if (!input.value) {
+                    input.classList.add('error');
+                    input.parentElement.classList.add('shake');
+                    isValid = false;
+                }
+            });
+            
+             if (passInput.value && repassInput.value && passInput.value !== repassInput.value) {
+                repassInput.classList.add('error');
+                repassInput.parentElement.classList.add('shake');
+                isValid = false;
+             }
+
+            // Remove shake class after animation
+            setTimeout(() => {
+                document.querySelectorAll('.shake').forEach(el => el.classList.remove('shake'));
+            }, 300);
+
+            // Remove error class on focus
+            [nameInput, emailInput, passInput, repassInput].forEach(inp => {
+                inp.addEventListener('focus', () => inp.classList.remove('error'));
+            });
+
+            if (!isValid) return;
+            
+            // Loading State
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>';
+            btn.disabled = true;
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> Đăng ký thành công';
+                btn.classList.remove('btn-primary');
+                btn.classList.add('bg-green-500', 'text-white');
+                
+                setTimeout(() => {
+                    // Redirect to login or reset
+                     window.location.href = 'login.html';
+                }, 1000);
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

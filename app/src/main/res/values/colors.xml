@@ -17,6 +17,13 @@
     <!-- Text Colors -->
     <color name="text_primary">#1E293B</color>
     <color name="text_secondary">#64748B</color>
+    <color name="text_placeholder">#94A3B8</color>
+    <color name="error">#EF4444</color>
+    <color name="glass_card_bg">#A6FFFFFF</color> <!-- 65% White -->
+    <color name="glass_input_bg">#66FFFFFF</color> <!-- 40% White -->
+    <color name="glass_border">#99FFFFFF</color> <!-- 60% White -->
+    <color name="glass_input_focus_border">#8B5CF6</color>
+
     
     <color name="star_color">#FACC15</color>
     <color name="white_alpha_90">#E6FFFFFF</color>

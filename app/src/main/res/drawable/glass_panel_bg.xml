@@ -1,4 +1,36 @@
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#32000000"/>
-    <corners android:radius="18dp"/>
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- nền kính rất nhẹ -->
+    <item>
+        <shape>
+            <solid android:color="#22000000"/>
+            <corners android:radius="24dp"/>
+        </shape>
+    </item>
+
+    <!-- viền kính -->
+    <item>
+        <shape>
+            <solid android:color="@android:color/transparent"/>
+            <stroke
+                android:width="2dp"
+                android:color="#42FFFFFF"/>
+            <corners android:radius="24dp"/>
+        </shape>
+    </item>
+
+    <!-- highlight phía trên (inset shadow) -->
+    <item
+        android:top="1dp"
+        android:left="1dp"
+        android:right="1dp">
+        <shape>
+            <gradient
+                android:angle="270"
+                android:startColor="#66FFFFFF"
+                android:endColor="@android:color/transparent"/>
+            <corners android:radius="24dp"/>
+        </shape>
+    </item>
+
+</layer-list>

@@ -1,10 +1,14 @@
 package com.app.cinx;
 
+import static com.app.cinx.util.ToastUtil.showCustomToast;
+
+import android.graphics.Color;
 import android.graphics.RenderEffect;
 import android.graphics.Shader;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,13 +30,12 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 
 import com.app.cinx.util.NavHelper;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
-    private boolean isLoggedIn = true; // Temporary toggle
 
     // Guest Views
     private RecyclerView partnersRecyclerView;
@@ -52,16 +55,40 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (isLoggedIn) {
+        if (UserManager.getInstance().isLoggedIn()) {
+            Log.i("MainActivity", "User is logged in");
             setContentView(R.layout.activity_main_logged_in);
             initLoggedInViews();
+            NavHelper.setupNavigation(this, R.id.navHome);
         } else {
             setContentView(R.layout.activity_main);
             initGuestViews();
             setupGuestRecyclerViews();
             loadGuestData();
             setupGuestClickListeners();
-            startAutoScroll();
+            // Start auto scroll only if the activity is valid
+            partnersRecyclerView.post(this::startAutoScroll);
+            
+             // Setup StatusBar for immersive experience
+            getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+            getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (autoScrollHandler != null && autoScrollRunnable != null) {
+            autoScrollHandler.removeCallbacks(autoScrollRunnable);
+        }
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (autoScrollHandler != null && autoScrollRunnable != null) {
+            autoScrollHandler.removeCallbacks(autoScrollRunnable);
         }
     }
     
@@ -69,6 +96,11 @@ public class MainActivity extends AppCompatActivity {
         userAvatar = findViewById(R.id.userAvatar);
         continueLearningRecyclerView = findViewById(R.id.continueLearningRecyclerView);
         recommendedRecyclerView = findViewById(R.id.recommendedRecyclerView);
+        TextView tvUserName = findViewById(R.id.tvUserName);
+        
+        if (tvUserName != null && UserManager.getInstance().getUserEmail() != null) {
+            tvUserName.setText(UserManager.getInstance().getUserEmail() + " 👋");
+        }
 
         // Load Avatar
         Glide.with(this)
@@ -87,10 +119,6 @@ public class MainActivity extends AppCompatActivity {
         List<Course> recommendedCourses = getCoursesList();
         RecommendedAdapter recommendedAdapter = new RecommendedAdapter(recommendedCourses);
         recommendedRecyclerView.setAdapter(recommendedAdapter);
-        
-        // Setup Bottom Nav (Simple placeholders)
-        // Note: The layout uses <include layout="@layout/bottom_nav_menu"> which has IDs like navHome, navSearch etc.
-        NavHelper.setupNavigation(this, R.id.navHome);
     }
 
     private void initGuestViews() {
@@ -98,15 +126,6 @@ public class MainActivity extends AppCompatActivity {
         coursesRecyclerView = findViewById(R.id.coursesRecyclerView);
         testimonialsRecyclerView1 = findViewById(R.id.testimonialsRecyclerView1);
         testimonialsRecyclerView2 = findViewById(R.id.testimonialsRecyclerView2);
-
-        // Load profile image
-        ImageView profileImage = findViewById(R.id.profileImage);
-        if (profileImage != null) {
-            Glide.with(this)
-                    .load("https://i.pravatar.cc/150?u=8")
-                    .circleCrop()
-                    .into(profileImage);
-        }
     }
 
     private void setupGuestRecyclerViews() {
@@ -160,7 +179,18 @@ public class MainActivity extends AppCompatActivity {
         CourseAdapter courseAdapter = new CourseAdapter(courses, new CourseAdapter.OnCourseClickListener() {
             @Override
             public void onCourseClick(Course course) {
-                Toast.makeText(MainActivity.this, "Clicked: " + course.getTitle(), Toast.LENGTH_SHORT).show();
+                Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
+                        "Đã lưu thành công", Snackbar.LENGTH_SHORT);
+
+                View sbView = snackbar.getView();
+                sbView.setBackgroundResource(R.drawable.bg_toast);
+
+                TextView text = sbView.findViewById(com.google.android.material.R.id.snackbar_text);
+                text.setTextColor(Color.WHITE);
+                text.setTextSize(14f);
+
+                snackbar.show();
+                //showCustomToast(MainActivity.this, "Clicked: " + course.getTitle());
             }
 
             @Override
@@ -184,55 +214,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupGuestClickListeners() {
         MaterialButton btnGetStarted = findViewById(R.id.btnGetStarted);
-        MaterialButton btnWatchDemo = findViewById(R.id.btnWatchDemo);
         
         if (btnGetStarted != null) {
-            btnGetStarted.setOnClickListener(v -> Toast.makeText(this, "Bắt đầu ngay!", Toast.LENGTH_SHORT).show());
-        }
-        if (btnWatchDemo != null) {
-            btnWatchDemo.setOnClickListener(v -> Toast.makeText(this, "Xem Demo", Toast.LENGTH_SHORT).show());
-        }
-        
-        setupSharedNavListeners();
-    }
-    
-    private void setupSharedNavListeners() {
-        // Custom nav logic - works for both layouts if IDs match
-        View navHome = findViewById(R.id.navHome);
-        if (navHome != null) setupNavClick((ImageView)navHome, "Home");
-        
-        View navSearch = findViewById(R.id.navSearch);
-        if (navSearch != null) setupNavClick((ImageView)navSearch, "Search");
-        
-        View navCourses = findViewById(R.id.navCourses);
-        if (navCourses != null) setupNavClick((ImageView)navCourses, "Courses");
-        
-        View navProfile = findViewById(R.id.navProfile);
-        if (navProfile != null) setupNavClick((ImageView)navProfile, "Profile");
-    }
-    
-    private void setupNavClick(ImageView view, String name) {
-        view.setOnClickListener(v -> {
-            // Reset all navs visual
-            resetNavs();
-            // Set active visual (simple for now)
-            view.setBackgroundResource(R.drawable.glass_panel_bg);
-            view.setColorFilter(getColor(R.color.primary));
-            Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
-        });
-    }
-    
-    private void resetNavs() {
-        int[] ids = {R.id.navHome, R.id.navSearch, R.id.navCourses, R.id.navProfile};
-        for (int id : ids) {
-            View v = findViewById(id);
-            if (v instanceof ImageView) {
-                v.setBackground(null);
-                ((ImageView)v).setColorFilter(getColor(R.color.text_secondary)); 
-            }
+            btnGetStarted.setOnClickListener(v -> {
+                android.content.Intent intent = new android.content.Intent(this, LoginActivity.class);
+                startActivity(intent);
+            });
         }
     }
-
 
     private List<Course> getCoursesList() {
         List<Course> courses = new ArrayList<>();

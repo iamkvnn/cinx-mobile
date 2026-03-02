@@ -1,10 +1,16 @@
 package com.app.cinx.util;
 
+import static com.app.cinx.util.Convert.dpToPx;
+
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.app.Activity;
+
+import androidx.core.content.res.ResourcesCompat;
 
 import com.app.cinx.DiscoveryActivity;
 import com.app.cinx.MainActivity;
@@ -57,8 +63,10 @@ public class NavHelper {
              ImageView icon = (ImageView) view;
              if (isActive) {
                  icon.setColorFilter(icon.getContext().getResources().getColor(R.color.primary));
-                 icon.setScaleX(1.1f);
-                 icon.setScaleY(1.1f);
+                 icon.setBackground(ResourcesCompat.getDrawable(icon.getResources(), R.drawable.glass_panel_bg, null));
+                 ViewGroup.LayoutParams params = view.getLayoutParams();
+                 params.width = dpToPx(icon.getContext(), 76);
+                 view.setLayoutParams(params);
              } else {
                  icon.setColorFilter(icon.getContext().getResources().getColor(R.color.text_secondary)); // Should define text_secondary or generic grey
                  icon.setScaleX(1.0f);

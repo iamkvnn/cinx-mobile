@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <solid android:color="@color/background" />
+        </shape>
+    </item>
+    
+    <!-- Blue Blob (Top Left) -->
+    <item android:top="-100dp" android:left="-100dp" android:width="400dp" android:height="400dp">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="200dp"
+                android:startColor="#66BFDBFE"
+                android:endColor="#00BFDBFE" />
+        </shape>
+    </item>
+
+    <!-- Violet Blob (Top Right) -->
+    <item android:top="100dp" android:right="-100dp" android:width="400dp" android:height="400dp" android:gravity="top|end">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="200dp"
+                android:startColor="#66DDD6FE"
+                android:endColor="#00DDD6FE" />
+        </shape>
+    </item>
+
+    <!-- Fuchsia Blob (Bottom Left) -->
+    <item android:bottom="-100dp" android:left="50dp" android:width="400dp" android:height="400dp" android:gravity="bottom|start">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="200dp"
+                android:startColor="#66E9D5FF"
+                android:endColor="#00E9D5FF" />
+        </shape>
+    </item>
+</layer-list>

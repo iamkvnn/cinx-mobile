@@ -58,10 +58,20 @@ public class TestimonialAdapter extends RecyclerView.Adapter<TestimonialAdapter.
             userName.setText(testimonial.getUserName());
             testimonialText.setText("\"" + testimonial.getText() + "\"");
 
-            Glide.with(itemView.getContext())
-                    .load(testimonial.getAvatarUrl())
-                    .circleCrop()
-                    .into(userAvatar);
+             try {
+                if (itemView.getContext() instanceof android.app.Activity) {
+                    android.app.Activity activity = (android.app.Activity) itemView.getContext();
+                    if (activity.isDestroyed() || activity.isFinishing()) {
+                        return;
+                    }
+                }
+                Glide.with(itemView.getContext())
+                        .load(testimonial.getAvatarUrl())
+                        .circleCrop()
+                        .into(userAvatar);
+            } catch (Exception e) {
+                // Ignore Glide errors if activity is destroyed
+            }
         }
     }
 }
