@@ -1,64 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/floatingNav"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginBottom="32dp"
     android:background="@drawable/glass_nav_bg"
-    android:padding="8dp"
-    android:clipToOutline="true"
-    android:outlineProvider="background"
-    android:elevation="4dp">
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="10dp"
+    android:elevation="24dp"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:animateLayoutChanges="true">
 
-    <ImageView
+    <!-- Home Tab -->
+    <LinearLayout
         android:id="@+id/navHome"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:padding="14dp"
-        android:src="@drawable/ic_home"
-        app:tint="@color/text_secondary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="8dp"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="6dp"
+        android:minHeight="48dp"
+        android:background="@android:color/transparent">
 
-    <ImageView
+        <ImageView
+            android:id="@+id/navHomeIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_home"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/navHomeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Trang chủ"
+            android:textColor="@color/primary"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Search Tab -->
+    <LinearLayout
         android:id="@+id/navSearch"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:padding="14dp"
-        android:src="@drawable/ic_search"
-        app:tint="@color/text_secondary"
-        app:layout_constraintStart_toEndOf="@id/navHome"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="6dp"
+        android:minHeight="48dp"
+        android:background="@android:color/transparent">
 
-    <ImageView
+        <ImageView
+            android:id="@+id/navSearchIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_search"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/navSearchText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tìm kiếm"
+            android:textColor="@color/primary"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Learning Tab -->
+    <LinearLayout
         android:id="@+id/navCourses"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:padding="14dp"
-        android:src="@drawable/ic_book"
-        app:tint="@color/text_secondary"
-        app:layout_constraintStart_toEndOf="@id/navSearch"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="6dp"
+        android:minHeight="48dp"
+        android:background="@android:color/transparent">
 
-    <ImageView
+        <ImageView
+            android:id="@+id/navCoursesIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_book"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/navCoursesText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Học tập"
+            android:textColor="@color/primary"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Profile Tab -->
+    <LinearLayout
         android:id="@+id/navProfile"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:padding="14dp"
-        android:src="@drawable/ic_person"
-        app:tint="@color/text_secondary"
-        app:layout_constraintStart_toEndOf="@id/navCourses"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginStart="8dp"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="6dp"
+        android:minHeight="48dp"
+        android:background="@android:color/transparent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageView
+            android:id="@+id/navProfileIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_person"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/navProfileText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tôi"
+            android:textColor="@color/primary"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</LinearLayout>

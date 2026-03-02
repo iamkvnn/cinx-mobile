@@ -1,40 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- nền kính rất nhẹ -->
+    <!-- Outermost soft shadow / depth -->
     <item>
         <shape>
-            <solid android:color="#20000000"/>
-            <corners android:radius="24dp"/>
+            <solid android:color="#0A000000"/>
+            <corners android:radius="40dp"/>
         </shape>
     </item>
 
-    <!-- viền kính -->
-    <item>
+    <!-- The actual frosted glass body -->
+    <item android:bottom="2dp" android:left="1dp" android:right="1dp">
         <shape>
-            <solid android:color="@android:color/transparent"/>
+            <!-- White semi-transparent inner background representing blur on a light canvas -->
+            <solid android:color="#D9FFFFFF"/>
+            
+            <!-- Crispy white edge to simulate iOS fluid glass light reflection -->
             <stroke
-                android:width="4dp"
-                android:color="#33FFFFFF"/>
-            <corners android:radius="24dp"/>
+                android:width="1.5dp"
+                android:color="#FFFFFF"/>
+            <corners android:radius="40dp"/>
         </shape>
     </item>
 
-    <!-- highlight phía trên (inset shadow) -->
+    <!-- Subtle inner highlight directly below the top edge -->
     <item
-        android:top="1dp"
-        android:left="1dp"
-        android:right="1dp">
+        android:top="2dp"
+        android:left="2dp"
+        android:right="2dp"
+        android:bottom="8dp">
         <shape>
             <gradient
                 android:angle="270"
-                android:startColor="#43FFFFFF"
+                android:startColor="#66FFFFFF"
                 android:endColor="@android:color/transparent"/>
-            <corners android:radius="24dp"/>
+            <corners android:radius="38dp"/>
         </shape>
     </item>
-
-    <item
-        android:drawable="@drawable/noise"
-        android:alpha="0.001"/>
 
 </layer-list>

@@ -59,19 +59,32 @@ public class NavHelper {
     }
 
     private static void setActiveState(View view, boolean isActive) {
-        if (view instanceof ImageView) {
-             ImageView icon = (ImageView) view;
-             if (isActive) {
-                 icon.setColorFilter(icon.getContext().getResources().getColor(R.color.primary));
-                 icon.setBackground(ResourcesCompat.getDrawable(icon.getResources(), R.drawable.glass_panel_bg, null));
-                 ViewGroup.LayoutParams params = view.getLayoutParams();
-                 params.width = dpToPx(icon.getContext(), 76);
-                 view.setLayoutParams(params);
-             } else {
-                 icon.setColorFilter(icon.getContext().getResources().getColor(R.color.text_secondary)); // Should define text_secondary or generic grey
-                 icon.setScaleX(1.0f);
-                 icon.setScaleY(1.0f);
-             }
+        if (view instanceof ViewGroup) {
+            ViewGroup container = (ViewGroup) view;
+            ImageView icon = null;
+            android.widget.TextView text = null;
+
+            for (int i = 0; i < container.getChildCount(); i++) {
+                View child = container.getChildAt(i);
+                if (child instanceof ImageView) {
+                    icon = (ImageView) child;
+                } else if (child instanceof android.widget.TextView) {
+                    text = (android.widget.TextView) child;
+                }
+            }
+
+            if (icon != null && text != null) {
+                if (isActive) {
+                    icon.setColorFilter(icon.getContext().getResources().getColor(R.color.primary));
+                    text.setVisibility(View.VISIBLE);
+                    // simple float animation
+                    text.setAlpha(0f);
+                    text.animate().alpha(1f).setDuration(200).start();
+                } else {
+                    icon.setColorFilter(icon.getContext().getResources().getColor(R.color.text_secondary));
+                    text.setVisibility(View.GONE);
+                }
+            }
         }
     }
 }

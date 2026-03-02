@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EduFuture - Chi tiết khóa học</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC; /* Màu nền sáng hơn một chút */
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+        }
+
+        /* Animations */
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .glass-nav-bottom {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border-top: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Segmented Control (Tabs) */
+        .segmented-control {
+            background: rgba(15, 23, 42, 0.05);
+            padding: 4px;
+            border-radius: 20px;
+            display: flex;
+            position: relative;
+        }
+        .segment-btn {
+            flex: 1;
+            padding: 12px 0;
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #64748b;
+            border-radius: 16px;
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s;
+        }
+        .segment-btn.active { color: #1e293b; }
+        .segment-indicator {
+            position: absolute;
+            top: 4px; bottom: 4px; left: 4px;
+            width: calc(33.333% - 2.66px); /* 3 tabs */
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            z-index: 0;
+        }
+
+        /* Accordion transition */
+        .accordion-content {
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .accordion-content.open {
+            max-height: 500px; /* arbitrary max height */
+            opacity: 1;
+        }
+
+        /* Hide Scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Dev Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #68D391;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #68D391;
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-32 overflow-x-hidden relative min-h-screen">
+
+<!-- Dynamic Pastel Background -->
+<div class="fixed inset-0 z-0 pointer-events-none">
+    <div class="absolute top-[-10%] left-[-10%] w-[70%] h-[50%] bg-purple-200/40 rounded-full blur-[80px] mix-blend-multiply animate-blob"></div>
+    <div class="absolute top-[30%] right-[-20%] w-[70%] h-[50%] bg-pink-200/40 rounded-full blur-[80px] mix-blend-multiply animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-[-10%] left-[10%] w-[70%] h-[50%] bg-indigo-200/40 rounded-full blur-[80px] mix-blend-multiply animate-blob animation-delay-4000"></div>
+</div>
+
+<!-- ========================================== -->
+<!-- DEV TOOL: TOGGLE STATE (For preview purpose) -->
+<!-- ========================================== -->
+<div class="fixed top-20 right-4 z-[100] glass-panel rounded-full px-3 py-2 flex items-center gap-2 shadow-lg scale-90 md:scale-100 origin-right">
+    <span class="text-xs font-bold text-slate-500">Chưa mua</span>
+    <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+        <input type="checkbox" name="toggle" id="state-toggle" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer transition-transform duration-200 ease-in-out z-10" onclick="toggleCourseState()"/>
+        <label for="state-toggle" class="toggle-label block overflow-hidden h-5 rounded-full bg-slate-300 cursor-pointer transition-colors duration-200 ease-in-out"></label>
+    </div>
+    <span class="text-xs font-bold text-slate-800">Đã mua</span>
+</div>
+<!-- ========================================== -->
+
+<div class="max-w-md mx-auto relative z-10">
+
+    <!-- Header (Sticky) -->
+    <header id="detail-header" class="fixed top-0 w-full max-w-md z-50 transition-all duration-300 py-3 px-4 glass-header">
+        <div class="flex justify-between items-center">
+            <button class="w-10 h-10 rounded-full bg-white/50 backdrop-blur flex items-center justify-center text-slate-700 shadow-sm active:scale-95 transition-transform" onclick="window.history.back()">
+                <i data-lucide="chevron-left" class="w-6 h-6"></i>
+            </button>
+            <h1 id="header-title" class="text-base font-bold text-slate-800 opacity-0 transition-opacity duration-300 truncate px-4">
+                UI/UX Design Masterclass
+            </h1>
+            <button class="w-10 h-10 rounded-full bg-white/50 backdrop-blur flex items-center justify-center text-slate-700 shadow-sm active:scale-95 transition-transform">
+                <i data-lucide="bookmark" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="pt-20 px-4 pb-6">
+        
+        <!-- Hero Image / Video Player -->
+        <div class="relative w-full aspect-video rounded-[2rem] overflow-hidden shadow-2xl shadow-violet-500/20 mb-6 group cursor-pointer animate-slide-up">
+            <img src="https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=800&q=80" alt="Course Thumbnail" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <!-- Overlay -->
+            <div class="absolute inset-0 bg-slate-900/30 group-hover:bg-slate-900/40 transition-colors"></div>
+            <!-- Play Button -->
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-16 h-16 rounded-full glass-panel border-white/40 flex items-center justify-center pl-1 group-active:scale-90 transition-transform">
+                    <i data-lucide="play" class="w-6 h-6 text-white fill-white"></i>
+                </div>
+            </div>
+            <!-- Purchased State: Progress Overlay (Hidden by default) -->
+            <div id="hero-progress-overlay" class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-900/80 to-transparent hidden">
+                <p class="text-white text-xs font-bold mb-2">Tiến độ khóa học: 30%</p>
+                <div class="w-full h-1.5 bg-white/30 rounded-full overflow-hidden backdrop-blur-sm">
+                    <div class="h-full bg-gradient-to-r from-violet-400 to-fuchsia-400 w-[30%] rounded-full shadow-[0_0_10px_rgba(167,139,250,0.8)]"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meta Info -->
+        <div class="mb-6 animate-slide-up" style="animation-delay: 0.1s;">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="px-2.5 py-1 rounded-md bg-orange-100 text-orange-600 text-[10px] font-bold uppercase tracking-wide">Bestseller</span>
+                <span class="px-2.5 py-1 rounded-md bg-violet-100 text-violet-600 text-[10px] font-bold uppercase tracking-wide">Design</span>
+            </div>
+            
+            <h1 class="text-2xl md:text-3xl font-black leading-tight text-slate-900 mb-3">
+                UI/UX Design Masterclass: Từ Cơ Bản Đến Nâng Cao
+            </h1>
+
+            <p class="text-sm text-slate-500 font-medium mb-4 leading-relaxed">
+                Nắm vững quy trình thiết kế sản phẩm, Figma, Web & Mobile Design, và tạo Portfolio chuyên nghiệp để xin việc.
+            </p>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="glass-panel rounded-2xl p-3 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500 shrink-0">
+                        <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-black text-slate-800 leading-none">4.9</p>
+                        <p class="text-[10px] text-slate-500 font-semibold">(12.5k đánh giá)</p>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-2xl p-3 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 shrink-0">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-black text-slate-800 leading-none">34k+</p>
+                        <p class="text-[10px] text-slate-500 font-semibold">Học viên</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructor -->
+            <div class="glass-panel rounded-2xl p-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full border-2 border-white shadow-md overflow-hidden shrink-0">
+                        <img src="https://ui-avatars.com/api/?name=Ha+Linh&background=random" alt="Instructor" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-semibold mb-0.5">Giảng viên</p>
+                        <p class="text-sm font-bold text-slate-800">Hà Linh (Senior UI/UX)</p>
+                    </div>
+                </div>
+                <button class="text-violet-600 bg-violet-50 p-2 rounded-full active:scale-90 transition-transform">
+                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="sticky top-[68px] z-40 pb-4 pt-2 bg-[#F8FAFC]/80 backdrop-blur-md animate-slide-up" style="animation-delay: 0.2s;">
+            <div class="segmented-control">
+                <div class="segment-indicator" id="tab-indicator"></div>
+                <button class="segment-btn active" onclick="switchTab('about', 0)">Tổng quan</button>
+                <button class="segment-btn" onclick="switchTab('curriculum', 1)">Nội dung</button>
+                <button class="segment-btn" onclick="switchTab('reviews', 2)">Đánh giá</button>
+            </div>
+        </div>
+
+        <!-- TABS CONTENT -->
+        <div class="animate-slide-up" style="animation-delay: 0.3s;">
+            
+            <!-- TAB 1: ABOUT -->
+            <div id="tab-about" class="tab-content block space-y-6">
+                <!-- What you'll learn -->
+                <div class="glass-panel rounded-[1.5rem] p-5">
+                    <h3 class="font-bold text-lg text-slate-800 mb-4">Bạn sẽ học được gì?</h3>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div class="flex items-start gap-3">
+                            <div class="mt-0.5 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 shrink-0">
+                                <i data-lucide="check" class="w-3 h-3 stroke-[3]"></i>
+                            </div>
+                            <p class="text-sm text-slate-600 font-medium">Sử dụng thành thạo Figma từ cơ bản đến Auto Layout, Components.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="mt-0.5 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 shrink-0">
+                                <i data-lucide="check" class="w-3 h-3 stroke-[3]"></i>
+                            </div>
+                            <p class="text-sm text-slate-600 font-medium">Quy trình thiết kế chuẩn UX Research, Wireframe, UI Design, Prototyping.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="mt-0.5 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 shrink-0">
+                                <i data-lucide="check" class="w-3 h-3 stroke-[3]"></i>
+                            </div>
+                            <p class="text-sm text-slate-600 font-medium">Xây dựng Portfolio ấn tượng để ứng tuyển các công ty công nghệ.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Info Blocks -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="glass-panel rounded-[1.5rem] p-4 flex flex-col items-center justify-center text-center">
+                        <i data-lucide="clock" class="w-6 h-6 text-violet-500 mb-2"></i>
+                        <p class="text-xs text-slate-500 font-semibold">Thời lượng</p>
+                        <p class="text-sm font-bold text-slate-800">24 Giờ</p>
+                    </div>
+                    <div class="glass-panel rounded-[1.5rem] p-4 flex flex-col items-center justify-center text-center">
+                        <i data-lucide="award" class="w-6 h-6 text-orange-500 mb-2"></i>
+                        <p class="text-xs text-slate-500 font-semibold">Chứng chỉ</p>
+                        <p class="text-sm font-bold text-slate-800">Cấp sau khóa học</p>
+                    </div>
+                    <div class="glass-panel rounded-[1.5rem] p-4 flex flex-col items-center justify-center text-center">
+                        <i data-lucide="bar-chart" class="w-6 h-6 text-blue-500 mb-2"></i>
+                        <p class="text-xs text-slate-500 font-semibold">Trình độ</p>
+                        <p class="text-sm font-bold text-slate-800">Người mới bắt đầu</p>
+                    </div>
+                    <div class="glass-panel rounded-[1.5rem] p-4 flex flex-col items-center justify-center text-center">
+                        <i data-lucide="smartphone" class="w-6 h-6 text-pink-500 mb-2"></i>
+                        <p class="text-xs text-slate-500 font-semibold">Truy cập</p>
+                        <p class="text-sm font-bold text-slate-800">Trọn đời trên App/Web</p>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <h3 class="font-bold text-lg text-slate-800 mb-2">Mô tả khóa học</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed font-medium line-clamp-4" id="course-desc">
+                        Chào mừng bạn đến với khóa học UI/UX Design toàn diện nhất. Khóa học này được thiết kế đặc biệt cho những người chưa có kinh nghiệm, muốn chuyển ngành hoặc nâng cao kỹ năng thiết kế giao diện và trải nghiệm người dùng. Bạn sẽ được học thông qua các dự án thực tế, từ việc thấu hiểu người dùng đến thiết kế giao diện cuối cùng hoàn chỉnh.
+                    </p>
+                    <button class="text-violet-600 text-sm font-bold mt-2 active:scale-95" onclick="document.getElementById('course-desc').classList.toggle('line-clamp-4')">
+                        Xem thêm / Thu gọn
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 2: CURRICULUM -->
+            <div id="tab-curriculum" class="tab-content hidden space-y-3">
+                
+                <!-- Section 1 -->
+                <div class="glass-panel rounded-[1.5rem] overflow-hidden">
+                    <button class="w-full p-4 flex justify-between items-center bg-white/40 active:bg-white/60 transition-colors" onclick="toggleAccordion('sec-1', this)">
+                        <div class="text-left">
+                            <h4 class="font-bold text-slate-800 text-sm">Chương 1: Nhập môn UI/UX</h4>
+                            <p class="text-[11px] text-slate-500 font-semibold mt-1">3 Bài học • 45 phút</p>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform duration-300 transform rotate-180"></i>
+                    </button>
+                    <div id="sec-1" class="accordion-content open">
+                        <div class="p-2 space-y-1 bg-white/20">
+                            <!-- Lesson Item (Free / Completed) -->
+                            <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 transition cursor-pointer group lesson-item">
+                                <div class="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center shrink-0 state-icon-container text-violet-600">
+                                    <i data-lucide="play-circle" class="w-4 h-4 state-icon"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-bold text-slate-800 group-hover:text-violet-600 transition-colors">1.1 UI và UX là gì?</p>
+                                    <p class="text-[10px] text-slate-500 font-semibold mt-0.5">Video • 12:30</p>
+                                </div>
+                                <span class="text-xs font-bold text-violet-600 bg-violet-50 px-2 py-1 rounded-md preview-badge">Xem trước</span>
+                            </div>
+                            
+                            <!-- Lesson Item (Locked / To do) -->
+                            <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 transition cursor-pointer group lesson-item locked-by-default">
+                                <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0 state-icon-container text-slate-400">
+                                    <i data-lucide="lock" class="w-4 h-4 state-icon"></i>
+                                </div>
+                                <div class="flex-1 opacity-70 state-opacity">
+                                    <p class="text-sm font-bold text-slate-800">1.2 Quy trình thiết kế sản phẩm</p>
+                                    <p class="text-[10px] text-slate-500 font-semibold mt-0.5">Video • 18:00</p>
+                                </div>
+                            </div>
+
+                            <!-- Lesson Item (Quiz) -->
+                            <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 transition cursor-pointer group lesson-item locked-by-default">
+                                <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0 state-icon-container text-slate-400">
+                                    <i data-lucide="lock" class="w-4 h-4 state-icon"></i>
+                                </div>
+                                <div class="flex-1 opacity-70 state-opacity">
+                                    <p class="text-sm font-bold text-slate-800">Quiz: Kiểm tra kiến thức Chương 1</p>
+                                    <p class="text-[10px] text-slate-500 font-semibold mt-0.5">Bài tập • 15 câu</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2 -->
+                <div class="glass-panel rounded-[1.5rem] overflow-hidden">
+                    <button class="w-full p-4 flex justify-between items-center bg-white/40 active:bg-white/60 transition-colors" onclick="toggleAccordion('sec-2', this)">
+                        <div class="text-left">
+                            <h4 class="font-bold text-slate-800 text-sm">Chương 2: Làm quen với Figma</h4>
+                            <p class="text-[11px] text-slate-500 font-semibold mt-1">5 Bài học • 2 giờ 10 phút</p>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform duration-300"></i>
+                    </button>
+                    <div id="sec-2" class="accordion-content">
+                        <div class="p-2 space-y-1 bg-white/20">
+                            <!-- Items generate dynamically or statics -->
+                            <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 transition cursor-pointer group lesson-item locked-by-default">
+                                <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0 state-icon-container text-slate-400">
+                                    <i data-lucide="lock" class="w-4 h-4 state-icon"></i>
+                                </div>
+                                <div class="flex-1 opacity-70 state-opacity">
+                                    <p class="text-sm font-bold text-slate-800">2.1 Cài đặt và giao diện cơ bản</p>
+                                    <p class="text-[10px] text-slate-500 font-semibold mt-0.5">Video • 20:00</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 transition cursor-pointer group lesson-item locked-by-default">
+                                <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0 state-icon-container text-slate-400">
+                                    <i data-lucide="lock" class="w-4 h-4 state-icon"></i>
+                                </div>
+                                <div class="flex-1 opacity-70 state-opacity">
+                                    <p class="text-sm font-bold text-slate-800">2.2 Shapes, Text, và Colors</p>
+                                    <p class="text-[10px] text-slate-500 font-semibold mt-0.5">Video • 25:00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TAB 3: REVIEWS -->
+            <div id="tab-reviews" class="tab-content hidden space-y-4">
+                <div class="glass-panel rounded-[1.5rem] p-5 flex items-center gap-6">
+                    <div class="text-center shrink-0">
+                        <h2 class="text-4xl font-black text-slate-800">4.9</h2>
+                        <div class="flex text-yellow-400 justify-center my-1 gap-0.5">
+                            <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                            <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                            <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                            <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                            <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                        </div>
+                        <p class="text-[10px] text-slate-500 font-bold">12,500 đánh giá</p>
+                    </div>
+                    <div class="flex-1 space-y-1">
+                        <!-- Progress bars for ratings -->
+                        <div class="flex items-center gap-2 text-[10px] font-bold text-slate-500">
+                            <span>5</span>
+                            <div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-yellow-400 w-[85%] rounded-full"></div></div>
+                            <span class="w-6 text-right">85%</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-[10px] font-bold text-slate-500">
+                            <span>4</span>
+                            <div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-yellow-400 w-[10%] rounded-full"></div></div>
+                            <span class="w-6 text-right">10%</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-[10px] font-bold text-slate-500">
+                            <span>3</span>
+                            <div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-yellow-400 w-[3%] rounded-full"></div></div>
+                            <span class="w-6 text-right">3%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review list -->
+                <div class="space-y-3">
+                    <div class="glass-panel rounded-[1.5rem] p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-2">
+                                <img src="https://i.pravatar.cc/150?u=12" class="w-8 h-8 rounded-full border border-white">
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800">Minh Tuấn</p>
+                                    <p class="text-[10px] text-slate-500">2 ngày trước</p>
+                                </div>
+                            </div>
+                            <div class="flex text-yellow-400 gap-0.5">
+                                <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                                <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                                <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                                <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                                <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-600 font-medium">Khóa học rất chi tiết và dễ hiểu. Nhờ thực hành theo project cuối khóa mà mình đã pass phỏng vấn Fresher UI/UX. Cảm ơn mentor Hà Linh!</p>
+                    </div>
+
+                    <div class="glass-panel rounded-[1.5rem] p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-2">
+                                <img src="https://i.pravatar.cc/150?u=15" class="w-8 h-8 rounded-full border border-white">
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800">Thảo My</p>
+                                    <p class="text-[10px] text-slate-500">1 tuần trước</p>
+                                </div>
+                            </div>
+                            <div class="flex text-yellow-400 gap-0.5">
+                                <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                                <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                                <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                                <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                                <i data-lucide="star" class="w-3 h-3"></i>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-600 font-medium">Nội dung Auto Layout được giải thích rất kỹ, tuy nhiên phần Prototyping hơi lướt nhanh. Nhìn chung vẫn rất đáng tiền.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Bottom Action Bar (Fixed) -->
+    <div class="fixed bottom-0 left-0 right-0 w-full z-50 glass-nav-bottom pb-8 pt-4 px-4 md:pb-6">
+        <div class="max-w-md mx-auto relative">
+            
+            <!-- STATE 1: UNPURCHASED (Guest) -->
+            <div id="action-unpurchased" class="flex items-center gap-4">
+                <div class="flex-col justify-center shrink-0 pl-2">
+                    <p class="text-xs text-slate-500 font-semibold line-through">1,200,000đ</p>
+                    <p class="text-xl font-black text-violet-600">599,000đ</p>
+                </div>
+                <div class="flex-1 flex gap-2">
+                    <button class="w-12 h-12 rounded-2xl bg-violet-100 text-violet-600 flex items-center justify-center shrink-0 active:scale-95 transition-transform">
+                        <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                    </button>
+                    <button class="flex-1 h-12 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-bold text-sm shadow-lg shadow-violet-500/30 active:scale-95 transition-transform" onclick="toggleCourseState()">
+                        Mua ngay
+                    </button>
+                </div>
+            </div>
+
+            <!-- STATE 2: PURCHASED (Enrolled) -->
+            <div id="action-purchased" class="hidden items-center gap-3">
+                <div class="flex-1">
+                    <div class="flex justify-between items-center mb-1.5">
+                        <p class="text-xs font-bold text-slate-600">Tiến độ học tập</p>
+                        <p class="text-xs font-bold text-violet-600">30%</p>
+                    </div>
+                    <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 w-[30%] rounded-full"></div>
+                    </div>
+                </div>
+                <button class="w-1/2 h-12 rounded-2xl bg-slate-900 text-white font-bold text-sm shadow-xl shadow-slate-900/20 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                    Tiếp tục học <i data-lucide="play-circle" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Initialize Icons
+    lucide.createIcons();
+
+    // 1. Handle Scroll for Header
+    window.addEventListener('scroll', () => {
+        const header = document.getElementById('detail-header');
+        const title = document.getElementById('header-title');
+        
+        if (window.scrollY > 150) {
+            title.classList.remove('opacity-0');
+            title.classList.add('opacity-100');
+        } else {
+            title.classList.add('opacity-0');
+            title.classList.remove('opacity-100');
+        }
+    });
+
+    // 2. Tabs Logic
+    function switchTab(tabId, index) {
+        // Update Buttons
+        const btns = document.querySelectorAll('.segment-btn');
+        btns.forEach(btn => btn.classList.remove('active'));
+        btns[index].classList.add('active');
+
+        // Update Indicator position (33.33% per tab)
+        const indicator = document.getElementById('tab-indicator');
+        indicator.style.transform = `translateX(${index * 100}%)`;
+
+        // Update Content
+        const contents = document.querySelectorAll('.tab-content');
+        contents.forEach(content => {
+            content.classList.remove('block');
+            content.classList.add('hidden');
+        });
+        document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+        document.getElementById(`tab-${tabId}`).classList.add('block');
+    }
+
+    // 3. Accordion Logic
+    function toggleAccordion(id, btn) {
+        const content = document.getElementById(id);
+        const icon = btn.querySelector('svg');
+        
+        if (content.classList.contains('open')) {
+            content.classList.remove('open');
+            icon.style.transform = 'rotate(0deg)';
+        } else {
+            content.classList.add('open');
+            icon.style.transform = 'rotate(180deg)';
+        }
+    }
+
+    // 4. MOCK LOGIC: Toggle Purchased / Unpurchased State
+    let isPurchased = false;
+
+    function toggleCourseState() {
+        isPurchased = !isPurchased;
+        const toggleInput = document.getElementById('state-toggle');
+        toggleInput.checked = isPurchased;
+
+        // Bottom Nav toggle
+        const actionUnpurchased = document.getElementById('action-unpurchased');
+        const actionPurchased = document.getElementById('action-purchased');
+
+        // Hero Overlay toggle
+        const heroProgress = document.getElementById('hero-progress-overlay');
+
+        if (isPurchased) {
+            // Show Enrolled state
+            actionUnpurchased.classList.add('hidden');
+            actionUnpurchased.classList.remove('flex');
+            actionPurchased.classList.remove('hidden');
+            actionPurchased.classList.add('flex');
+
+            heroProgress.classList.remove('hidden');
+
+            // Update Curriculum UI: Unlock items
+            updateCurriculumUI(true);
+        } else {
+            // Show Guest state
+            actionPurchased.classList.add('hidden');
+            actionPurchased.classList.remove('flex');
+            actionUnpurchased.classList.remove('hidden');
+            actionUnpurchased.classList.add('flex');
+
+            heroProgress.classList.add('hidden');
+
+            // Update Curriculum UI: Lock items
+            updateCurriculumUI(false);
+        }
+    }
+
+    // Update Curriculum icons based on state
+    function updateCurriculumUI(purchased) {
+        const lockedItems = document.querySelectorAll('.locked-by-default');
+        const previewBadges = document.querySelectorAll('.preview-badge');
+
+        lockedItems.forEach((item, index) => {
+            const iconContainer = item.querySelector('.state-icon-container');
+            const opacityWrapper = item.querySelector('.state-opacity');
+            
+            if (purchased) {
+                // Unlock
+                opacityWrapper.classList.remove('opacity-70');
+                iconContainer.className = 'w-8 h-8 rounded-full flex items-center justify-center shrink-0 state-icon-container bg-violet-100 text-violet-600';
+                
+                // Mock: first 2 are completed, rest are to-do
+                if(index < 2) {
+                    iconContainer.className = 'w-8 h-8 rounded-full flex items-center justify-center shrink-0 state-icon-container bg-green-100 text-green-600';
+                    iconContainer.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4 state-icon"></i>';
+                } else if (index === 2) {
+                    // current learning
+                    iconContainer.innerHTML = '<i data-lucide="play-circle" class="w-4 h-4 state-icon"></i>';
+                } else {
+                    iconContainer.innerHTML = '<i data-lucide="play" class="w-4 h-4 state-icon"></i>';
+                }
+
+            } else {
+                // Lock
+                opacityWrapper.classList.add('opacity-70');
+                iconContainer.className = 'w-8 h-8 rounded-full flex items-center justify-center shrink-0 state-icon-container bg-slate-100 text-slate-400';
+                iconContainer.innerHTML = '<i data-lucide="lock" class="w-4 h-4 state-icon"></i>';
+            }
+        });
+
+        // Hide/Show "Xem trước" (Preview) badges
+        previewBadges.forEach(badge => {
+            badge.style.display = purchased ? 'none' : 'block';
+        });
+
+        // Re-render new icons
+        lucide.createIcons();
+    }
+
+</script>
+</body>
+</html>

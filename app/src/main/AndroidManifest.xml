@@ -41,6 +41,11 @@
             android:name=".MyLearningActivity"
             android:exported="false"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name=".CourseDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+
     </application>
 
 </manifest>

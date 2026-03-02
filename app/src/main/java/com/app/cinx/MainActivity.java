@@ -179,18 +179,8 @@ public class MainActivity extends AppCompatActivity {
         CourseAdapter courseAdapter = new CourseAdapter(courses, new CourseAdapter.OnCourseClickListener() {
             @Override
             public void onCourseClick(Course course) {
-                Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
-                        "Đã lưu thành công", Snackbar.LENGTH_SHORT);
-
-                View sbView = snackbar.getView();
-                sbView.setBackgroundResource(R.drawable.bg_toast);
-
-                TextView text = sbView.findViewById(com.google.android.material.R.id.snackbar_text);
-                text.setTextColor(Color.WHITE);
-                text.setTextSize(14f);
-
-                snackbar.show();
-                //showCustomToast(MainActivity.this, "Clicked: " + course.getTitle());
+                android.content.Intent intent = new android.content.Intent(MainActivity.this, CourseDetailActivity.class);
+                startActivity(intent);
             }
 
             @Override
