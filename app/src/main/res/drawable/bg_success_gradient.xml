@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Soft gradient background for the payment-success screen -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:startColor="@color/success_bg_start"
+        android:endColor="@color/success_bg_end"
+        android:angle="135"
+        android:type="linear" />
+</shape>

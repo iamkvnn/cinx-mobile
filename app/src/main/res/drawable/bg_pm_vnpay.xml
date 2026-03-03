@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Blue rounded square background for VNPAY icon -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/checkout_vnpay_bg" />
+    <corners android:radius="12dp" />
+</shape>

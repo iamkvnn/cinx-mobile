@@ -36,6 +36,16 @@
     <color name="cart_delete_bg">#EF4444</color>    <!-- swipe-to-delete red -->
     <color name="cart_discount_text">#10B981</color> <!-- discount green       -->
     <color name="cart_empty_icon">#8B5CF6</color>    <!-- empty state icon     -->
+
+    <!-- Checkout screen -->
+    <color name="checkout_momo_bg">#AE2070</color>
+    <color name="checkout_vnpay_bg">#005BAA</color>
+    <color name="checkout_card_bg">#1E293B</color>
+    <color name="checkout_selected_border">#7C3AED</color>
+    <color name="checkout_order_code_bg">#F5F3FF</color>
+    <color name="success_green">#10B981</color>
+    <color name="success_bg_start">#EEF2FF</color>
+    <color name="success_bg_end">#F5F3FF</color>
 <!--    <color name="star_color">#FBBF24</color>-->
 <!--    <color name="white_alpha_90">#E6FFFFFF</color>-->
 </resources>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  item_payment_method.xml
+  Single row in the payment-method list.
+  The root background is swapped programmatically between
+  bg_payment_method_item (default) and bg_payment_method_selected.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/bg_payment_method_item"
+    android:padding="14dp"
+    android:layout_marginBottom="10dp">
+
+    <!-- Coloured icon square -->
+    <FrameLayout
+        android:id="@+id/iconWrapper"
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:background="@drawable/bg_pm_momo">
+
+        <ImageView
+            android:id="@+id/ivPaymentIcon"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_pm_momo" />
+    </FrameLayout>
+
+    <!-- Name + description -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="12dp">
+
+        <TextView
+            android:id="@+id/tvPaymentName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ví MoMo"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvPaymentDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Thanh toán nhanh qua App"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- Radio button -->
+    <RadioButton
+        android:id="@+id/rbPayment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:focusable="false"
+        android:buttonTint="@color/primary" />
+
+</LinearLayout>

@@ -1,5 +1,6 @@
 package com.app.cinx;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -257,9 +258,16 @@ public class CartActivity extends AppCompatActivity
             long total = calculateTotal();
             if (total == 0) {
                 Toast.makeText(this, getString(R.string.cart_no_items_selected), Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, getString(R.string.cart_checkout_placeholder, Convert.formatVnd(total)), Toast.LENGTH_SHORT).show();
+                return;
             }
+            Intent intent = new Intent(this, CheckoutActivity.class);
+            if (appliedVoucher != null) {
+                intent.putExtra(CheckoutActivity.EXTRA_VOUCHER_PERCENT,
+                        appliedVoucher.getDiscountPercent());
+                intent.putExtra(CheckoutActivity.EXTRA_VOUCHER_TITLE,
+                        appliedVoucher.getTitle());
+            }
+            startActivity(intent);
         });
     }
 

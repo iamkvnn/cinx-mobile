@@ -44,6 +44,7 @@ dependencies {
     annotationProcessor(libs.glide.compiler)
     implementation(libs.viewpager2)
     implementation(libs.coordinatorlayout)
+    implementation(libs.lottie)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

@@ -40,5 +40,39 @@
     <string name="cart_enter_promo_code">Vui lòng nhập mã khuyến mãi</string>
     <string name="cart_promo_applied">Đã áp dụng giảm %1$d%%!</string>
     <string name="cart_promo_invalid">Mã khuyến mãi không hợp lệ</string>
+
+    <!-- Checkout screen -->
+    <string name="checkout_title">Thanh toán</string>
+    <string name="checkout_back">Quay lại</string>
+    <string name="checkout_receiver_title">Thông tin nhận khóa học</string>
+    <string name="checkout_main_account">Tài khoản chính</string>
+    <string name="checkout_order_section">Đơn hàng của bạn (%1$d)</string>
+    <string name="checkout_payment_title">Phương thức thanh toán</string>
+    <string name="checkout_detail_title">Chi tiết thanh toán</string>
+    <string name="checkout_subtotal">Tổng tiền hàng (%1$d khóa)</string>
+    <string name="checkout_voucher_discount">Giảm giá Voucher</string>
+    <string name="checkout_total_label">Tổng thanh toán:</string>
+    <string name="checkout_place_order">Đặt hàng</string>
+    <string name="checkout_processing">Đang xử lý…</string>
+    <string name="checkout_no_payment_method">Vui lòng chọn phương thức thanh toán</string>
+
+    <!-- Payment method labels -->
+    <string name="pm_momo_name">Ví MoMo</string>
+    <string name="pm_momo_desc">Thanh toán nhanh qua App</string>
+    <string name="pm_vnpay_name">VNPAY-QR</string>
+    <string name="pm_vnpay_desc">Quét mã qua App ngân hàng</string>
+    <string name="pm_card_name">Thẻ Visa/Mastercard</string>
+    <string name="pm_card_desc">Hỗ trợ thẻ nội địa &amp; quốc tế</string>
+
+    <!-- Success screen -->
+    <string name="success_title">Thanh toán thành công!</string>
+    <string name="success_desc">Cảm ơn bạn đã mua khóa học. Biên lai đã được gửi đến\nemail %1$s.</string>
+    <string name="success_order_code_label">MÃ ĐƠN HÀNG</string>
+    <string name="success_copy">Sao chép</string>
+    <string name="success_copied">Đã sao chép!</string>
+    <string name="success_go_learn">Vào học ngay</string>
+    <string name="success_go_home">Về trang chủ</string>
+    <string name="success_terms">Nhấn \"Đặt hàng\" đồng nghĩa với việc bạn đồng ý với </string>
+    <string name="success_terms_link">Điều khoản EduFuture</string>
 </resources>
 

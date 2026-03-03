@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  activity_payment_success.xml
+  Thanh-toán thành công (Success) screen.
+
+  Layout:
+    FrameLayout (full-screen)
+      LottieAnimationView  ← confetti (behind everything)
+      ScrollView
+        LinearLayout (centered content)
+          LottieAnimationView  ← success checkmark
+          TV title / description
+          Order-code card
+          Buttons
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_success_gradient">
+
+    <!-- ── Confetti animation (full-screen, beneath content) ──────── -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieConfetti"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        app:lottie_rawRes="@raw/lottie_confetti"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false" />
+
+    <!-- ── Scrollable foreground content ─────────────────────────── -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="32dp"
+            android:paddingTop="80dp"
+            android:paddingBottom="40dp">
+
+            <!-- ── Success check animation ──────────────────────── -->
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottieCheck"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                app:lottie_rawRes="@raw/lottie_success_check"
+                app:lottie_autoPlay="false"
+                app:lottie_loop="false" />
+
+            <!-- ── Title ─────────────────────────────────────────── -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:text="@string/success_title"
+                android:textColor="@color/text_primary"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <!-- ── Description (filled in Java) ─────────────────── -->
+            <TextView
+                android:id="@+id/tvSuccessDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.4"
+                android:text="Cảm ơn bạn đã mua khóa học."
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+
+            <!-- ── Order code card ───────────────────────────────── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:background="@drawable/bg_order_code"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.12"
+                    android:text="@string/success_order_code_label"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="6dp">
+
+                    <TextView
+                        android:id="@+id/tvOrderCode"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="monospace"
+                        android:text="EDUF-XXXXXX"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/btnCopyCode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_btn_copy"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp"
+                        android:text="@string/success_copy"
+                        android:textColor="@color/primary"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ── Primary button: go learn ─────────────────────── -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnGoLearn"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="28dp"
+                android:background="@drawable/bg_btn_dark"
+                android:drawableEnd="@drawable/ic_play_circle"
+                android:stateListAnimator="@null"
+                android:text="@string/success_go_learn"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <!-- ── Secondary button: go home ─────────────────────── -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnGoHome"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_btn_outline"
+                android:stateListAnimator="@null"
+                android:text="@string/success_go_home"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>
