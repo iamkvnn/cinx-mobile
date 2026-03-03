@@ -31,6 +31,11 @@
 
     <!-- Other Colors -->
     <color name="divider">#E2E8F0</color>
+
+    <!-- Cart screen -->
+    <color name="cart_delete_bg">#EF4444</color>    <!-- swipe-to-delete red -->
+    <color name="cart_discount_text">#10B981</color> <!-- discount green       -->
+    <color name="cart_empty_icon">#8B5CF6</color>    <!-- empty state icon     -->
 <!--    <color name="star_color">#FBBF24</color>-->
 <!--    <color name="white_alpha_90">#E6FFFFFF</color>-->
 </resources>

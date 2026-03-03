@@ -77,6 +77,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (!UserManager.getInstance().isLoggedIn() && autoScrollHandler != null && autoScrollRunnable != null) {
+            startAutoScroll();
+        }
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         if (autoScrollHandler != null && autoScrollRunnable != null) {

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    view_lesson_video.xml
+    Embedded as <include> inside activity_lesson.xml for VIDEO type lessons.
+    Displays a thumbnail-based video player placeholder (tap to play).
+    In a production app replace FrameLayout with a PlayerView (ExoPlayer).
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- ===== 16:9 VIDEO PLAYER AREA ===== -->
+    <FrameLayout
+        android:id="@+id/videoPlayerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="210dp"
+        android:layout_marginStart="-16dp"
+        android:layout_marginEnd="-16dp"
+        android:background="#000000">
+
+        <!-- Thumbnail -->
+        <ImageView
+            android:id="@+id/ivVideoThumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:contentDescription="Video thumbnail"
+            tools:src="@drawable/ic_play_circle" />
+
+        <!-- Dark overlay for better icon visibility -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#44000000" />
+
+        <!-- Play / Pause button (center) -->
+        <FrameLayout
+            android:id="@+id/btnVideoPlay"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_circle_outline"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:id="@+id/ivPlayPauseIcon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_play"
+                android:tint="@android:color/white"
+                android:contentDescription="Play" />
+        </FrameLayout>
+
+        <!-- Duration badge (bottom right) -->
+        <TextView
+            android:id="@+id/tvVideoDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="10dp"
+            android:background="#CC000000"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:textColor="@android:color/white"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            tools:text="12:30" />
+
+        <!-- Progress bar at bottom of player -->
+        <ProgressBar
+            android:id="@+id/videoProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_gravity="bottom"
+            android:progress="0"
+            android:progressDrawable="@drawable/bg_progress_bar_fill"
+            android:background="@drawable/bg_progress_bar_track" />
+
+    </FrameLayout>
+
+    <!-- ===== INFO BAR BELOW PLAYER ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingTop="16dp"
+        android:paddingBottom="4dp">
+
+        <!-- Video type badge -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Video"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#7C3AED"
+            android:background="@drawable/bg_icon_purple"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="5dp" />
+
+        <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1"/>
+
+        <!-- Duration label -->
+        <TextView
+            android:id="@+id/tvVideoMeta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_clock"
+            android:drawablePadding="4dp"
+            android:textSize="12sp"
+            android:textColor="@color/text_secondary"
+            tools:text="12:30" />
+    </LinearLayout>
+
+    <!-- ===== LESSON TITLE ===== -->
+    <TextView
+        android:id="@+id/tvVideoTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"
+        android:paddingTop="4dp"
+        android:paddingBottom="12dp"
+        android:lineHeight="28dp"
+        tools:text="Giao diện cơ bản của Figma" />
+
+    <!-- ===== CHAPTER BREADCRUMB ===== -->
+    <TextView
+        android:id="@+id/tvVideoChapter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@color/text_secondary"
+        android:paddingBottom="8dp"
+        tools:text="Chương 2: Làm quen với Figma" />
+
+    <!-- ===== DIVIDER ===== -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"
+        android:layout_marginVertical="8dp" />
+
+    <!-- ===== ABOUT THIS LESSON SECTION ===== -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Về bài học này"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"
+        android:paddingTop="4dp"
+        android:paddingBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tvVideoDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/text_secondary"
+        android:lineSpacingMultiplier="1.5"
+        android:paddingBottom="16dp"
+        tools:text="Trong bài học này bạn sẽ khám phá giao diện cơ bản của Figma, các công cụ chính, và cách điều hướng trong bản thiết kế." />
+
+</LinearLayout>

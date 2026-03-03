@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_lesson_sheet.xml
+    A single row in the curriculum bottom sheet RecyclerView.
+    States: default (white), active (purple tint, left accent), completed (green check, strikethrough), locked (gray).
+-->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="4dp">
+
+    <!-- Background card — state is swapped programmatically -->
+    <LinearLayout
+        android:id="@+id/lessonRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_lesson_default"
+        android:padding="12dp">
+
+        <!-- Left accent bar (active indicator) -->
+        <View
+            android:id="@+id/viewActiveAccent"
+            android:layout_width="3dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/primary"
+            android:visibility="gone" />
+
+        <!-- Icon container -->
+        <FrameLayout
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="12dp">
+
+            <!-- State icon -->
+            <ImageView
+                android:id="@+id/ivLessonIcon"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center"
+                android:contentDescription="Lesson state"
+                tools:src="@drawable/ic_play_circle" />
+        </FrameLayout>
+
+        <!-- Title + Subtitle -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvLessonSheetTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:maxLines="2"
+                android:ellipsize="end"
+                tools:text="Giao diện cơ bản của Figma" />
+
+            <TextView
+                android:id="@+id/tvLessonSheetMeta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="2dp"
+                tools:text="Video • 12:30" />
+        </LinearLayout>
+
+        <!-- Right indicator: playing bars if active, arrow if navigable -->
+        <ImageView
+            android:id="@+id/ivActiveIndicator"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_bar_chart"
+            android:contentDescription="Now playing"
+            android:visibility="gone"
+            app:tint="@color/primary" />
+    </LinearLayout>
+
+</FrameLayout>

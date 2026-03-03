@@ -52,35 +52,85 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
                 android:orientation="vertical">
 
                 <!-- Header -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
                     android:paddingHorizontal="24dp"
                     android:paddingTop="32dp"
                     android:paddingBottom="8dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- Title block -->
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Thư viện"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_secondary"
-                        android:textAllCaps="true"
-                        android:letterSpacing="0.05"
-                        android:layout_marginBottom="4dp"/>
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Khám phá"
-                        android:textSize="32sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_primary"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Thư viện"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_secondary"
+                            android:textAllCaps="true"
+                            android:letterSpacing="0.05"
+                            android:layout_marginBottom="4dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Khám phá"
+                            android:textSize="32sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary"/>
+                    </LinearLayout>
+
+                    <!-- Cart button with item-count badge -->
+                    <FrameLayout
+                        android:id="@+id/btnCartBadgeDiscovery"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageButton
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:src="@drawable/ic_shopping_cart"
+                            android:background="@drawable/bg_white_card"
+                            android:elevation="2dp"
+                            android:padding="10dp"
+                            android:clickable="false"
+                            android:focusable="false"
+                            android:contentDescription="@string/cart_title" />
+
+                        <TextView
+                            android:id="@+id/tvCartBadgeDiscovery"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="top|end"
+                            android:layout_marginTop="-4dp"
+                            android:layout_marginEnd="-2dp"
+                            android:background="@drawable/bg_cart_badge"
+                            android:gravity="center"
+                            android:elevation="4dp"
+                            android:textColor="@color/white"
+                            android:textSize="9sp"
+                            android:textStyle="bold"
+                            android:visibility="gone"
+                            tools:text="2"
+                            tools:visibility="visible" />
+                    </FrameLayout>
 
                 </LinearLayout>
 

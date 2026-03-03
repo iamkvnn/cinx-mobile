@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_chapter_header.xml
+    Chapter section label displayed in the curriculum bottom sheet.
+-->
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tvChapterHeader"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="4dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="8dp"
+    android:textSize="10sp"
+    android:textStyle="bold"
+    android:letterSpacing="0.12"
+    android:textAllCaps="true"
+    android:textColor="@color/text_secondary" />

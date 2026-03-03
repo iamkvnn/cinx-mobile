@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_lesson.xml
+    Main container for all lesson types (VIDEO, DOCUMENT, QUIZ).
+    The Activity will show/hide the relevant content section
+    based on the lesson type passed via Intent.
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <!-- ================================================ -->
+    <!-- STICKY HEADER                                    -->
+    <!-- ================================================ -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/glass_panel_bg"
+        android:elevation="4dp"
+        app:elevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="8dp">
+
+            <!-- Close button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClose"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:icon="@drawable/ic_close"
+                app:iconSize="20dp"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:cornerRadius="20dp"
+                app:strokeColor="@color/divider"
+                android:backgroundTint="@color/badge_background" />
+
+            <!-- Chapter + Title -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingHorizontal="12dp">
+
+                <TextView
+                    android:id="@+id/tvChapterLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.12"
+                    android:textColor="@color/primary"
+                    android:textAllCaps="true"
+                    tools:text="Chương 2" />
+
+                <TextView
+                    android:id="@+id/tvLessonTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    tools:text="Làm quen với Figma" />
+            </LinearLayout>
+
+            <!-- Curriculum list button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCurriculum"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:icon="@drawable/ic_list_video"
+                app:iconSize="20dp"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:cornerRadius="20dp"
+                app:strokeColor="@color/divider"
+                android:backgroundTint="@color/badge_background" />
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- ================================================ -->
+    <!-- SCROLLABLE CONTENT                               -->
+    <!-- ================================================ -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="100dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp">
+
+            <!-- ============================================ -->
+            <!-- VIDEO VIEW                                   -->
+            <!-- ============================================ -->
+            <include
+                android:id="@+id/viewVideo"
+                layout="@layout/view_lesson_video"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+            <!-- ============================================ -->
+            <!-- DOCUMENT VIEW                                -->
+            <!-- ============================================ -->
+            <include
+                android:id="@+id/viewDocument"
+                layout="@layout/view_lesson_document"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+            <!-- ============================================ -->
+            <!-- QUIZ VIEW                                    -->
+            <!-- ============================================ -->
+            <include
+                android:id="@+id/viewQuiz"
+                layout="@layout/view_lesson_quiz"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- ================================================ -->
+    <!-- BOTTOM ACTION BAR (fixed, glass)                 -->
+    <!-- ================================================ -->
+    <LinearLayout
+        android:id="@+id/bottomActionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="28dp"
+        android:background="@drawable/glass_nav_bg"
+        android:elevation="8dp"
+        android:gravity="center_vertical">
+
+        <!-- Previous Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPrevLesson"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"
+            app:icon="@drawable/ic_chevron_left"
+            app:iconSize="24dp"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:cornerRadius="16dp"
+            app:strokeColor="@color/divider"
+            android:backgroundTint="@android:color/white" />
+
+        <!-- Space -->
+        <Space android:layout_width="8dp" android:layout_height="1dp" />
+
+        <!-- Primary Action Button (Complete / Check answer / Next) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPrimaryAction"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="Hoàn thành &amp; Tiếp tục"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            app:icon="@drawable/ic_check_circle"
+            app:iconSize="20dp"
+            app:iconGravity="end"
+            app:iconTint="@android:color/white"
+            app:cornerRadius="16dp"
+            android:backgroundTint="@color/text_primary" />
+    </LinearLayout>
+
+    <!-- ================================================ -->
+    <!-- BOTTOM SHEET OVERLAY                             -->
+    <!-- ================================================ -->
+    <View
+        android:id="@+id/sheetOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#66000000"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <!-- ================================================ -->
+    <!-- CURRICULUM BOTTOM SHEET                          -->
+    <!-- ================================================ -->
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/bottomSheetContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:elevation="16dp">
+
+        <LinearLayout
+            android:id="@+id/bottomSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_bottom_sheet"
+            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+            app:behavior_peekHeight="0dp"
+            app:behavior_hideable="true"
+            app:behavior_skipCollapsed="true">
+
+            <!-- Drag handle -->
+            <View
+                android:layout_width="48dp"
+                android:layout_height="4dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_drag_handle" />
+
+            <!-- Sheet Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="20dp"
+                android:paddingBottom="12dp"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nội dung học"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:id="@+id/tvSheetSubtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_secondary"
+                        tools:text="32 bài học • Hoàn thành 30%" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvSheetProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_icon_purple"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary"
+                    tools:text="8/32" />
+            </LinearLayout>
+
+            <!-- Thin divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider"
+                android:layout_marginBottom="4dp" />
+
+            <!-- Lesson list -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvCurriculum"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:maxHeight="420dp"
+                android:minHeight="200dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp"
+                android:clipToPadding="false"
+                android:overScrollMode="never" />
+
+        </LinearLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

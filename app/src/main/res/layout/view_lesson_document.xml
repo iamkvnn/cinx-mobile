@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    view_lesson_document.xml
+    Embedded as <include> inside activity_lesson.xml for DOCUMENT type lessons.
+    Renders rich HTML content (documentHtml) inside a WebView.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- ===== TOP META ROW ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingVertical="12dp">
+
+        <!-- Type badge (icon + label, orange) -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_type_badge_orange"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="6dp">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_document"
+                android:contentDescription="Document" />
+
+            <TextView
+                android:id="@+id/tvDocMeta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="#EA580C"
+                android:textStyle="bold"
+                android:layout_marginStart="6dp"
+                tools:text="Bài đọc • 5 phút" />
+        </LinearLayout>
+
+        <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1"/>
+
+        <!-- Type label badge (matching the dropdown in screenshot) -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tài liệu đọc"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_secondary"
+            android:background="@drawable/bg_icon_gray"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp" />
+    </LinearLayout>
+
+    <!-- ===== THIN GRADIENT DIVIDER ===== -->
+    <View
+        android:layout_width="48dp"
+        android:layout_height="3dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_gradient_button" />
+
+    <!-- ===== HTML CONTENT VIA WEBVIEW ===== -->
+    <WebView
+        android:id="@+id/webViewDocument"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="300dp"
+        android:scrollbars="none"
+        android:overScrollMode="never" />
+
+</LinearLayout>

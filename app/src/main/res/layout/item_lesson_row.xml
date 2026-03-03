@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_lesson_row.xml
+    A single lesson row rendered inside the chapter card in CourseCurriculumAdapter.
+    Contains: Top divider | icon | title + meta | "Xem trước" badge (optional)
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- Thin divider between rows -->
+    <View
+        android:id="@+id/rowDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginHorizontal="16dp"
+        android:background="#F0F0F0" />
+
+    <!-- Row content -->
+    <LinearLayout
+        android:id="@+id/lessonRowContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@color/cardview_light_background">
+
+        <!-- Lesson state icon -->
+        <FrameLayout
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_marginEnd="12dp">
+
+            <ImageView
+                android:id="@+id/ivLessonIcon"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_gravity="center"
+                android:contentDescription="Lesson icon"
+                tools:src="@drawable/ic_play_circle" />
+
+        </FrameLayout>
+
+        <!-- Title + meta (takes remaining width) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvLessonTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="@color/text_primary"
+                android:maxLines="2"
+                android:ellipsize="end"
+                tools:text="1.1 UI và UX là gì?" />
+
+            <TextView
+                android:id="@+id/tvLessonMeta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="2dp"
+                tools:text="Video • 12:30" />
+
+        </LinearLayout>
+
+        <!-- "Xem trước" badge — visible only when lesson.isPreview() -->
+        <TextView
+            android:id="@+id/tvPreviewBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Xem trước"
+            android:textSize="11sp"
+            android:textColor="@color/primary"
+            android:textStyle="bold"
+            android:layout_marginStart="8dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</LinearLayout>

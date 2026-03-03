@@ -7,5 +7,38 @@
     <string name="search">Search</string>
     <string name="courses">Courses</string>
     <string name="profile">Profile</string>
+
+    <!-- Cart screen -->
+    <string name="cart_title">Giỏ hàng</string>
+    <string name="cart_back">Quay lại</string>
+    <string name="cart_clear_all">Xóa\ntất cả</string>
+    <string name="cart_select_all">Chọn tất cả</string>
+    <string name="cart_course_image">Ảnh khóa học</string>
+    <string name="cart_delete_item">Xóa khóa học</string>
+    <string name="cart_by_instructor">Bởi %1$s</string>
+    <string name="cart_voucher_hint">Khuyến mãi / Voucher</string>
+    <string name="cart_voucher_sub">Chọn hoặc nhập mã</string>
+    <string name="cart_voucher_icon">Voucher</string>
+    <string name="cart_payment_details">Chi tiết thanh toán</string>
+    <string name="cart_subtotal_label">Tạm tính (%1$d khóa học)</string>
+    <string name="cart_subtotal_label_default">Tạm tính</string>
+    <string name="cart_discount_label">Giảm giá khuyến mãi</string>
+    <string name="cart_total">Tổng cộng</string>
+    <string name="cart_vat_included">Đã bao gồm thuế VAT</string>
+    <string name="cart_secure_note">Thanh toán an toàn &amp; bảo mật 256-bit</string>
+    <string name="cart_total_label">TỔNG THANH TOÁN</string>
+    <string name="cart_checkout_btn">Thanh toán ›</string>
+    <string name="cart_empty_title">Giỏ hàng trống</string>
+    <string name="cart_empty_desc">Bạn chưa thêm khóa học nào vào giỏ hàng. Hãy khám phá thêm nhé!</string>
+    <string name="cart_explore_btn">Khám phá khóa học →</string>
+    <string name="cart_sheet_title">Chọn Voucher</string>
+    <string name="cart_promo_hint">NHẬP MÃ KHUYẾN MÃI</string>
+    <string name="cart_apply_btn">Áp dụng</string>
+    <string name="cart_voucher_code_label">MÃ: %1$s</string>
+    <string name="cart_no_items_selected">Vui lòng chọn ít nhất 1 khóa học</string>
+    <string name="cart_checkout_placeholder">Thanh toán %1$s (demo)</string>
+    <string name="cart_enter_promo_code">Vui lòng nhập mã khuyến mãi</string>
+    <string name="cart_promo_applied">Đã áp dụng giảm %1$d%%!</string>
+    <string name="cart_promo_invalid">Mã khuyến mãi không hợp lệ</string>
 </resources>
 

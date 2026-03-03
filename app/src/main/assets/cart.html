@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EduFuture - Giỏ hàng</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+        }
+
+        /* Animations */
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .glass-bottom-bar {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border-top: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Cart Item Animation */
+        .cart-item {
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-height: 200px;
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .cart-item.removing {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        .cart-item.collapse-space {
+            max-height: 0;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            border: none !important;
+            overflow: hidden;
+        }
+
+        /* Input highlight */
+        input:focus {
+            outline: none;
+        }
+
+        /* Custom Checkbox */
+        .custom-checkbox input:checked + .checkbox-box {
+            background-color: #7c3aed; /* violet-600 */
+            border-color: #7c3aed;
+        }
+        .custom-checkbox input:checked + .checkbox-box .check-icon {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        /* Swipe to delete layout */
+        .swipe-content {
+            background: #ffffff; /* Dùng nền trắng đặc để không bị xuyên thấu màu đỏ từ dưới lên */
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            width: 100%;
+            z-index: 10;
+        }
+
+        /* Bottom Sheet (Voucher) */
+        .bottom-sheet {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: translateY(100%);
+        }
+        .bottom-sheet.open {
+            transform: translateY(0);
+        }
+        .sheet-overlay {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .sheet-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Hide Scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-slate-800 pb-36 overflow-x-hidden relative min-h-screen flex flex-col">
+
+<!-- Dynamic Pastel Background -->
+<div class="fixed inset-0 z-0 pointer-events-none">
+    <div class="absolute top-[-10%] left-[-10%] w-[70%] h-[50%] bg-blue-200/30 rounded-full blur-[80px] mix-blend-multiply animate-blob"></div>
+    <div class="absolute top-[30%] right-[-20%] w-[70%] h-[50%] bg-violet-200/30 rounded-full blur-[80px] mix-blend-multiply animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-[-10%] left-[10%] w-[70%] h-[50%] bg-fuchsia-200/30 rounded-full blur-[80px] mix-blend-multiply animate-blob animation-delay-4000"></div>
+</div>
+
+<div class="max-w-md mx-auto w-full relative z-10 flex-1 flex flex-col">
+
+    <!-- Header (Sticky) -->
+    <header class="fixed top-0 w-full max-w-md z-50 transition-all duration-300 py-3 px-4 glass-header flex justify-between items-center">
+        <button class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 shadow-sm active:scale-95 transition-transform" onclick="window.history.back()">
+            <i data-lucide="chevron-left" class="w-6 h-6"></i>
+        </button>
+        
+        <h1 class="text-base font-bold text-slate-800">Giỏ hàng</h1>
+
+        <button class="w-10 h-10 flex items-center justify-center text-slate-500 active:text-slate-800 transition-colors" onclick="clearCart()">
+            <span class="text-xs font-bold">Xóa tất cả</span>
+        </button>
+    </header>
+
+    <main class="pt-[76px] px-4 pb-6 flex-1 flex flex-col" id="main-content">
+        
+        <!-- ========================================== -->
+        <!-- HAS ITEMS STATE                            -->
+        <!-- ========================================== -->
+        <div id="cart-has-items" class="flex-1">
+            
+            <!-- Select All Bar -->
+            <div class="flex justify-between items-center mb-4 px-2 animate-slide-up">
+                <label class="custom-checkbox flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" id="selectAllCheckbox" class="hidden" checked onchange="toggleSelectAll(this)">
+                    <div class="checkbox-box w-6 h-6 rounded-[8px] border-2 border-slate-300 flex items-center justify-center transition-all bg-white shadow-sm">
+                        <!-- Sử dụng SVG trực tiếp thay vì Lucide để tránh lỗi ghi đè component -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="text-white opacity-0 scale-50 transition-all duration-200 check-icon">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <span class="text-sm font-bold text-slate-700">Chọn tất cả</span>
+                </label>
+            </div>
+
+            <!-- Items List -->
+            <div id="cart-items-container" class="space-y-4 mb-6">
+                <!-- Javascript will inject items here -->
+            </div>
+
+            <!-- Promo Code Section (Clickable) -->
+            <div onclick="openVoucherSheet()" class="glass-panel p-3 rounded-2xl flex items-center justify-between mb-6 animate-slide-up cursor-pointer active:scale-[0.98] transition-transform" style="animation-delay: 0.1s;">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600 shrink-0">
+                        <i data-lucide="ticket" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-slate-800" id="voucher-title">Khuyến mãi / Voucher</p>
+                        <p class="text-[11px] text-slate-500 font-medium" id="voucher-subtitle">Chọn hoặc nhập mã</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span id="voucher-badge" class="hidden text-[10px] font-bold bg-green-100 text-green-600 px-2 py-1 rounded-md">-20%</span>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="glass-panel p-5 rounded-[2rem] animate-slide-up" style="animation-delay: 0.2s;">
+                <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <i data-lucide="receipt" class="w-5 h-5 text-violet-500"></i> Chi tiết thanh toán
+                </h3>
+                <div class="space-y-3 text-sm font-medium text-slate-600">
+                    <div class="flex justify-between items-center">
+                        <span>Tạm tính (<span id="summary-count">0</span> khóa học)</span>
+                        <span id="summary-subtotal" class="font-semibold text-slate-800">0đ</span>
+                    </div>
+                    <div id="discount-row" class="flex justify-between items-center text-green-600 hidden">
+                        <span>Giảm giá khuyến mãi</span>
+                        <span id="summary-discount" class="font-bold">-0đ</span>
+                    </div>
+                    <div class="h-px w-full bg-slate-200/60 my-3"></div>
+                    <div class="flex justify-between items-end">
+                        <span class="font-bold text-slate-800 pb-1">Tổng cộng</span>
+                        <div class="text-right">
+                            <span id="summary-total" class="text-2xl font-black text-violet-600">0đ</span>
+                            <p class="text-[10px] text-slate-400 mt-1">Đã bao gồm thuế VAT</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security Badge -->
+            <div class="flex items-center justify-center gap-2 mt-6 text-slate-400 opacity-80 animate-slide-up" style="animation-delay: 0.3s;">
+                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                <span class="text-[10px] font-semibold">Thanh toán an toàn & bảo mật 256-bit</span>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- EMPTY STATE                                -->
+        <!-- ========================================== -->
+        <div id="cart-empty" class="hidden flex-1 flex-col items-center justify-center py-10 animate-fade-in">
+            <div class="w-40 h-40 bg-white/50 rounded-full flex items-center justify-center mb-6 shadow-inner relative">
+                <!-- Decorative blobs behind icon -->
+                <div class="absolute inset-0 bg-violet-200/50 rounded-full blur-xl animate-pulse"></div>
+                <i data-lucide="shopping-bag" class="w-16 h-16 text-violet-300 relative z-10 stroke-[1.5]"></i>
+            </div>
+            <h2 class="text-xl font-black text-slate-800 mb-2">Giỏ hàng trống</h2>
+            <p class="text-sm text-slate-500 font-medium text-center mb-8 max-w-[250px]">Bạn chưa thêm khóa học nào vào giỏ hàng. Hãy khám phá thêm nhé!</p>
+            <button class="bg-slate-900 text-white px-8 py-3.5 rounded-full font-bold shadow-xl shadow-slate-900/20 active:scale-95 transition-transform flex items-center gap-2" onclick="window.history.back()">
+                Khám phá khóa học <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Voucher Bottom Sheet -->
+    <div class="fixed inset-0 z-[100] sheet-overlay bg-slate-900/40 backdrop-blur-sm" id="voucher-overlay" onclick="closeVoucherSheet()"></div>
+    <div class="fixed bottom-0 left-0 right-0 z-[110] bottom-sheet" id="voucher-sheet">
+        <div class="max-w-md mx-auto bg-white/95 backdrop-blur-2xl rounded-t-[2.5rem] shadow-2xl h-[65vh] flex flex-col">
+            <!-- Drag Handle -->
+            <div class="w-full pt-4 pb-2 flex justify-center shrink-0 cursor-pointer" onclick="closeVoucherSheet()">
+                <div class="w-12 h-1.5 bg-slate-300 rounded-full"></div>
+            </div>
+            
+            <div class="px-6 pb-4 border-b border-slate-100 shrink-0">
+                <h3 class="text-xl font-black text-slate-800">Chọn Voucher</h3>
+                <div class="mt-4 flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                    <i data-lucide="ticket" class="w-5 h-5 text-slate-400 ml-2"></i>
+                    <input type="text" placeholder="Nhập mã khuyến mãi" class="flex-1 bg-transparent border-none text-sm font-semibold text-slate-800 placeholder:text-slate-400 uppercase outline-none">
+                    <button class="bg-slate-900 text-white px-4 py-2 rounded-lg text-xs font-bold">Áp dụng</button>
+                </div>
+            </div>
+
+            <!-- Voucher List -->
+            <div class="flex-1 overflow-y-auto px-4 py-4 space-y-3 no-scrollbar" id="voucher-list">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Action Bar (Fixed) -->
+    <div id="checkout-bar" class="fixed bottom-0 left-0 right-0 w-full z-40 glass-bottom-bar pb-8 pt-4 px-4 md:pb-6 transition-transform duration-500">
+        <div class="max-w-md mx-auto flex items-center gap-4">
+            <div class="flex-col justify-center shrink-0 pl-2">
+                <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wide mb-0.5">Tổng thanh toán</p>
+                <p id="bottom-bar-total" class="text-xl font-black text-slate-900">0đ</p>
+            </div>
+            <button class="flex-1 h-14 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-bold text-base shadow-lg shadow-violet-500/30 active:scale-95 transition-transform flex items-center justify-center gap-2" onclick="processCheckout()">
+                Thanh toán <i data-lucide="chevron-right" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- DATA ---
+    let cartItems = [
+        {
+            id: 1,
+            title: "UI/UX Design Masterclass: Từ Cơ Bản Đến Nâng Cao",
+            instructor: "Hà Linh",
+            price: 599000,
+            originalPrice: 1200000,
+            image: "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80",
+            selected: true // Thêm trạng thái chọn
+        },
+        {
+            id: 2,
+            title: "Fullstack React & Node.js cho người mới",
+            instructor: "Minh Tuấn",
+            price: 899000,
+            originalPrice: 1500000,
+            image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=300&q=80",
+            selected: true
+        }
+    ];
+
+    const availableVouchers = [
+        { id: 'v1', code: 'EDUFUTURE', title: 'Giảm 20% cho thành viên mới', desc: 'Áp dụng cho mọi khóa học', percent: 20 },
+        { id: 'v2', code: 'PRODEV', title: 'Giảm 10% Lập trình', desc: 'Dành riêng cho khóa Code', percent: 10 },
+        { id: 'v3', code: 'DESIGN50', title: 'Giảm 5% Thiết kế', desc: 'Dành riêng cho khóa Design', percent: 5 }
+    ];
+
+    let appliedVoucher = null;
+
+    // --- UTILS ---
+    function formatMoney(amount) {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    }
+
+    // --- RENDER LOGIC ---
+    function renderCart() {
+        const container = document.getElementById('cart-items-container');
+        
+        container.innerHTML = cartItems.map((item, index) => `
+            <div id="cart-item-${item.id}" class="cart-item relative animate-slide-up mb-4" style="animation-delay: ${index * 0.1}s">
+                
+                <!-- Delete Action (Behind) - Giới hạn width bên phải -->
+                <div class="absolute inset-y-0 right-0 w-[100px] bg-red-500 rounded-[1.5rem] flex items-center justify-end pr-5 cursor-pointer transition-colors shadow-inner" onclick="removeItem(${item.id})">
+                    <div class="w-10 h-10 bg-white/25 rounded-full flex items-center justify-center active:bg-white/40 transition-colors">
+                        <i data-lucide="trash-2" class="w-5 h-5 text-white"></i>
+                    </div>
+                </div>
+
+                <!-- Swipeable Content -->
+                <div class="swipe-content p-3 flex gap-3 relative z-10">
+                    <!-- Checkbox -->
+                    <label class="custom-checkbox flex items-center justify-center cursor-pointer px-1 shrink-0">
+                        <input type="checkbox" class="hidden" ${item.selected ? 'checked' : ''} onchange="toggleItem(${item.id})">
+                        <div class="checkbox-box w-6 h-6 rounded-[8px] border-2 border-slate-300 flex items-center justify-center transition-all bg-white shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="text-white opacity-0 scale-50 transition-all duration-200 check-icon">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                    </label>
+
+                    <!-- Image -->
+                    <div class="w-20 h-20 md:w-24 md:h-24 rounded-xl bg-slate-200 overflow-hidden shrink-0 shadow-sm pointer-events-none">
+                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover">
+                    </div>
+
+                    <!-- Info -->
+                    <div class="flex-1 py-0.5 pr-1 flex flex-col justify-between pointer-events-none">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800 line-clamp-2 leading-snug mb-1">${item.title}</h3>
+                            <p class="text-[11px] text-slate-500 font-medium">Bởi <span class="text-slate-700 font-bold">${item.instructor}</span></p>
+                        </div>
+                        <div class="flex justify-between items-end mt-2">
+                            <div>
+                                <p class="text-[10px] text-slate-400 line-through font-semibold">${formatMoney(item.originalPrice)}</p>
+                                <p class="text-base font-black text-violet-600 leading-none mt-0.5">${formatMoney(item.price)}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        lucide.createIcons();
+        updateSummary();
+        checkEmptyState();
+        initSwipeToDelete();
+
+        // Update Select All Checkbox state
+        const allSelected = cartItems.length > 0 && cartItems.every(i => i.selected);
+        const selectAllInput = document.getElementById('selectAllCheckbox');
+        if (selectAllInput) selectAllInput.checked = allSelected;
+    }
+
+    function initSwipeToDelete() {
+        const items = document.querySelectorAll('.swipe-content');
+        items.forEach(item => {
+            let startX = 0;
+            let currentX = 0;
+            const threshold = -40; // Kéo qua 40px thì mở
+            const maxSwipe = -80; // Độ rộng của nút xóa
+
+            item.addEventListener('touchstart', e => {
+                startX = e.touches[0].clientX;
+                item.style.transition = 'none'; 
+            }, {passive: true});
+
+            item.addEventListener('touchmove', e => {
+                const touchX = e.touches[0].clientX;
+                currentX = touchX - startX;
+                
+                // Chỉ cho phép vuốt sang trái
+                if (currentX < 0) {
+                    const move = Math.max(currentX, maxSwipe - 20); // Tạo độ đàn hồi nhẹ
+                    item.style.transform = `translateX(${move}px)`;
+                } else if (currentX > 0 && item.style.transform !== 'translateX(0px)' && item.style.transform !== '') {
+                    // Cho phép vuốt lại sang phải nếu đang mở
+                    item.style.transform = `translateX(${Math.min(0, maxSwipe + currentX)}px)`;
+                }
+            }, {passive: true});
+
+            item.addEventListener('touchend', e => {
+                item.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                if (currentX < threshold) {
+                    item.style.transform = `translateX(${maxSwipe}px)`; // Mở hẳn nút xóa
+                } else {
+                    item.style.transform = `translateX(0px)`; // Đóng lại
+                }
+            });
+        });
+    }
+
+    function updateSummary() {
+        // Chỉ tính toán các item được chọn
+        const selectedItems = cartItems.filter(item => item.selected);
+        
+        let subtotal = selectedItems.reduce((sum, item) => sum + item.price, 0);
+        let discountPercent = appliedVoucher ? appliedVoucher.percent : 0;
+        let discountAmount = subtotal * (discountPercent / 100);
+        let total = subtotal - discountAmount;
+
+        // Update DOM
+        document.getElementById('summary-count').innerText = selectedItems.length;
+        document.getElementById('summary-subtotal').innerText = formatMoney(subtotal);
+        
+        const discountRow = document.getElementById('discount-row');
+        if (discountPercent > 0 && selectedItems.length > 0) {
+            discountRow.classList.remove('hidden');
+            discountRow.classList.add('flex');
+            document.getElementById('summary-discount').innerText = '-' + formatMoney(discountAmount);
+        } else {
+            discountRow.classList.add('hidden');
+            discountRow.classList.remove('flex');
+        }
+
+        document.getElementById('summary-total').innerText = formatMoney(total);
+        document.getElementById('bottom-bar-total').innerText = formatMoney(total);
+
+        // Disable/Enable checkout button
+        const checkoutBtn = document.querySelector('#checkout-bar button');
+        if (selectedItems.length === 0) {
+            checkoutBtn.classList.add('opacity-50', 'pointer-events-none');
+        } else {
+            checkoutBtn.classList.remove('opacity-50', 'pointer-events-none');
+        }
+    }
+
+    // --- ITEM SELECTION ---
+    function toggleItem(id) {
+        const item = cartItems.find(i => i.id === id);
+        if(item) {
+            item.selected = !item.selected;
+            renderCart(); // Re-render để cập nhật trạng thái "Select All" và tính tiền
+        }
+    }
+
+    function toggleSelectAll(checkbox) {
+        const isChecked = checkbox.checked;
+        cartItems.forEach(item => item.selected = isChecked);
+        renderCart();
+    }
+
+    // --- VOUCHER LOGIC ---
+    function renderVouchers() {
+        const list = document.getElementById('voucher-list');
+        list.innerHTML = availableVouchers.map(v => `
+            <div class="p-4 rounded-2xl border ${appliedVoucher?.id === v.id ? 'border-violet-500 bg-violet-50' : 'border-slate-200 bg-white'} flex justify-between items-center cursor-pointer hover:border-violet-300 transition-colors" onclick="selectVoucher('${v.id}')">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 shrink-0">
+                        <i data-lucide="ticket" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-800 text-sm">${v.title}</p>
+                        <p class="text-xs text-slate-500">${v.desc}</p>
+                        <p class="text-[10px] font-bold text-violet-500 mt-1 uppercase">Mã: ${v.code}</p>
+                    </div>
+                </div>
+                <!-- Radio Check -->
+                <div class="w-5 h-5 rounded-full border-2 ${appliedVoucher?.id === v.id ? 'border-violet-500 flex items-center justify-center' : 'border-slate-300'}">
+                    ${appliedVoucher?.id === v.id ? '<div class="w-2.5 h-2.5 bg-violet-500 rounded-full"></div>' : ''}
+                </div>
+            </div>
+        `).join('');
+        lucide.createIcons();
+    }
+
+    function openVoucherSheet() {
+        renderVouchers();
+        document.getElementById('voucher-sheet').classList.add('open');
+        document.getElementById('voucher-overlay').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeVoucherSheet() {
+        document.getElementById('voucher-sheet').classList.remove('open');
+        document.getElementById('voucher-overlay').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    function selectVoucher(id) {
+        // Toggle (click again to deselect)
+        if (appliedVoucher && appliedVoucher.id === id) {
+            appliedVoucher = null;
+        } else {
+            appliedVoucher = availableVouchers.find(v => v.id === id);
+        }
+        
+        renderVouchers(); // Update checks
+        updateVoucherUI();
+        updateSummary();
+        
+        setTimeout(() => closeVoucherSheet(), 300); // Close automatically after selection
+    }
+
+    function updateVoucherUI() {
+        const title = document.getElementById('voucher-title');
+        const subtitle = document.getElementById('voucher-subtitle');
+        const badge = document.getElementById('voucher-badge');
+
+        if (appliedVoucher) {
+            title.innerText = appliedVoucher.title;
+            subtitle.innerText = `Đã áp dụng mã ${appliedVoucher.code}`;
+            subtitle.classList.replace('text-slate-500', 'text-violet-500');
+            badge.innerText = `-${appliedVoucher.percent}%`;
+            badge.classList.remove('hidden');
+        } else {
+            title.innerText = "Khuyến mãi / Voucher";
+            subtitle.innerText = "Chọn hoặc nhập mã";
+            subtitle.classList.replace('text-violet-500', 'text-slate-500');
+            badge.classList.add('hidden');
+        }
+    }
+
+    function checkEmptyState() {
+        const hasItemsView = document.getElementById('cart-has-items');
+        const emptyView = document.getElementById('cart-empty');
+        const bottomBar = document.getElementById('checkout-bar');
+
+        if (cartItems.length === 0) {
+            // Hide list, show empty state
+            hasItemsView.classList.add('hidden');
+            hasItemsView.classList.remove('flex-1');
+            
+            emptyView.classList.remove('hidden');
+            emptyView.classList.add('flex');
+
+            // Hide bottom bar with slide down animation
+            bottomBar.style.transform = 'translateY(100%)';
+        } else {
+            hasItemsView.classList.remove('hidden');
+            hasItemsView.classList.add('flex-1');
+            
+            emptyView.classList.add('hidden');
+            emptyView.classList.remove('flex');
+
+            // Show bottom bar
+            bottomBar.style.transform = 'translateY(0)';
+        }
+    }
+
+    // --- ACTIONS ---
+    function removeItem(id) {
+        const element = document.getElementById(`cart-item-${id}`);
+        if (!element) return;
+
+        // 1. Slide out to right & fade
+        element.classList.add('removing');
+
+        // 2. Collapse height space after slide out finishes
+        setTimeout(() => {
+            element.classList.add('collapse-space');
+        }, 300); // match transition duration
+
+        // 3. Remove from data and DOM
+        setTimeout(() => {
+            cartItems = cartItems.filter(item => item.id !== id);
+            element.remove();
+            updateSummary();
+            checkEmptyState();
+        }, 700);
+    }
+
+    function clearCart() {
+        if(cartItems.length === 0) return;
+        
+        // Add removing class to all
+        cartItems.forEach(item => {
+            const el = document.getElementById(`cart-item-${item.id}`);
+            if(el) {
+                el.classList.add('removing');
+                setTimeout(() => el.classList.add('collapse-space'), 200);
+            }
+        });
+
+        setTimeout(() => {
+            cartItems = [];
+            document.getElementById('cart-items-container').innerHTML = '';
+            updateSummary();
+            checkEmptyState();
+        }, 500);
+    }
+
+    function applyPromo() {
+        const input = document.getElementById('promo-input');
+        const code = input.value.trim().toUpperCase();
+        const btn = document.getElementById('apply-promo-btn');
+        const msg = document.getElementById('promo-message');
+
+        if (code === '') return;
+
+        // Button loading state mock
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>';
+        lucide.createIcons();
+        btn.disabled = true;
+
+        setTimeout(() => {
+            if (code === 'EDUFUTURE') {
+                discountPercent = 20;
+                
+                // Success UI
+                btn.innerHTML = 'Đã áp dụng';
+                btn.classList.replace('bg-slate-900', 'bg-green-600');
+                input.disabled = true;
+                
+                msg.classList.remove('hidden');
+                msg.classList.add('flex');
+
+                updateSummary();
+            } else {
+                // Error UI
+                btn.innerHTML = 'Áp dụng';
+                btn.disabled = false;
+                
+                // Shake input
+                input.parentElement.style.animation = 'shake 0.4s ease-in-out';
+                setTimeout(() => input.parentElement.style.animation = '', 400);
+                alert("Mã giảm giá không hợp lệ hoặc đã hết hạn.");
+            }
+            lucide.createIcons();
+        }, 800);
+    }
+
+    function processCheckout() {
+        const btn = document.querySelector('#checkout-bar button');
+        const originalText = btn.innerHTML;
+        
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Đang xử lý...';
+        lucide.createIcons();
+
+        setTimeout(() => {
+            alert("Chuyển hướng đến cổng thanh toán an toàn...");
+            btn.innerHTML = originalText;
+            lucide.createIcons();
+        }, 1500);
+    }
+
+    // --- INIT ---
+    document.addEventListener('DOMContentLoaded', () => {
+        renderCart();
+    });
+
+</script>
+</body>
+</html>

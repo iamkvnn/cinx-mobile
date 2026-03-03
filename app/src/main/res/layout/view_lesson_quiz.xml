@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    view_lesson_quiz.xml
+    Embedded as <include> inside activity_lesson.xml for QUIZ type lessons.
+    Shows one question at a time with a countdown timer.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- ===== TOP META ROW ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingVertical="12dp">
+
+        <!-- Question counter -->
+        <TextView
+            android:id="@+id/tvQuestionCounter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="CÂU HỎI 1/10"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.08"
+            android:textColor="@color/text_secondary"
+            android:textAllCaps="true"
+            tools:text="CÂU HỎI 3/10" />
+
+        <!-- Timer -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_type_badge_blue"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="6dp">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_timer"
+                android:contentDescription="Timer" />
+
+            <TextView
+                android:id="@+id/tvQuizTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                android:fontFamily="monospace"
+                android:layout_marginStart="6dp"
+                tools:text="14:25" />
+        </LinearLayout>
+
+        <!-- Type label -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Trắc nghiệm"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_secondary"
+            android:background="@drawable/bg_icon_gray"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+    <!-- ===== PROGRESS BAR ===== -->
+    <ProgressBar
+        android:id="@+id/quizProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:progress="30"
+        android:progressDrawable="@drawable/bg_progress_bar_fill"
+        android:background="@drawable/bg_progress_bar_track"
+        android:layout_marginBottom="20dp" />
+
+    <!-- ===== QUESTION CARD ===== -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@android:color/white"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/tvQuestionText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:lineSpacingMultiplier="1.4"
+                tools:text="Trong Figma, phím tắt nào được sử dụng để chuyển đối tượng thành một Component?" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- ===== OPTIONS LIST ===== -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvQuizOptions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false"
+        android:overScrollMode="never"
+        tools:itemCount="4" />
+
+    <!-- ===== RESULT FEEDBACK CARD (visible after answering) ===== -->
+    <LinearLayout
+        android:id="@+id/layoutQuizFeedback"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_icon_purple"
+        android:padding="16dp"
+        android:layout_marginTop="16dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/ivFeedbackIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_check_circle"
+            android:contentDescription="Feedback" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+
+            <TextView
+                android:id="@+id/tvFeedbackTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                tools:text="Chính xác!" />
+
+            <TextView
+                android:id="@+id/tvFeedbackDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="2dp"
+                android:visibility="gone"
+                tools:text="Đáp án đúng: Ctrl + Alt + K" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
