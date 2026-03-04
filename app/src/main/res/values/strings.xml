@@ -74,5 +74,46 @@
     <string name="success_go_home">Về trang chủ</string>
     <string name="success_terms">Nhấn \"Đặt hàng\" đồng nghĩa với việc bạn đồng ý với </string>
     <string name="success_terms_link">Điều khoản EduFuture</string>
+
+    <!-- Profile screen -->
+    <string name="profile_title">Tài khoản</string>
+    <string name="profile_badge_pro">PRO MEMBER</string>
+    <string name="profile_badge_basic">BASIC MEMBER</string>
+
+    <!-- Stats -->
+    <string name="profile_stat_streak">Chuỗi ngày</string>
+    <string name="profile_stat_xp">Điểm XP</string>
+    <string name="profile_stat_hours">Giờ học</string>
+
+    <!-- Group headers -->
+    <string name="profile_group_learning">Học tập &amp; Thành tích</string>
+    <string name="profile_group_transactions">Giao dịch</string>
+    <string name="profile_group_settings">Cài đặt ứng dụng</string>
+    <string name="profile_group_support">Hỗ trợ</string>
+
+    <!-- Menu items -->
+    <string name="profile_certificates">Chứng chỉ của tôi</string>
+    <string name="profile_downloads">Tài liệu đã tải</string>
+    <string name="profile_order_history">Lịch sử đơn hàng</string>
+    <string name="profile_vouchers">Mã giảm giá</string>
+    <string name="profile_notifications">Thông báo</string>
+    <string name="profile_dark_mode">Giao diện tối</string>
+    <string name="profile_help_center">Trung tâm trợ giúp</string>
+    <string name="profile_logout">Đăng xuất</string>
+
+    <!-- Toggle feedback -->
+    <string name="profile_notifications_on">Thông báo đã bật</string>
+    <string name="profile_notifications_off">Thông báo đã tắt</string>
+    <string name="profile_dark_mode_on">Giao diện tối đã bật</string>
+    <string name="profile_dark_mode_off">Giao diện tối đã tắt</string>
+
+    <!-- Logout dialog -->
+    <string name="profile_logout_confirm">Bạn có chắc chắn muốn đăng xuất không?</string>
+    <string name="profile_logout_yes">Đăng xuất</string>
+    <string name="profile_logout_cancel">Hủy</string>
+
+    <!-- Misc -->
+    <string name="profile_coming_soon">Tính năng đang phát triển…</string>
+    <string name="profile_version">EduFuture Phiên bản 2.4.0 (Build 88)</string>
 </resources>
 

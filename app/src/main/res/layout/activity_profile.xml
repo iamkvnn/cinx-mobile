@@ -1,0 +1,809 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8FAFC"
+    tools:context=".ProfileActivity">
+
+    <!-- ── Background Blobs ────────────────────────────────────────── -->
+    <View
+        android:layout_width="320dp"
+        android:layout_height="320dp"
+        android:background="@drawable/dot_indicator"
+        android:backgroundTint="#FBCFE8"
+        android:alpha="0.45"
+        android:scaleX="1.4"
+        android:scaleY="1.4"
+        android:translationX="-80dp"
+        android:translationY="-60dp" />
+
+    <View
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:background="@drawable/dot_indicator"
+        android:backgroundTint="#DDD6FE"
+        android:alpha="0.45"
+        android:scaleX="1.4"
+        android:scaleY="1.4"
+        android:layout_gravity="top|end"
+        android:translationX="80dp"
+        android:translationY="80dp" />
+
+    <View
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:background="@drawable/dot_indicator"
+        android:backgroundTint="#BFDBFE"
+        android:alpha="0.35"
+        android:scaleX="1.4"
+        android:scaleY="1.4"
+        android:layout_gravity="bottom|start"
+        android:translationX="20dp"
+        android:translationY="60dp" />
+
+    <!-- ── Scrollable Content ──────────────────────────────────────── -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="120dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="80dp"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="16dp">
+
+            <!-- ── Profile Card ──────────────────────────────────────── -->
+            <LinearLayout
+                android:id="@+id/profileCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:background="@drawable/bg_glass_card"
+                android:padding="20dp"
+                android:layout_marginBottom="20dp">
+
+                <!-- Avatar with dashed border ring -->
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+
+                    <ImageView
+                        android:id="@+id/ivAvatarRing"
+                        android:layout_width="88dp"
+                        android:layout_height="88dp"
+                        android:src="@drawable/bg_circle_outline"
+                        android:alpha="0.9" />
+
+                    <ImageView
+                        android:id="@+id/ivAvatar"
+                        android:layout_width="78dp"
+                        android:layout_height="78dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_profile_placeholder"
+                        android:scaleType="centerCrop"
+                        android:clipToOutline="true"
+                        android:background="@drawable/dot_indicator" />
+
+                    <!-- Edit badge -->
+                    <LinearLayout
+                        android:id="@+id/btnEditAvatar"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_gravity="bottom|end"
+                        android:background="@drawable/bg_btn_primary"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/ic_eye"
+                            app:tint="@android:color/white" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <!-- Name -->
+                <TextView
+                    android:id="@+id/tvProfileName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nguyễn Hoàng Minh"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:letterSpacing="-0.02" />
+
+                <!-- Email -->
+                <TextView
+                    android:id="@+id/tvProfileEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="minh.nguyen@example.com"
+                    android:textSize="13sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Membership Badge -->
+                <LinearLayout
+                    android:id="@+id/membershipBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="6dp"
+                    android:background="@drawable/bg_grade_badge"
+                    android:layout_marginBottom="20dp">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_zap"
+                        app:tint="#FBBF24"
+                        android:layout_marginEnd="5dp" />
+
+                    <TextView
+                        android:id="@+id/tvMembershipLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PRO MEMBER"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="#B45309"
+                        android:letterSpacing="0.07" />
+                </LinearLayout>
+
+                <!-- Stats Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Stats Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Streak -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_flame"
+                                app:tint="#F97316"
+                                android:layout_marginEnd="3dp" />
+
+                            <TextView
+                                android:id="@+id/tvStreak"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="14"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_primary" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_stat_streak"
+                            android:textSize="11sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="40dp"
+                        android:background="@color/divider" />
+
+                    <!-- XP Points -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_zap"
+                                app:tint="@color/primary"
+                                android:layout_marginEnd="3dp" />
+
+                            <TextView
+                                android:id="@+id/tvXp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2450"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_primary" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_stat_xp"
+                            android:textSize="11sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="40dp"
+                        android:background="@color/divider" />
+
+                    <!-- Learning Hours -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_clock"
+                                app:tint="#0EA5E9"
+                                android:layout_marginEnd="3dp" />
+
+                            <TextView
+                                android:id="@+id/tvHours"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="38"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_primary" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_stat_hours"
+                            android:textSize="11sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- GROUP: Học tập                                         -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_group_learning"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/text_secondary"
+                android:letterSpacing="0.07"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_glass_card"
+                android:layout_marginBottom="20dp">
+
+                <!-- Row: Chứng chỉ -->
+                <LinearLayout
+                    android:id="@+id/rowCertificates"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_yellow"
+                        android:gravity="center"
+                        android:layout_marginEnd="12dp">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_certificate"
+                            app:tint="#B45309" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/profile_certificates"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_primary" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/text_secondary" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/divider" android:layout_marginStart="64dp" />
+
+                <!-- Row: Tài liệu đã tải -->
+                <LinearLayout
+                    android:id="@+id/rowDownloads"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_indigo"
+                        android:gravity="center"
+                        android:layout_marginEnd="12dp">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_document"
+                            app:tint="#4338CA" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/profile_downloads"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_primary" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/text_secondary" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- GROUP: Giao dịch                                       -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_group_transactions"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/text_secondary"
+                android:letterSpacing="0.07"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_glass_card"
+                android:layout_marginBottom="20dp">
+
+                <!-- Row: Lịch sử đơn hàng -->
+                <LinearLayout
+                    android:id="@+id/rowOrderHistory"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_purple"
+                        android:gravity="center"
+                        android:layout_marginEnd="12dp">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_list_video"
+                            app:tint="#6D28D9" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/profile_order_history"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_primary" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/text_secondary" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/divider" android:layout_marginStart="64dp" />
+
+                <!-- Row: Mã giảm giá -->
+                <LinearLayout
+                    android:id="@+id/rowVouchers"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_gray"
+                        android:gravity="center"
+                        android:layout_marginEnd="12dp">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_bookmark"
+                            app:tint="@color/text_secondary" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/profile_vouchers"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_primary" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/text_secondary" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- GROUP: Cài đặt                                         -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_group_settings"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/text_secondary"
+                android:letterSpacing="0.07"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_glass_card"
+                android:layout_marginBottom="20dp">
+
+                <!-- Row: Thông báo (toggle) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp">
+
+                    <LinearLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_indigo"
+                        android:gravity="center"
+                        android:layout_marginEnd="12dp">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_smartphone"
+                            app:tint="#4338CA" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/profile_notifications"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_primary" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchNotifications"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        app:thumbTint="@android:color/white"
+                        app:trackTint="@color/switch_track_selector" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/divider" android:layout_marginStart="64dp" />
+
+                <!-- Row: Giao diện tối (toggle) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp">
+
+                    <LinearLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_gray"
+                        android:gravity="center"
+                        android:layout_marginEnd="12dp">
+
+                        <ImageView
+                            android:id="@+id/ivDarkModeIcon"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_eye_off"
+                            app:tint="@color/text_secondary" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/profile_dark_mode"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_primary" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchDarkMode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        app:thumbTint="@android:color/white"
+                        app:trackTint="@color/switch_track_selector" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- GROUP: Hỗ trợ                                          -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_group_support"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/text_secondary"
+                android:letterSpacing="0.07"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_glass_card"
+                android:layout_marginBottom="8dp">
+
+                <!-- Row: Trung tâm trợ giúp -->
+                <LinearLayout
+                    android:id="@+id/rowHelpCenter"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_gray"
+                        android:gravity="center"
+                        android:layout_marginEnd="12dp">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_circle_outline"
+                            app:tint="@color/text_secondary" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/profile_help_center"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_primary" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/text_secondary" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/divider" android:layout_marginStart="64dp" />
+
+                <!-- Row: Đăng xuất (red) -->
+                <LinearLayout
+                    android:id="@+id/rowLogout"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_gray"
+                        android:gravity="center"
+                        android:layout_marginEnd="12dp">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_close"
+                            app:tint="@color/error" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/profile_logout"
+                        android:textSize="15sp"
+                        android:textColor="@color/error"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/error" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Version label -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_version"
+                android:textSize="11sp"
+                android:textColor="@color/text_placeholder"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- ── Sticky Header ──────────────────────────────────────────── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_glass_card"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="14dp"
+        android:elevation="8dp">
+
+        <View android:layout_width="40dp" android:layout_height="40dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/profile_title"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:gravity="center" />
+
+        <!-- Settings icon placeholder -->
+        <LinearLayout
+            android:id="@+id/btnSettings"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_icon_gray"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_person"
+                app:tint="@color/text_secondary" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ── Floating Bottom Nav ────────────────────────────────────── -->
+    <include
+        layout="@layout/layout_floating_nav"
+        android:layout_width="302dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="32dp" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

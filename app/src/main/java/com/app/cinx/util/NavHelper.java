@@ -14,6 +14,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.app.cinx.DiscoveryActivity;
 import com.app.cinx.MainActivity;
+import com.app.cinx.ProfileActivity;
 import com.app.cinx.R;
 
 public class NavHelper {
@@ -55,7 +56,13 @@ public class NavHelper {
             }
         });
         
-        // Add others as needed
+        profileBtn.setOnClickListener(v -> {
+            if (activeTabId != R.id.navProfile) {
+                Intent intent = new Intent(activity, ProfileActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                activity.startActivity(intent);
+            }
+        });
     }
 
     private static void setActiveState(View view, boolean isActive) {

@@ -46,6 +46,10 @@
     <color name="success_green">#10B981</color>
     <color name="success_bg_start">#EEF2FF</color>
     <color name="success_bg_end">#F5F3FF</color>
+
+    <!-- Switch toggle -->
+    <color name="switch_track_on">#7C3AED</color>
+    <color name="switch_track_off">#CBD5E1</color>
 <!--    <color name="star_color">#FBBF24</color>-->
 <!--    <color name="white_alpha_90">#E6FFFFFF</color>-->
 </resources>
