@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F3FF"
+    tools:context=".VouchersActivity">
+
+    <!-- Background gradient -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_hero_gradient"
+        android:alpha="0.07" />
+
+    <!-- Fixed Header (back + title + segmented control) -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_glass_card"
+        android:paddingBottom="16dp"
+        android:elevation="3dp">
+
+        <!-- Top row: back + title -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="8dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="8dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_chevron_left"
+                android:background="@drawable/bg_icon_gray"
+                android:padding="8dp"
+                android:contentDescription="@string/voucher_back" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/voucher_title"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:gravity="center" />
+
+            <View android:layout_width="40dp" android:layout_height="40dp" />
+        </LinearLayout>
+
+        <!-- Segmented tabs: Available / Expired -->
+        <LinearLayout
+            android:id="@+id/segmentedControl"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="20dp"
+            android:orientation="horizontal"
+            android:background="@drawable/bg_segmented_control"
+            android:padding="4dp">
+
+            <TextView
+                android:id="@+id/tabAvailable"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/voucher_tab_available"
+                android:gravity="center"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:background="@drawable/bg_segment_active" />
+
+            <TextView
+                android:id="@+id/tabExpired"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/voucher_tab_expired"
+                android:gravity="center"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_secondary"
+                android:background="@android:color/transparent" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Scrollable content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="128dp"
+        android:paddingBottom="24dp"
+        android:clipToPadding="false"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="16dp"
+            android:paddingHorizontal="20dp">
+
+            <!-- Add voucher code row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_glass_input"
+                    android:paddingHorizontal="14dp"
+                    android:layout_marginEnd="10dp">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_shopping_cart"
+                        android:alpha="0.5"
+                        android:layout_marginEnd="8dp" />
+
+                    <EditText
+                        android:id="@+id/etVoucherCode"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:hint="@string/voucher_input_hint"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_placeholder"
+                        android:background="@android:color/transparent"
+                        android:inputType="textCapCharacters"
+                        android:imeOptions="actionDone"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnSaveCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/voucher_save_btn"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:textColor="#FFFFFF"
+                    android:gravity="center"
+                    android:paddingHorizontal="18dp"
+                    android:background="@drawable/bg_btn_dark"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <!-- Voucher list -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvVouchers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:scrollbars="none" />
+
+            <!-- Empty state -->
+            <LinearLayout
+                android:id="@+id/emptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingTop="60dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/ic_shopping_cart"
+                    android:alpha="0.25" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/voucher_empty"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_secondary" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Voucher Detail Bottom Sheet backdrop -->
+    <View
+        android:id="@+id/sheetOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#99000000"
+        android:elevation="20dp"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <!-- Voucher Detail Bottom Sheet -->
+    <FrameLayout
+        android:id="@+id/voucherDetailSheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bg_bottom_sheet_light"
+        android:elevation="24dp"
+        android:translationY="1000dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Drag handle -->
+            <View
+                android:id="@+id/dragHandle"
+                android:layout_width="40dp"
+                android:layout_height="4dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/bg_drag_handle" />
+
+            <!-- Sheet title -->
+            <TextView
+                android:id="@+id/tvSheetTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="16dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                tools:text="Ưu đãi thành viên mới"
+                xmlns:tools="http://schemas.android.com/tools" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider" />
+
+            <!-- Sheet content -->
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxHeight="340dp"
+                android:scrollbars="none"
+                android:paddingHorizontal="24dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Code section -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/voucher_detail_code_label"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_secondary"
+                        android:letterSpacing="0.1" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="20dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/tvSheetCode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary"
+                            android:letterSpacing="0.05"
+                            tools:text="VOUCHER20"
+                            xmlns:tools="http://schemas.android.com/tools" />
+
+                        <ImageView
+                            android:id="@+id/btnCopyCode"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="10dp"
+                            android:src="@drawable/ic_document"
+                            app:tint="@color/text_secondary"
+                            android:clickable="true"
+                            android:focusable="true" />
+                    </LinearLayout>
+
+                    <!-- Expiry section -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/voucher_detail_expiry_label"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_secondary"
+                        android:letterSpacing="0.1" />
+
+                    <TextView
+                        android:id="@+id/tvSheetExpiry"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="20dp"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary"
+                        tools:text="Đến 23:59 ngày 30/06/2026"
+                        xmlns:tools="http://schemas.android.com/tools" />
+
+                    <!-- Conditions section -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/voucher_detail_conditions_label"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_secondary"
+                        android:letterSpacing="0.1" />
+
+                    <LinearLayout
+                        android:id="@+id/llConditions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp" />
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- Understand button -->
+            <TextView
+                android:id="@+id/btnUnderstood"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_margin="16dp"
+                android:text="@string/voucher_detail_understood"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:gravity="center"
+                android:background="@drawable/bg_btn_dark_full"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+    </FrameLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

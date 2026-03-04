@@ -40,6 +40,7 @@ public class ProfileActivity extends AppCompatActivity {
     private LinearLayout rowDownloads;
     private LinearLayout rowOrderHistory;
     private LinearLayout rowVouchers;
+    private LinearLayout rowPaymentMethods;
     private LinearLayout rowHelpCenter;
     private LinearLayout rowLogout;
 
@@ -82,6 +83,7 @@ public class ProfileActivity extends AppCompatActivity {
         rowDownloads     = findViewById(R.id.rowDownloads);
         rowOrderHistory  = findViewById(R.id.rowOrderHistory);
         rowVouchers      = findViewById(R.id.rowVouchers);
+        rowPaymentMethods = findViewById(R.id.rowPaymentMethods);
         rowHelpCenter    = findViewById(R.id.rowHelpCenter);
         rowLogout        = findViewById(R.id.rowLogout);
 
@@ -128,8 +130,11 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void setupMenuListeners() {
         // Learning group
-        rowCertificates.setOnClickListener(v ->
-                ToastUtil.showCustomToast(this, getString(R.string.profile_coming_soon)));
+        rowCertificates.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CertificatesActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivity(intent);
+        });
 
         rowDownloads.setOnClickListener(v ->
                 ToastUtil.showCustomToast(this, getString(R.string.profile_coming_soon)));
@@ -141,8 +146,17 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        rowVouchers.setOnClickListener(v ->
-                ToastUtil.showCustomToast(this, getString(R.string.profile_coming_soon)));
+        rowVouchers.setOnClickListener(v -> {
+            Intent intent = new Intent(this, VouchersActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivity(intent);
+        });
+
+        rowPaymentMethods.setOnClickListener(v -> {
+            Intent intent = new Intent(this, PaymentMethodsActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivity(intent);
+        });
 
         // Support group
         rowHelpCenter.setOnClickListener(v ->

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ticket-style voucher row item -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginBottom="12dp"
+    android:background="@drawable/bg_ticket_right"
+    android:clipToOutline="true"
+    android:elevation="1dp">
+
+    <!-- Left colored panel (discount value) -->
+    <LinearLayout
+        android:id="@+id/panelLeft"
+        android:layout_width="100dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="12dp"
+        android:background="@drawable/bg_voucher_left_purple">
+
+        <TextView
+            android:id="@+id/tvDiscountValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:gravity="center"
+            tools:text="20%" />
+
+        <TextView
+            android:id="@+id/tvDiscountSub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:textColor="#E0CCFF"
+            android:gravity="center"
+            android:letterSpacing="0.05"
+            tools:text="GIẢM GIÁ" />
+
+    </LinearLayout>
+
+    <!-- Dashed vertical divider (drawn via negative margin trick) -->
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_progress_bar_track"
+        android:alpha="0.3" />
+
+    <!-- Right panel -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <!-- Top row: title + quantity badge -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="Ưu đãi thành viên mới" />
+
+            <TextView
+                android:id="@+id/tvQuantity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_secondary"
+                android:background="@drawable/bg_icon_gray"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                tools:text="x1"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- Description -->
+        <TextView
+            android:id="@+id/tvDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="11sp"
+            android:textColor="@color/text_secondary"
+            android:maxLines="2"
+            android:ellipsize="end"
+            tools:text="Áp dụng cho mọi khóa học trên hệ thống. Giảm..." />
+
+        <!-- See detail link -->
+        <TextView
+            android:id="@+id/tvSeeDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/voucher_see_detail"
+            android:textSize="11sp"
+            android:textColor="@color/primary"
+            android:drawableEnd="@drawable/ic_arrow_right"
+            app:drawableTint="@color/primary"
+            android:drawablePadding="2dp"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Bottom row: expiry + use button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/tvExpiry"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="#EF4444"
+                tools:text="HSD: 30/06/2026" />
+
+            <TextView
+                android:id="@+id/btnUse"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="@string/voucher_use_btn"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:gravity="center"
+                android:paddingHorizontal="14dp"
+                android:background="@drawable/bg_btn_use_voucher"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

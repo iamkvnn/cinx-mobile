@@ -96,6 +96,7 @@
     <string name="profile_downloads">Tài liệu đã tải</string>
     <string name="profile_order_history">Lịch sử đơn hàng</string>
     <string name="profile_vouchers">Mã giảm giá</string>
+    <string name="profile_payment_methods">Phương thức thanh toán</string>
     <string name="profile_notifications">Thông báo</string>
     <string name="profile_dark_mode">Giao diện tối</string>
     <string name="profile_help_center">Trung tâm trợ giúp</string>
@@ -115,5 +116,73 @@
     <!-- Misc -->
     <string name="profile_coming_soon">Tính năng đang phát triển…</string>
     <string name="profile_version">EduFuture Phiên bản 2.4.0 (Build 88)</string>
+
+    <!-- ── Certificates screen ──────────────────────────────────── -->
+    <string name="cert_title">Chứng chỉ của tôi</string>
+    <string name="cert_back">Quay lại</string>
+    <string name="cert_empty">Chưa có chứng chỉ nào</string>
+    <string name="cert_empty_desc">Hoàn thành khóa học để nhận chứng chỉ của bạn!</string>
+    <string name="cert_issued_prefix">Cấp ngày: %1$s</string>
+    <string name="cert_btn_pdf">Tải PDF</string>
+    <string name="cert_btn_linkedin">Thêm vào hồ sơ</string>
+    <string name="cert_download_toast">Đang tải chứng chỉ "%1$s"…</string>
+
+    <!-- ── Vouchers screen ──────────────────────────────────────── -->
+    <string name="voucher_title">Kho Voucher</string>
+    <string name="voucher_back">Quay lại</string>
+    <string name="voucher_tab_available">Khả dụng</string>
+    <string name="voucher_tab_available_count">Khả dụng (%1$d)</string>
+    <string name="voucher_tab_expired">Hết hạn / Đã dùng</string>
+    <string name="voucher_input_hint">Nhập mã voucher</string>
+    <string name="voucher_save_btn">Lưu</string>
+    <string name="voucher_see_detail">Xem chi tiết</string>
+    <string name="voucher_expiry_prefix">HSD: %1$s</string>
+    <string name="voucher_use_btn">Dùng ngay</string>
+    <string name="voucher_empty">Không có voucher nào</string>
+    <string name="voucher_enter_code">Vui lòng nhập mã voucher</string>
+    <string name="voucher_code_saved">Đã lưu mã "%1$s"!</string>
+    <string name="voucher_code_copied">Đã sao chép mã!</string>
+    <string name="voucher_quantity">x%1$d</string>
+    <!-- Detail sheet -->
+    <string name="voucher_detail_code_label">MÃ ƯU ĐÃI</string>
+    <string name="voucher_detail_expiry_label">HẠN SỬ DỤNG</string>
+    <string name="voucher_detail_expiry_value">Đến 23:59 ngày %1$s</string>
+    <string name="voucher_detail_conditions_label">ĐIỀU KIỆN SỬ DỤNG</string>
+    <string name="voucher_detail_understood">Đã hiểu</string>
+
+    <!-- ── Payment Methods screen ───────────────────────────────── -->
+    <string name="pm_title">Thanh toán</string>
+    <string name="pm_back">Quay lại</string>
+    <string name="pm_section_cards">THẺ TÍN DỤNG / GHI NỢ</string>
+    <string name="pm_swipe_hint">Chạm để chuyển thẻ</string>
+    <string name="pm_add_card">+ Thêm thẻ mới</string>
+    <string name="pm_section_wallets">VÍ ĐIỆN TỬ ĐÃ LIÊN KẾT</string>
+    <string name="pm_link_wallet">+ Liên kết ví mới</string>
+    <string name="pm_link_wallet_coming">Tính năng liên kết ví đang phát triển…</string>
+    <!-- Card labels -->
+    <string name="pm_card_holder_label">CHỦ THẺ</string>
+    <string name="pm_card_expiry_label">HẾT HẠN</string>
+    <!-- Sheet -->
+    <string name="pm_sheet_title">Thêm thẻ mới</string>
+    <string name="pm_sheet_subtitle">Thông tin được mã hóa bảo mật 256-bit</string>
+    <string name="pm_field_number">SỐ THẺ</string>
+    <string name="pm_field_name">TÊN CHỦ THẺ</string>
+    <string name="pm_field_expiry">NGÀY HẾT HẠN</string>
+    <string name="pm_field_cvv">CVV</string>
+    <string name="pm_security_note">EduFuture không lưu trữ thông tin thẻ của bạn. Giao dịch được xử lý an toàn qua cổng thanh toán quốc tế.</string>
+    <string name="pm_save_btn">Lưu và sử dụng</string>
+    <!-- Validation -->
+    <string name="pm_invalid_number">Số thẻ phải có ít nhất 16 chữ số</string>
+    <string name="pm_invalid_name">Vui lòng nhập tên chủ thẻ</string>
+    <string name="pm_invalid_expiry">Ngày hết hạn không hợp lệ (MM/YY)</string>
+    <string name="pm_invalid_cvv">CVV không hợp lệ</string>
+    <string name="pm_card_saved">Đã lưu thẻ thành công!</string>
+    <!-- Unlink wallet -->
+    <string name="pm_unlink">Hủy liên kết</string>
+    <string name="pm_unlink_title">Hủy liên kết %1$s?</string>
+    <string name="pm_unlink_confirm">Bạn có chắc muốn hủy liên kết với ví này không?</string>
+    <string name="pm_unlink_yes">Hủy liên kết</string>
+    <string name="pm_unlink_cancel">Giữ lại</string>
+    <string name="pm_unlinked_toast">Đã hủy liên kết %1$s</string>
 </resources>
 

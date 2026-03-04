@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EduFuture - Lịch sử mua hàng</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+        }
+
+        /* Animations */
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+        }
+
+        /* Gộp chung Header & Tab thành 1 khối liền mạch, bo góc dưới mềm mại */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-top: none;
+            border-bottom-left-radius: 2rem;
+            border-bottom-right-radius: 2rem;
+            box-shadow: 0 12px 40px -10px rgba(124, 58, 237, 0.15); /* Bóng đổ ánh tím */
+            position: relative;
+        }
+
+        /* Dải sáng tinh tế ở mép viền dưới Header */
+        .glass-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.6), transparent);
+            border-radius: 2px;
+        }
+
+        /* Tabs Styling */
+        .tab-btn {
+            white-space: nowrap;
+            padding: 8px 20px;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #64748b; /* slate-500 */
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Hiệu ứng bouncy mượt mà */
+            background: transparent;
+            border: 1px solid transparent;
+            position: relative;
+        }
+        .tab-btn:active {
+            transform: scale(0.95);
+        }
+        .tab-btn.active {
+            color: #7c3aed; /* violet-600 */
+            background: #ffffff; /* Nền trắng tinh để nổi bật trên nền kính */
+            border: 1px solid rgba(124, 58, 237, 0.15); /* Viền tím siêu nhạt */
+            box-shadow: 0 4px 16px rgba(124, 58, 237, 0.12), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Hide Scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-slate-800 overflow-x-hidden relative min-h-screen flex flex-col">
+
+<!-- Dynamic Pastel Background -->
+<div class="fixed inset-0 z-0 pointer-events-none">
+    <div class="absolute top-[-10%] left-[-10%] w-[70%] h-[50%] bg-blue-200/30 rounded-full blur-[80px] mix-blend-multiply animate-blob"></div>
+    <div class="absolute top-[30%] right-[-20%] w-[70%] h-[50%] bg-violet-200/30 rounded-full blur-[80px] mix-blend-multiply animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-[-10%] left-[10%] w-[70%] h-[50%] bg-fuchsia-200/30 rounded-full blur-[80px] mix-blend-multiply animate-blob animation-delay-4000"></div>
+</div>
+
+<div class="max-w-md mx-auto w-full relative z-10 flex-1 flex flex-col min-h-screen">
+
+    <!-- Unified Header & Tabs (Khối Glassmorphism liền mạch, bo góc dưới) -->
+    <header class="fixed top-0 w-full max-w-md z-50 transition-all duration-300 glass-header flex flex-col pt-3 pb-2">
+        <!-- Top Title Bar -->
+        <div class="flex justify-between items-center px-4 mb-4">
+            <button class="w-10 h-10 rounded-full bg-slate-100/80 flex items-center justify-center text-slate-700 shadow-sm active:scale-95 transition-transform" onclick="window.history.back()">
+                <i data-lucide="chevron-left" class="w-6 h-6"></i>
+            </button>
+            <h1 class="text-base font-bold text-slate-800">Lịch sử đơn hàng</h1>
+            <button class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 active:bg-slate-100 transition-colors">
+                <i data-lucide="search" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Scrollable Tabs -->
+        <div class="w-full pb-2">
+            <div class="flex overflow-x-auto no-scrollbar gap-2 px-4 snap-x">
+                <button class="tab-btn active snap-start" onclick="switchTab('all', this)">Tất cả</button>
+                <button class="tab-btn snap-start" onclick="switchTab('success', this)">Thành công</button>
+                <button class="tab-btn snap-start" onclick="switchTab('pending', this)">Chờ thanh toán</button>
+                <button class="tab-btn snap-start" onclick="switchTab('cancelled', this)">Đã hủy</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="pt-[140px] px-4 pb-8 flex-1 flex flex-col" id="orders-container">
+        <!-- Orders injected by JS -->
+    </main>
+
+</div>
+
+<script>
+    // --- MOCK DATA ---
+    const ordersData = [
+        {
+            id: 'EDUF-8A9B2C',
+            status: 'success', // success | pending | cancelled
+            date: '24/05/2026',
+            instructor: 'Hà Linh',
+            courses: [
+                { title: 'UI/UX Design Masterclass: Từ Cơ Bản Đến Nâng Cao', image: 'https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80', price: 599000, originalPrice: 1200000 }
+            ],
+            totalAmount: 599000
+        },
+        {
+            id: 'EDUF-3X7Y9Z',
+            status: 'pending',
+            date: '23/05/2026',
+            instructor: 'Minh Tuấn',
+            courses: [
+                { title: 'Fullstack React & Node.js cho người mới', image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=300&q=80', price: 899000, originalPrice: 1500000 },
+                { title: 'React Native thực chiến', image: 'https://images.unsplash.com/photo-1555099962-4199c345e5dd?w=300&q=80', price: 499000, originalPrice: 800000 }
+            ],
+            totalAmount: 1398000
+        },
+        {
+            id: 'EDUF-1K2L3M',
+            status: 'cancelled',
+            date: '20/05/2026',
+            instructor: 'Sarah Nguyễn',
+            courses: [
+                { title: 'Digital Marketing 101: SEO & Ads', image: 'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=300&q=80', price: 450000, originalPrice: 900000 }
+            ],
+            totalAmount: 450000
+        }
+    ];
+
+    // --- UTILS ---
+    function formatMoney(amount) {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    }
+
+    function getStatusConfig(status) {
+        switch(status) {
+            case 'success':
+                return { text: 'HOÀN THÀNH', colorClass: 'text-green-600', icon: 'check-circle-2' };
+            case 'pending':
+                return { text: 'CHỜ THANH TOÁN', colorClass: 'text-orange-500', icon: 'clock' };
+            case 'cancelled':
+                return { text: 'ĐÃ HỦY', colorClass: 'text-red-500', icon: 'x-circle' };
+            default:
+                return { text: 'KHÔNG RÕ', colorClass: 'text-slate-500', icon: 'help-circle' };
+        }
+    }
+
+    // --- RENDER LOGIC ---
+    function renderOrders(filterStatus = 'all') {
+        const container = document.getElementById('orders-container');
+        
+        // Filter Data
+        const filteredOrders = ordersData.filter(order => filterStatus === 'all' || order.status === filterStatus);
+
+        // Reset Animation
+        container.classList.remove('animate-fade-in');
+        void container.offsetWidth; // trigger reflow
+        container.classList.add('animate-fade-in');
+
+        // Render Empty State
+        if (filteredOrders.length === 0) {
+            container.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center py-10 opacity-80">
+                    <div class="w-32 h-32 bg-white/50 rounded-full flex items-center justify-center mb-6 shadow-inner relative">
+                        <div class="absolute inset-0 bg-violet-200/40 rounded-full blur-xl animate-pulse"></div>
+                        <i data-lucide="receipt" class="w-12 h-12 text-violet-400 relative z-10 stroke-[1.5]"></i>
+                    </div>
+                    <h2 class="text-lg font-bold text-slate-800 mb-2">Chưa có đơn hàng</h2>
+                    <p class="text-sm text-slate-500 text-center">Bạn chưa có đơn hàng nào ở trạng thái này.</p>
+                </div>
+            `;
+            lucide.createIcons();
+            return;
+        }
+
+        // Render List
+        container.innerHTML = filteredOrders.map((order, index) => {
+            const statusConfig = getStatusConfig(order.status);
+            
+            // Generate Course Items HTML
+            const itemsHtml = order.courses.map(course => `
+                <div class="flex gap-3 py-3 border-b border-slate-100 last:border-0">
+                    <img src="${course.image}" class="w-16 h-16 rounded-xl object-cover shadow-sm shrink-0">
+                    <div class="flex-1 flex flex-col justify-center">
+                        <h4 class="text-sm font-bold text-slate-800 line-clamp-1">${course.title}</h4>
+                        <div class="flex justify-between items-end mt-1">
+                            <p class="text-[10px] text-slate-500 font-medium line-through">${formatMoney(course.originalPrice)}</p>
+                            <p class="text-sm font-black text-slate-800">${formatMoney(course.price)}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Generate Action Buttons based on status
+            let actionButtonsHtml = '';
+            if (order.status === 'success') {
+                actionButtonsHtml = `
+                    <button class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 active:scale-95 transition-all">Đánh giá</button>
+                    <button class="px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-bold text-xs shadow-md shadow-violet-500/20 active:scale-95 transition-all">Vào học ngay</button>
+                `;
+            } else if (order.status === 'pending') {
+                actionButtonsHtml = `
+                    <button class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 active:scale-95 transition-all">Hủy đơn</button>
+                    <button class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs shadow-md shadow-slate-900/20 active:scale-95 transition-all">Thanh toán ngay</button>
+                `;
+            } else if (order.status === 'cancelled') {
+                actionButtonsHtml = `
+                    <button class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 active:scale-95 transition-all">Xem chi tiết</button>
+                    <button class="px-4 py-2 rounded-xl bg-violet-100 text-violet-600 font-bold text-xs hover:bg-violet-200 active:scale-95 transition-all">Mua lại</button>
+                `;
+            }
+
+            return `
+                <div class="glass-panel p-4 rounded-[1.5rem] mb-4 animate-slide-up" style="animation-delay: ${index * 0.1}s">
+                    <!-- Order Header -->
+                    <div class="flex justify-between items-center pb-3 border-b border-slate-100/80">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="store" class="w-4 h-4 text-slate-400"></i>
+                            <span class="text-xs font-bold text-slate-700 uppercase">${order.id}</span>
+                        </div>
+                        <div class="flex items-center gap-1 ${statusConfig.colorClass}">
+                            <i data-lucide="${statusConfig.icon}" class="w-3.5 h-3.5"></i>
+                            <span class="text-[10px] font-bold tracking-wide">${statusConfig.text}</span>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="py-1">
+                        ${itemsHtml}
+                    </div>
+                    
+                    ${order.courses.length > 1 ? `<div class="text-center pb-2 text-[10px] text-slate-400 font-semibold border-b border-slate-100/80">Xem thêm sản phẩm</div>` : ''}
+
+                    <!-- Total Row -->
+                    <div class="flex justify-between items-center py-3">
+                        <span class="text-xs text-slate-500 font-medium">Thành tiền:</span>
+                        <span class="text-base font-black text-violet-600">${formatMoney(order.totalAmount)}</span>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-end gap-2 pt-2">
+                        ${actionButtonsHtml}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        lucide.createIcons();
+    }
+
+    // --- TAB SWITCH LOGIC ---
+    function switchTab(status, btnElement) {
+        // Update active class on tabs
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+
+        // Scroll tab into view if needed (centering it smoothly)
+        btnElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+        // Re-render orders
+        renderOrders(status);
+    }
+
+    // --- INIT ---
+    document.addEventListener('DOMContentLoaded', () => {
+        renderOrders('all');
+    });
+
+</script>
+</body>
+</html>

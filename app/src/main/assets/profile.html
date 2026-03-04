@@ -1,355 +1,355 @@
-!DOCTYPE html
-html lang=vi
-head
-    meta charset=UTF-8
-    meta name=viewport content=width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no
-    titleEduFuture - Hồ sơ cá nhântitle
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EduFuture - Hồ sơ cá nhân</title>
 
-    !-- Tailwind CSS --
-    script src=httpscdn.tailwindcss.comscript
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    !-- Lucide Icons --
-    script src=httpsunpkg.comlucide@latestscript
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-    !-- Google Fonts --
-    link href=httpsfonts.googleapis.comcss2family=Plus+Jakarta+Sanswght@400;500;600;700;800&display=swap rel=stylesheet
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    style
+    <style>
         body {
-            font-family 'Plus Jakarta Sans', sans-serif;
-            background-color #F8FAFC;
-            -webkit-tap-highlight-color transparent;
-            overscroll-behavior-y none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
         }
 
-         Animations 
+        /* Animations */
         @keyframes blob {
-            0% { transform translate(0px, 0px) scale(1); }
-            33% { transform translate(30px, -50px) scale(1.1); }
-            66% { transform translate(-20px, 20px) scale(0.9); }
-            100% { transform translate(0px, 0px) scale(1); }
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
         }
-        .animate-blob { animation blob 7s infinite; }
-        .animation-delay-2000 { animation-delay 2s; }
-        .animation-delay-4000 { animation-delay 4s; }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
 
         @keyframes slideUp {
-            from { opacity 0; transform translateY(20px); }
-            to { opacity 1; transform translateY(0); }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .animate-slide-up { animation slideUp 0.4s ease-out forwards; }
+        .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
 
-         Glassmorphism Classes 
+        /* Glassmorphism Classes */
         .glass-panel {
-            background rgba(255, 255, 255, 0.75);
-            backdrop-filter blur(20px) saturate(180%);
-            -webkit-backdrop-filter blur(20px) saturate(180%);
-            border 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow 0 8px 32px rgba(31, 38, 135, 0.05);
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
         }
 
         .glass-header {
-            background rgba(255, 255, 255, 0.85);
-            backdrop-filter blur(25px) saturate(200%);
-            -webkit-backdrop-filter blur(25px) saturate(200%);
-            border-bottom 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow 0 4px 30px rgba(0, 0, 0, 0.03);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
         }
 
-         Bottom Nav (From home.html context) 
+        /* Bottom Nav (From home.html context) */
         .glass-nav {
-            background rgba(255, 255, 255, 0.85);
-            backdrop-filter blur(25px) saturate(200%);
-            -webkit-backdrop-filter blur(25px) saturate(200%);
-            border-radius 2rem;
-            border 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow 0 15px 40px -10px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.15);
         }
-        .nav-item.active .nav-bg { opacity 1; transform scale(1); }
-        .nav-item.active .nav-icon { transform translateY(-4px); color #7c3aed; }
-        .nav-item.active .nav-icon svg { fill #ddd6fe; stroke-width 2.5; }
-        .nav-item.active .nav-dot { transform scale(1); opacity 1; }
+        .nav-item.active .nav-bg { opacity: 1; transform: scale(1); }
+        .nav-item.active .nav-icon { transform: translateY(-4px); color: #7c3aed; }
+        .nav-item.active .nav-icon svg { fill: #ddd6fe; stroke-width: 2.5; }
+        .nav-item.active .nav-dot { transform: scale(1); opacity: 1; }
 
-         iOS Toggle Switch 
+        /* iOS Toggle Switch */
         .ios-toggle {
-            position relative;
-            display inline-block;
-            width 44px;
-            height 24px;
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
         }
-        .ios-toggle input { opacity 0; width 0; height 0; }
+        .ios-toggle input { opacity: 0; width: 0; height: 0; }
         .slider {
-            position absolute;
-            cursor pointer;
-            top 0; left 0; right 0; bottom 0;
-            background-color #cbd5e1;
-            transition .4s;
-            border-radius 34px;
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #cbd5e1;
+            transition: .4s;
+            border-radius: 34px;
         }
-        .sliderbefore {
-            position absolute;
-            content ;
-            height 20px;
-            width 20px;
-            left 2px;
-            bottom 2px;
-            background-color white;
-            transition .4s;
-            border-radius 50%;
-            box-shadow 0 2px 4px rgba(0,0,0,0.2);
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        inputchecked + .slider { background-color #8b5cf6; }
-        inputchecked + .sliderbefore { transform translateX(20px); }
+        input:checked + .slider { background-color: #8b5cf6; }
+        input:checked + .slider:before { transform: translateX(20px); }
 
-         Grouped List Item Hover 
-        .list-group-itemactive { background-color rgba(255, 255, 255, 0.4); }
+        /* Grouped List Item Hover */
+        .list-group-item:active { background-color: rgba(255, 255, 255, 0.4); }
 
-         Hide Scrollbar 
-        .no-scrollbar-webkit-scrollbar { display none; }
-        .no-scrollbar { -ms-overflow-style none; scrollbar-width none; }
-    style
-head
-body class=text-slate-800 pb-[100px] overflow-x-hidden relative min-h-screen
+        /* Hide Scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-slate-800 pb-[100px] overflow-x-hidden relative min-h-screen">
 
-!-- Dynamic Pastel Background --
-div class=fixed inset-0 z-0 pointer-events-none
-    div class=absolute top-[-10%] right-[-10%] w-[70%] h-[50%] bg-pink-20040 rounded-full blur-[80px] mix-blend-multiply animate-blobdiv
-    div class=absolute top-[30%] left-[-20%] w-[70%] h-[50%] bg-violet-20040 rounded-full blur-[80px] mix-blend-multiply animate-blob animation-delay-2000div
-    div class=absolute bottom-[-10%] right-[10%] w-[70%] h-[50%] bg-blue-20040 rounded-full blur-[80px] mix-blend-multiply animate-blob animation-delay-4000div
-div
+<!-- Dynamic Pastel Background -->
+<div class="fixed inset-0 z-0 pointer-events-none">
+    <div class="absolute top-[-10%] right-[-10%] w-[70%] h-[50%] bg-pink-200/40 rounded-full blur-[80px] mix-blend-multiply animate-blob"></div>
+    <div class="absolute top-[30%] left-[-20%] w-[70%] h-[50%] bg-violet-200/40 rounded-full blur-[80px] mix-blend-multiply animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-[-10%] right-[10%] w-[70%] h-[50%] bg-blue-200/40 rounded-full blur-[80px] mix-blend-multiply animate-blob animation-delay-4000"></div>
+</div>
 
-div class=max-w-md mx-auto w-full relative z-10 flex flex-col
+<div class="max-w-md mx-auto w-full relative z-10 flex flex-col">
 
-    !-- Header (Sticky) --
-    header class=fixed top-0 w-full max-w-md z-50 transition-all duration-300 glass-header flex justify-between items-center py-3 px-4 rounded-b-[2rem]
-        div class=w-10 h-10div !-- Spacer --
-        h1 class=text-base font-bold text-slate-800Tài khoảnh1
-        button class=w-10 h-10 rounded-full bg-slate-10050 flex items-center justify-center text-slate-700 shadow-sm activescale-95 transition-transform
-            i data-lucide=settings class=w-5 h-5i
-        button
-    header
+    <!-- Header (Sticky) -->
+    <header class="fixed top-0 w-full max-w-md z-50 transition-all duration-300 glass-header flex justify-between items-center py-3 px-4 rounded-b-[2rem]">
+        <div class="w-10 h-10"></div> <!-- Spacer -->
+        <h1 class="text-base font-bold text-slate-800">Tài khoản</h1>
+        <button class="w-10 h-10 rounded-full bg-slate-100/50 flex items-center justify-center text-slate-700 shadow-sm active:scale-95 transition-transform">
+            <i data-lucide="settings" class="w-5 h-5"></i>
+        </button>
+    </header>
 
-    main class=pt-[88px] px-4 space-y-6
+    <main class="pt-[88px] px-4 space-y-6">
         
-        !-- 1. Profile Info Card --
-        section class=glass-panel rounded-[2rem] p-5 flex flex-col items-center animate-slide-up style=animation-delay 0s;
-            div class=relative mb-3
-                div class=w-20 h-20 rounded-full p-1 border-2 border-violet-500 border-dashed
-                    img src=httpsi.pravatar.cc150u=my_user alt=Avatar class=w-full h-full rounded-full object-cover
-                div
-                button class=absolute bottom-0 right-0 w-7 h-7 bg-slate-900 rounded-full text-white flex items-center justify-center border-2 border-white shadow-md activescale-95
-                    i data-lucide=camera class=w-3.5 h-3.5i
-                button
-            div
+        <!-- 1. Profile Info Card -->
+        <section class="glass-panel rounded-[2rem] p-5 flex flex-col items-center animate-slide-up" style="animation-delay: 0s;">
+            <div class="relative mb-3">
+                <div class="w-20 h-20 rounded-full p-1 border-2 border-violet-500 border-dashed">
+                    <img src="https://i.pravatar.cc/150?u=my_user" alt="Avatar" class="w-full h-full rounded-full object-cover">
+                </div>
+                <button class="absolute bottom-0 right-0 w-7 h-7 bg-slate-900 rounded-full text-white flex items-center justify-center border-2 border-white shadow-md active:scale-95">
+                    <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
             
-            h2 class=text-xl font-black text-slate-800 tracking-tightNguyễn Hoàng Minhh2
-            p class=text-sm font-medium text-slate-500 mb-3minh.nguyen@example.comp
+            <h2 class="text-xl font-black text-slate-800 tracking-tight">Nguyễn Hoàng Minh</h2>
+            <p class="text-sm font-medium text-slate-500 mb-3">minh.nguyen@example.com</p>
             
-            div class=flex items-center gap-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 px-3 py-1 rounded-full border border-amber-20050 shadow-sm mb-4
-                i data-lucide=crown class=w-4 h-4 fill-amber-500i
-                span class=text-xs font-bold tracking-widePRO MEMBERspan
-            div
+            <div class="flex items-center gap-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 px-3 py-1 rounded-full border border-amber-200/50 shadow-sm mb-4">
+                <i data-lucide="crown" class="w-4 h-4 fill-amber-500"></i>
+                <span class="text-xs font-bold tracking-wide">PRO MEMBER</span>
+            </div>
 
-            !-- Stats Grid --
-            div class=w-full grid grid-cols-3 gap-3 border-t border-slate-20060 pt-4
-                div class=text-center
-                    p class=text-xl font-black text-violet-60012p
-                    p class=text-[10px] font-bold text-slate-500 uppercase tracking-widerNgày họcp
-                div
-                div class=text-center border-l border-r border-slate-20060
-                    p class=text-xl font-black text-fuchsia-6003p
-                    p class=text-[10px] font-bold text-slate-500 uppercase tracking-widerChứng chỉp
-                div
-                div class=text-center
-                    p class=text-xl font-black text-blue-6002.4kp
-                    p class=text-[10px] font-bold text-slate-500 uppercase tracking-widerĐiểm XPp
-                div
-            div
-        section
+            <!-- Stats Grid -->
+            <div class="w-full grid grid-cols-3 gap-3 border-t border-slate-200/60 pt-4">
+                <div class="text-center">
+                    <p class="text-xl font-black text-violet-600">12</p>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Ngày học</p>
+                </div>
+                <div class="text-center border-l border-r border-slate-200/60">
+                    <p class="text-xl font-black text-fuchsia-600">3</p>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Chứng chỉ</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-xl font-black text-blue-600">2.4k</p>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Điểm XP</p>
+                </div>
+            </div>
+        </section>
 
-        !-- 2. Learning Group --
-        section class=animate-slide-up style=animation-delay 0.1s;
-            h3 class=text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-2Học tập & Thành tíchh3
-            div class=glass-panel p-0 rounded-[1.5rem] overflow-hidden
-                a href=# class=list-group-item flex items-center justify-between p-4 border-b border-slate-10080 transition-colors
-                    div class=flex items-center gap-3
-                        div class=w-8 h-8 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center
-                            i data-lucide=award class=w-4 h-4i
-                        div
-                        span class=text-sm font-bold text-slate-700Chứng chỉ của tôispan
-                    div
-                    div class=flex items-center gap-2
-                        span class=w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center1span
-                        i data-lucide=chevron-right class=w-5 h-5 text-slate-400i
-                    div
-                a
-                a href=# class=list-group-item flex items-center justify-between p-4 transition-colors
-                    div class=flex items-center gap-3
-                        div class=w-8 h-8 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center
-                            i data-lucide=download-cloud class=w-4 h-4i
-                        div
-                        span class=text-sm font-bold text-slate-700Tài liệu đã tảispan
-                    div
-                    i data-lucide=chevron-right class=w-5 h-5 text-slate-400i
-                a
-            div
-        section
+        <!-- 2. Learning Group -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s;">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-2">Học tập & Thành tích</h3>
+            <div class="glass-panel p-0 rounded-[1.5rem] overflow-hidden">
+                <a href="#" class="list-group-item flex items-center justify-between p-4 border-b border-slate-100/80 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+                            <i data-lucide="award" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-sm font-bold text-slate-700">Chứng chỉ của tôi</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">1</span>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
+                    </div>
+                </a>
+                <a href="#" class="list-group-item flex items-center justify-between p-4 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                            <i data-lucide="download-cloud" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-sm font-bold text-slate-700">Tài liệu đã tải</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
+                </a>
+            </div>
+        </section>
 
-        !-- 3. Transactions Group --
-        section class=animate-slide-up style=animation-delay 0.2s;
-            h3 class=text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-2Giao dịchh3
-            div class=glass-panel p-0 rounded-[1.5rem] overflow-hidden
-                a href=# class=list-group-item flex items-center justify-between p-4 border-b border-slate-10080 transition-colors
-                    div class=flex items-center gap-3
-                        div class=w-8 h-8 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center
-                            i data-lucide=receipt class=w-4 h-4i
-                        div
-                        span class=text-sm font-bold text-slate-700Lịch sử đơn hàngspan
-                    div
-                    i data-lucide=chevron-right class=w-5 h-5 text-slate-400i
-                a
-                a href=# class=list-group-item flex items-center justify-between p-4 border-b border-slate-10080 transition-colors
-                    div class=flex items-center gap-3
-                        div class=w-8 h-8 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center
-                            i data-lucide=ticket class=w-4 h-4i
-                        div
-                        span class=text-sm font-bold text-slate-700Mã giảm giá (Vouchers)span
-                    div
-                    i data-lucide=chevron-right class=w-5 h-5 text-slate-400i
-                a
-                a href=# class=list-group-item flex items-center justify-between p-4 transition-colors
-                    div class=flex items-center gap-3
-                        div class=w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center
-                            i data-lucide=credit-card class=w-4 h-4i
-                        div
-                        span class=text-sm font-bold text-slate-700Phương thức thanh toánspan
-                    div
-                    i data-lucide=chevron-right class=w-5 h-5 text-slate-400i
-                a
-            div
-        section
+        <!-- 3. Transactions Group -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s;">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-2">Giao dịch</h3>
+            <div class="glass-panel p-0 rounded-[1.5rem] overflow-hidden">
+                <a href="#" class="list-group-item flex items-center justify-between p-4 border-b border-slate-100/80 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center">
+                            <i data-lucide="receipt" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-sm font-bold text-slate-700">Lịch sử đơn hàng</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
+                </a>
+                <a href="#" class="list-group-item flex items-center justify-between p-4 border-b border-slate-100/80 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center">
+                            <i data-lucide="ticket" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-sm font-bold text-slate-700">Mã giảm giá (Vouchers)</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
+                </a>
+                <a href="#" class="list-group-item flex items-center justify-between p-4 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                            <i data-lucide="credit-card" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-sm font-bold text-slate-700">Phương thức thanh toán</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
+                </a>
+            </div>
+        </section>
 
-        !-- 4. Settings Group --
-        section class=animate-slide-up style=animation-delay 0.3s;
-            h3 class=text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-2Cài đặt ứng dụngh3
-            div class=glass-panel p-0 rounded-[1.5rem] overflow-hidden
-                div class=flex items-center justify-between p-4 border-b border-slate-10080
-                    div class=flex items-center gap-3
-                        div class=w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center
-                            i data-lucide=bell class=w-4 h-4i
-                        div
-                        span class=text-sm font-bold text-slate-700Thông báo đẩyspan
-                    div
-                    label class=ios-toggle
-                        input type=checkbox checked
-                        span class=sliderspan
-                    label
-                div
-                div class=flex items-center justify-between p-4 border-b border-slate-10080
-                    div class=flex items-center gap-3
-                        div class=w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center
-                            i data-lucide=moon class=w-4 h-4i
-                        div
-                        span class=text-sm font-bold text-slate-700Chế độ tối (Dark Mode)span
-                    div
-                    label class=ios-toggle
-                        input type=checkbox
-                        span class=sliderspan
-                    label
-                div
-                a href=# class=list-group-item flex items-center justify-between p-4 transition-colors
-                    div class=flex items-center gap-3
-                        div class=w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center
-                            i data-lucide=globe class=w-4 h-4i
-                        div
-                        span class=text-sm font-bold text-slate-700Ngôn ngữspan
-                    div
-                    div class=flex items-center gap-2
-                        span class=text-xs font-bold text-slate-500Tiếng Việtspan
-                        i data-lucide=chevron-right class=w-5 h-5 text-slate-400i
-                    div
-                a
-            div
-        section
+        <!-- 4. Settings Group -->
+        <section class="animate-slide-up" style="animation-delay: 0.3s;">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-2">Cài đặt ứng dụng</h3>
+            <div class="glass-panel p-0 rounded-[1.5rem] overflow-hidden">
+                <div class="flex items-center justify-between p-4 border-b border-slate-100/80">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center">
+                            <i data-lucide="bell" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-sm font-bold text-slate-700">Thông báo đẩy</span>
+                    </div>
+                    <label class="ios-toggle">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between p-4 border-b border-slate-100/80">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center">
+                            <i data-lucide="moon" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-sm font-bold text-slate-700">Chế độ tối (Dark Mode)</span>
+                    </div>
+                    <label class="ios-toggle">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <a href="#" class="list-group-item flex items-center justify-between p-4 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center">
+                            <i data-lucide="globe" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-sm font-bold text-slate-700">Ngôn ngữ</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-500">Tiếng Việt</span>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
+                    </div>
+                </a>
+            </div>
+        </section>
 
-        !-- 5. Support & Actions --
-        section class=animate-slide-up style=animation-delay 0.4s;
-            div class=glass-panel p-0 rounded-[1.5rem] overflow-hidden mb-6
-                a href=# class=list-group-item flex items-center justify-between p-4 border-b border-slate-10080 transition-colors
-                    div class=flex items-center gap-3
-                        div class=w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center
-                            i data-lucide=help-circle class=w-4 h-4i
-                        div
-                        span class=text-sm font-bold text-slate-700Trung tâm trợ giúpspan
-                    div
-                    i data-lucide=chevron-right class=w-5 h-5 text-slate-400i
-                a
-                button class=w-full text-left list-group-item flex items-center justify-between p-4 transition-colors
-                    div class=flex items-center gap-3
-                        div class=w-8 h-8 rounded-xl bg-red-50 text-red-500 flex items-center justify-center
-                            i data-lucide=log-out class=w-4 h-4i
-                        div
-                        span class=text-sm font-bold text-red-500Đăng xuấtspan
-                    div
-                button
-            div
+        <!-- 5. Support & Actions -->
+        <section class="animate-slide-up" style="animation-delay: 0.4s;">
+            <div class="glass-panel p-0 rounded-[1.5rem] overflow-hidden mb-6">
+                <a href="#" class="list-group-item flex items-center justify-between p-4 border-b border-slate-100/80 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                            <i data-lucide="help-circle" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-sm font-bold text-slate-700">Trung tâm trợ giúp</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
+                </a>
+                <button class="w-full text-left list-group-item flex items-center justify-between p-4 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-red-50 text-red-500 flex items-center justify-center">
+                            <i data-lucide="log-out" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-sm font-bold text-red-500">Đăng xuất</span>
+                    </div>
+                </button>
+            </div>
             
-            p class=text-center text-[10px] font-bold text-slate-400 mb-8EduFuture Phiên bản 2.4.0 (Build 88)p
-        section
+            <p class="text-center text-[10px] font-bold text-slate-400 mb-8">EduFuture Phiên bản 2.4.0 (Build 88)</p>
+        </section>
 
-    main
+    </main>
 
-    !-- Floating Bottom Nav (Reused from context) --
-    div class=fixed bottom-6 left-12 -translate-x-12 z-50 w-[92%] max-w-[380px]
-        div class=glass-nav p-1.5 mdp-2 flex justify-between items-center relative
+    <!-- Floating Bottom Nav (Reused from context) -->
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[380px]">
+        <div class="glass-nav p-1.5 md:p-2 flex justify-between items-center relative">
             
-            button class=nav-item relative flex flex-col items-center justify-center w-14 h-14 mdw-16 mdh-16 rounded-full transition-all duration-300 ease-out group onclick=setActiveTab(this)
-                span class=nav-bg absolute inset-1 bg-gradient-to-tr from-violet-100 to-fuchsia-100 rounded-full transition-all duration-300 opacity-0 scale-50 shadow-innerspan
-                div class=nav-icon relative z-10 transition-all duration-300 text-slate-400 group-hovertext-slate-600
-                    i data-lucide=home class=w-6 h-6i
-                div
-                span class=nav-dot absolute bottom-2.5 mdbottom-3 w-1.5 h-1.5 bg-violet-500 rounded-full shadow-lg shadow-violet-50050 transition-all duration-300 scale-0 opacity-0span
-            button
+            <button class="nav-item relative flex flex-col items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full transition-all duration-300 ease-out group" onclick="setActiveTab(this)">
+                <span class="nav-bg absolute inset-1 bg-gradient-to-tr from-violet-100 to-fuchsia-100 rounded-full transition-all duration-300 opacity-0 scale-50 shadow-inner"></span>
+                <div class="nav-icon relative z-10 transition-all duration-300 text-slate-400 group-hover:text-slate-600">
+                    <i data-lucide="home" class="w-6 h-6"></i>
+                </div>
+                <span class="nav-dot absolute bottom-2.5 md:bottom-3 w-1.5 h-1.5 bg-violet-500 rounded-full shadow-lg shadow-violet-500/50 transition-all duration-300 scale-0 opacity-0"></span>
+            </button>
 
-            button class=nav-item relative flex flex-col items-center justify-center w-14 h-14 mdw-16 mdh-16 rounded-full transition-all duration-300 ease-out group onclick=setActiveTab(this)
-                span class=nav-bg absolute inset-1 bg-gradient-to-tr from-violet-100 to-fuchsia-100 rounded-full transition-all duration-300 opacity-0 scale-50 shadow-innerspan
-                div class=nav-icon relative z-10 transition-all duration-300 text-slate-400 group-hovertext-slate-600
-                    i data-lucide=search class=w-6 h-6i
-                div
-                span class=nav-dot absolute bottom-2.5 mdbottom-3 w-1.5 h-1.5 bg-violet-500 rounded-full shadow-lg shadow-violet-50050 transition-all duration-300 scale-0 opacity-0span
-            button
+            <button class="nav-item relative flex flex-col items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full transition-all duration-300 ease-out group" onclick="setActiveTab(this)">
+                <span class="nav-bg absolute inset-1 bg-gradient-to-tr from-violet-100 to-fuchsia-100 rounded-full transition-all duration-300 opacity-0 scale-50 shadow-inner"></span>
+                <div class="nav-icon relative z-10 transition-all duration-300 text-slate-400 group-hover:text-slate-600">
+                    <i data-lucide="search" class="w-6 h-6"></i>
+                </div>
+                <span class="nav-dot absolute bottom-2.5 md:bottom-3 w-1.5 h-1.5 bg-violet-500 rounded-full shadow-lg shadow-violet-500/50 transition-all duration-300 scale-0 opacity-0"></span>
+            </button>
 
-            button class=nav-item relative flex flex-col items-center justify-center w-14 h-14 mdw-16 mdh-16 rounded-full transition-all duration-300 ease-out group onclick=setActiveTab(this)
-                span class=nav-bg absolute inset-1 bg-gradient-to-tr from-violet-100 to-fuchsia-100 rounded-full transition-all duration-300 opacity-0 scale-50 shadow-innerspan
-                div class=nav-icon relative z-10 transition-all duration-300 text-slate-400 group-hovertext-slate-600
-                    i data-lucide=book-open class=w-6 h-6i
-                div
-                span class=nav-dot absolute bottom-2.5 mdbottom-3 w-1.5 h-1.5 bg-violet-500 rounded-full shadow-lg shadow-violet-50050 transition-all duration-300 scale-0 opacity-0span
-            button
+            <button class="nav-item relative flex flex-col items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full transition-all duration-300 ease-out group" onclick="setActiveTab(this)">
+                <span class="nav-bg absolute inset-1 bg-gradient-to-tr from-violet-100 to-fuchsia-100 rounded-full transition-all duration-300 opacity-0 scale-50 shadow-inner"></span>
+                <div class="nav-icon relative z-10 transition-all duration-300 text-slate-400 group-hover:text-slate-600">
+                    <i data-lucide="book-open" class="w-6 h-6"></i>
+                </div>
+                <span class="nav-dot absolute bottom-2.5 md:bottom-3 w-1.5 h-1.5 bg-violet-500 rounded-full shadow-lg shadow-violet-500/50 transition-all duration-300 scale-0 opacity-0"></span>
+            </button>
 
-            !-- ACTIVE TAB USER --
-            button class=nav-item active relative flex flex-col items-center justify-center w-14 h-14 mdw-16 mdh-16 rounded-full transition-all duration-300 ease-out group onclick=setActiveTab(this)
-                span class=nav-bg absolute inset-1 bg-gradient-to-tr from-violet-100 to-fuchsia-100 rounded-full transition-all duration-300 opacity-0 scale-50 shadow-innerspan
-                div class=nav-icon relative z-10 transition-all duration-300 text-slate-400 group-hovertext-slate-600
-                    i data-lucide=user class=w-6 h-6i
-                div
-                span class=nav-dot absolute bottom-2.5 mdbottom-3 w-1.5 h-1.5 bg-violet-500 rounded-full shadow-lg shadow-violet-50050 transition-all duration-300 scale-0 opacity-0span
-            button
+            <!-- ACTIVE TAB: USER -->
+            <button class="nav-item active relative flex flex-col items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full transition-all duration-300 ease-out group" onclick="setActiveTab(this)">
+                <span class="nav-bg absolute inset-1 bg-gradient-to-tr from-violet-100 to-fuchsia-100 rounded-full transition-all duration-300 opacity-0 scale-50 shadow-inner"></span>
+                <div class="nav-icon relative z-10 transition-all duration-300 text-slate-400 group-hover:text-slate-600">
+                    <i data-lucide="user" class="w-6 h-6"></i>
+                </div>
+                <span class="nav-dot absolute bottom-2.5 md:bottom-3 w-1.5 h-1.5 bg-violet-500 rounded-full shadow-lg shadow-violet-500/50 transition-all duration-300 scale-0 opacity-0"></span>
+            </button>
 
-        div
-    div
+        </div>
+    </div>
 
-div
+</div>
 
-script
-     Init Icons
+<script>
+    // Init Icons
     lucide.createIcons();
 
-     Handle Tab Switching in Bottom Nav
+    // Handle Tab Switching in Bottom Nav
     function setActiveTab(element) {
-        document.querySelectorAll('.nav-item').forEach(el = el.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         element.classList.add('active');
     }
-script
-body
-html
+</script>
+</body>
+</html>

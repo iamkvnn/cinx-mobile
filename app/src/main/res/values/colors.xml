@@ -40,7 +40,7 @@
     <!-- Checkout screen -->
     <color name="checkout_momo_bg">#AE2070</color>
     <color name="checkout_vnpay_bg">#005BAA</color>
-    <color name="checkout_card_bg">#1E293B</color>
+    <color name="checkout_card_bg">#B5FFA3</color>
     <color name="checkout_selected_border">#7C3AED</color>
     <color name="checkout_order_code_bg">#F5F3FF</color>
     <color name="success_green">#10B981</color>
@@ -52,5 +52,9 @@
     <color name="switch_track_off">#CBD5E1</color>
 <!--    <color name="star_color">#FBBF24</color>-->
 <!--    <color name="white_alpha_90">#E6FFFFFF</color>-->
+
+    <!-- Certificate screen -->
+    <color name="cert_grade_excellent_text">#B45309</color>
+    <color name="cert_grade_good_text">#1D4ED8</color>
 </resources>
 

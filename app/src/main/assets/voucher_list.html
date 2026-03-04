@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EduFuture - Mã giảm giá</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+        .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px) saturate(200%); border-bottom: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03); border-bottom-left-radius: 2rem; border-bottom-right-radius: 2rem;}
+        
+        /* Design Ticket */
+        .ticket {
+            background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 1.5rem; display: flex; position: relative; overflow: hidden; box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+        }
+        .ticket-left { width: 32%; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+        .ticket-right { width: 68%; padding: 16px; background: rgba(255,255,255,0.5); border-left: 2px dashed rgba(139, 92, 246, 0.3); position: relative;}
+        
+        /* Punch holes for ticket effect */
+        .ticket-right::before, .ticket-right::after {
+            content: ''; position: absolute; left: -8px; width: 14px; height: 14px; background-color: #F8FAFC; border-radius: 50%; border: 1px solid rgba(255,255,255,0.8);
+        }
+        .ticket-right::before { top: -8px; border-bottom: none; border-left: none; border-right: none;}
+        .ticket-right::after { bottom: -8px; border-top: none; border-left: none; border-right: none;}
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .segmented-control { background: rgba(15, 23, 42, 0.05); padding: 4px; border-radius: 16px; display: flex; position: relative; }
+        .segment-btn { flex: 1; padding: 10px; text-align: center; font-size: 0.85rem; font-weight: 700; color: #64748b; border-radius: 12px; z-index: 1; transition: color 0.3s; }
+        .segment-btn.active { color: #1e293b; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+        /* Bottom Sheet (Voucher Detail) */
+        .bottom-sheet {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: translateY(100%);
+        }
+        .bottom-sheet.open {
+            transform: translateY(0);
+        }
+        .sheet-overlay {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .sheet-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-10 overflow-x-hidden relative min-h-screen">
+<div class="fixed inset-0 z-0 bg-gradient-to-br from-violet-50 to-pink-50 pointer-events-none"></div>
+
+<div class="max-w-md mx-auto w-full relative z-10 flex flex-col">
+    <!-- Header -->
+    <header class="fixed top-0 w-full max-w-md z-50 transition-all duration-300 glass-header flex flex-col pt-3 pb-3">
+        <div class="flex justify-between items-center px-4 mb-4">
+            <button class="w-10 h-10 rounded-full bg-slate-100/80 flex items-center justify-center text-slate-700 shadow-sm active:scale-95 transition-transform" onclick="window.history.back()">
+                <i data-lucide="chevron-left" class="w-6 h-6"></i>
+            </button>
+            <h1 class="text-base font-bold text-slate-800">Kho Voucher</h1>
+            <div class="w-10 h-10"></div>
+        </div>
+        <div class="px-4">
+            <div class="segmented-control">
+                <button class="segment-btn active">Khả dụng (2)</button>
+                <button class="segment-btn">Hết hạn / Đã dùng</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-[140px] px-4 space-y-4">
+        <!-- Input Add Code -->
+        <div class="flex gap-2 mb-6 animate-slide-up">
+            <div class="flex-1 bg-white rounded-2xl p-1.5 flex items-center border border-slate-200 shadow-sm">
+                <i data-lucide="ticket" class="w-5 h-5 text-slate-400 ml-2"></i>
+                <input type="text" placeholder="Nhập mã voucher" class="w-full bg-transparent border-none outline-none px-2 text-sm font-bold uppercase placeholder:normal-case placeholder:font-medium">
+            </div>
+            <button class="px-5 bg-slate-900 text-white font-bold text-sm rounded-2xl active:scale-95 transition-transform shadow-md">Lưu</button>
+        </div>
+
+        <!-- Ticket 1 -->
+        <div class="ticket animate-slide-up" style="animation-delay: 0.1s;">
+            <div class="ticket-left bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white">
+                <span class="text-2xl font-black">20%</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest mt-0.5">Giảm giá</span>
+            </div>
+            <div class="ticket-right">
+                <div class="flex justify-between items-start mb-1">
+                    <h3 class="font-bold text-sm text-slate-800">Ưu đãi thành viên mới</h3>
+                    <span class="text-[9px] font-bold text-violet-600 bg-violet-100 px-1.5 py-0.5 rounded">x1</span>
+                </div>
+                <p class="text-[10px] text-slate-500 font-medium line-clamp-1 mb-1">Áp dụng cho mọi khóa học trên hệ thống. Giảm tối đa 500k.</p>
+                <button onclick="openVoucherDetail('VOUCHER20', 'Ưu đãi thành viên mới')" class="text-[10px] text-violet-500 font-bold mb-3 flex items-center gap-0.5 active:opacity-70 transition-opacity">
+                    Xem chi tiết <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                </button>
+                <div class="flex justify-between items-end">
+                    <p class="text-[10px] text-red-500 font-bold">HSD: 30/06/2026</p>
+                    <button class="bg-violet-600 text-white px-3 py-1.5 rounded-full text-[10px] font-bold shadow-md shadow-violet-500/30 active:scale-95">Dùng ngay</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ticket 2 -->
+        <div class="ticket animate-slide-up" style="animation-delay: 0.2s;">
+            <div class="ticket-left bg-gradient-to-br from-emerald-400 to-teal-500 text-white">
+                <span class="text-xl font-black text-center leading-tight">100K</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest mt-0.5">Voucher</span>
+            </div>
+            <div class="ticket-right">
+                <h3 class="font-bold text-sm text-slate-800 mb-1">Giảm trực tiếp 100K</h3>
+                <p class="text-[10px] text-slate-500 font-medium line-clamp-1 mb-1">Áp dụng cho danh mục Design & Code. Đơn tối thiểu 800k.</p>
+                <button onclick="openVoucherDetail('CODE100K', 'Giảm trực tiếp 100K')" class="text-[10px] text-violet-500 font-bold mb-3 flex items-center gap-0.5 active:opacity-70 transition-opacity">
+                    Xem chi tiết <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                </button>
+                <div class="flex justify-between items-end">
+                    <p class="text-[10px] text-slate-400 font-bold">HSD: 15/07/2026</p>
+                    <button class="bg-violet-600 text-white px-3 py-1.5 rounded-full text-[10px] font-bold shadow-md shadow-violet-500/30 active:scale-95">Dùng ngay</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Voucher Detail Bottom Sheet -->
+<div class="fixed inset-0 z-[100] sheet-overlay bg-slate-900/40 backdrop-blur-sm" id="voucher-detail-overlay" onclick="closeVoucherDetail()"></div>
+
+<div class="fixed bottom-0 left-0 right-0 z-[110] bottom-sheet" id="voucher-detail-sheet">
+    <div class="max-w-md mx-auto bg-white/95 backdrop-blur-2xl rounded-t-[2.5rem] shadow-2xl h-[70vh] flex flex-col">
+        <!-- Drag Handle -->
+        <div class="w-full pt-4 pb-2 flex justify-center shrink-0 cursor-pointer" onclick="closeVoucherDetail()">
+            <div class="w-12 h-1.5 bg-slate-300 rounded-full"></div>
+        </div>
+        
+        <div class="px-6 pb-4 border-b border-slate-100 shrink-0">
+            <h3 class="text-xl font-black text-slate-800" id="detail-title">Chi tiết ưu đãi</h3>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-6 py-6 space-y-5 no-scrollbar">
+            <div>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Mã ưu đãi</h4>
+                <div class="flex items-center gap-2">
+                    <p class="text-lg font-black text-violet-600 tracking-widest" id="detail-code">VOUCHER20</p>
+                    <button class="w-7 h-7 rounded-md bg-violet-50 text-violet-600 flex items-center justify-center active:bg-violet-100 transition-colors"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Hạn sử dụng</h4>
+                <p class="text-sm font-semibold text-slate-800">Đến 23:59 ngày 30/06/2026</p>
+            </div>
+
+            <div>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Điều kiện sử dụng</h4>
+                <ul class="space-y-2 text-sm text-slate-600 font-medium list-disc pl-4">
+                    <li>Giảm trực tiếp vào tổng giá trị đơn hàng khóa học.</li>
+                    <li>Mức giảm tối đa không vượt quá giới hạn của từng chương trình.</li>
+                    <li>Mỗi tài khoản chỉ được sử dụng voucher 1 lần duy nhất.</li>
+                    <li>Không áp dụng đồng thời cùng các mã giảm giá khác.</li>
+                    <li>Voucher không có giá trị quy đổi thành tiền mặt dưới mọi hình thức.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="p-4 border-t border-slate-100 shrink-0">
+            <button class="w-full h-12 rounded-2xl bg-slate-900 text-white font-bold text-sm shadow-xl shadow-slate-900/20 active:scale-95 transition-transform" onclick="closeVoucherDetail()">
+                Đã hiểu
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    lucide.createIcons();
+
+    function openVoucherDetail(code, title) {
+        if(title) document.getElementById('detail-title').innerText = title;
+        if(code) document.getElementById('detail-code').innerText = code;
+        
+        document.getElementById('voucher-detail-sheet').classList.add('open');
+        document.getElementById('voucher-detail-overlay').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeVoucherDetail() {
+        document.getElementById('voucher-detail-sheet').classList.remove('open');
+        document.getElementById('voucher-detail-overlay').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+</script>
+</body>
+</html>

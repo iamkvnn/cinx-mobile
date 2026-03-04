@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="14dp"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/bg_wallet_item">
+
+    <!-- Wallet icon -->
+    <FrameLayout
+        android:id="@+id/iconContainer"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:background="@drawable/bg_wallet_momo"
+        android:layout_marginEnd="14dp">
+
+        <ImageView
+            android:id="@+id/ivWalletIcon"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_pm_momo"
+            android:contentDescription="@null" />
+    </FrameLayout>
+
+    <!-- Name + masked phone -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvWalletName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            tools:text="Ví MoMo" />
+
+        <TextView
+            android:id="@+id/tvMaskedPhone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="12sp"
+            android:textColor="@color/text_secondary"
+            tools:text="0912***678" />
+    </LinearLayout>
+
+    <!-- Unlink button -->
+    <TextView
+        android:id="@+id/btnUnlink"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:text="@string/pm_unlink"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:textColor="#EF4444"
+        android:gravity="center"
+        android:paddingHorizontal="12dp"
+        android:background="@drawable/bg_btn_unlink"
+        android:clickable="true"
+        android:focusable="true" />
+
+</LinearLayout>
