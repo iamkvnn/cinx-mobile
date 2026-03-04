@@ -141,7 +141,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Transactions group
         rowOrderHistory.setOnClickListener(v -> {
-            Intent intent = new Intent(this, CartActivity.class);
+            Intent intent = new Intent(this, PurchaseHistoryActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivity(intent);
         });

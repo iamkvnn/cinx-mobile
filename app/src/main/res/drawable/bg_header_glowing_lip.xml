@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  "Glowing lip" – a thin gradient line rendered at the bottom of the
+  header to add the high-end shimmering edge effect.
+  Placed as a View with height 2dp, width match_parent.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="0"
+        android:startColor="#00000000"
+        android:centerColor="#BBA9F5"
+        android:endColor="#00000000"
+        android:type="linear" />
+</shape>

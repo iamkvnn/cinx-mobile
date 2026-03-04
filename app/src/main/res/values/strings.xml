@@ -183,6 +183,43 @@
     <string name="pm_unlink_confirm">Bạn có chắc muốn hủy liên kết với ví này không?</string>
     <string name="pm_unlink_yes">Hủy liên kết</string>
     <string name="pm_unlink_cancel">Giữ lại</string>
+
+    <!-- ── Purchase History screen ─────────────────────────────── -->
+    <string name="order_history_title">Lịch sử đơn hàng</string>
+    <string name="order_history_back">Quay lại</string>
+    <string name="order_tab_all">Tất cả</string>
+    <string name="order_tab_completed">Thành công</string>
+    <string name="order_tab_pending">Chờ thanh toán</string>
+    <string name="order_tab_cancelled">Đã hủy</string>
+    <!-- Order card -->
+    <string name="order_id_label">%1$s</string>
+    <string name="order_date_prefix">Ngày đặt: %1$s</string>
+    <string name="order_status_completed">HOÀN THÀNH</string>
+    <string name="order_status_pending">CHỜ THANH TOÁN</string>
+    <string name="order_status_cancelled">ĐÃ HỦY</string>
+    <string name="order_by_instructor">Bởi %1$s</string>
+    <string name="order_original_price">%1$s</string>
+    <string name="order_more_items">Xem thêm %1$d sản phẩm</string>
+    <string name="order_collapse">Thu gọn ▲</string>
+    <string name="order_total_label">Thành tiền:</string>
+    <string name="order_course_image">Ảnh khóa học</string>
+    <!-- Action buttons -->
+    <string name="order_btn_review">Đánh giá</string>
+    <string name="order_btn_go_learn">Vào học ngay</string>
+    <string name="order_btn_cancel">Hủy đơn</string>
+    <string name="order_btn_pay_now">Thanh toán ngay</string>
+    <string name="order_btn_view_detail">Xem chi tiết</string>
+    <string name="order_btn_repurchase">Mua lại</string>
+    <!-- Empty state -->
+    <string name="order_empty_title">Không có đơn hàng nào</string>
+    <string name="order_empty_desc">Hãy khám phá và mua khóa học để\nbắt đầu hành trình học tập của bạn!</string>
+    <string name="order_empty_browse">Khám phá khóa học →</string>
+    <!-- Toast -->
+    <string name="order_cancel_toast">Đơn hàng %1$s đã được hủy (demo)</string>
+    <string name="order_review_toast">Mở đánh giá cho đơn %1$s (demo)</string>
+    <string name="order_pay_toast">Mở thanh toán cho đơn %1$s (demo)</string>
+    <string name="order_repurchase_toast">Thêm lại khóa học vào giỏ (demo)</string>
+    <string name="order_detail_toast">Xem chi tiết đơn %1$s (demo)</string>
     <string name="pm_unlinked_toast">Đã hủy liên kết %1$s</string>
 </resources>
 

@@ -56,5 +56,18 @@
     <!-- Certificate screen -->
     <color name="cert_grade_excellent_text">#B45309</color>
     <color name="cert_grade_good_text">#1D4ED8</color>
+
+    <!-- Purchase History screen -->
+    <color name="order_status_completed_text">#059669</color>   <!-- emerald-600 -->
+    <color name="order_status_completed_bg">#DCFCE7</color>     <!-- green-100   -->
+    <color name="order_status_pending_text">#D97706</color>     <!-- amber-600   -->
+    <color name="order_status_pending_bg">#FEF3C7</color>       <!-- amber-100   -->
+    <color name="order_status_cancelled_text">#DC2626</color>   <!-- red-600     -->
+    <color name="order_status_cancelled_bg">#FEE2E2</color>     <!-- red-100     -->
+    <color name="order_tab_active_text">#7C3AED</color>         <!-- violet-600  -->
+    <color name="order_tab_inactive_text">#64748B</color>       <!-- slate-500   -->
+    <color name="order_total_amount_text">#7C3AED</color>       <!-- violet-600  -->
+    <color name="order_header_bg">#F7F5FF</color>               <!-- violet-50   -->
+    <color name="order_header_shadow">#1F7C3AED</color>         <!-- violet/12%  -->
 </resources>
 

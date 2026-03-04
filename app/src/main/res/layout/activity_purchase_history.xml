@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  activity_purchase_history.xml
+  ─────────────────────────────
+  Structure:
+    ┌──────────────────────────────┐
+    │  Fixed header (AppBarLayout) │  ← glass-header look, rounded bottom
+    │  ┌──────────────────────────┐│
+    │  │  Title bar               ││
+    │  │  Scrollable tabs         ││
+    │  │  Glowing lip             ││
+    │  └──────────────────────────┘│
+    │  RecyclerView (orders)        │  ← scrolls beneath header
+    │  Empty state overlay          │
+    └──────────────────────────────┘
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_main_background">
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- Glass header (title bar + scrollable tabs)              -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_purchase_history_header"
+        android:elevation="8dp"
+        app:elevation="8dp">
+
+        <!-- ── Title bar ─────────────────────────────────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="4dp">
+
+            <!-- Back button -->
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_white_card"
+                android:contentDescription="@string/order_history_back"
+                android:elevation="2dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_chevron_left" />
+
+            <!-- Title -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/order_history_title"
+                android:textColor="@color/text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <!-- Search (placeholder icon) -->
+            <ImageButton
+                android:id="@+id/btnSearch"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_white_card"
+                android:contentDescription="@string/search"
+                android:elevation="2dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_search" />
+
+        </LinearLayout>
+
+        <!-- ── Scrollable tab bar ─────────────────────────────── -->
+        <HorizontalScrollView
+            android:id="@+id/hsvTabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fillViewport="false"
+            android:scrollbars="none"
+            android:paddingHorizontal="12dp"
+            android:paddingBottom="12dp"
+            android:paddingTop="4dp"
+            android:overScrollMode="never">
+
+            <LinearLayout
+                android:id="@+id/llTabs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- Tab: Tất cả -->
+                <TextView
+                    android:id="@+id/tabAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:gravity="center"
+                    android:paddingHorizontal="20dp"
+                    android:layout_marginEnd="4dp"
+                    android:text="@string/order_tab_all"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_order_tab_active"
+                    android:textColor="@color/order_tab_active_text" />
+
+                <!-- Tab: Thành công -->
+                <TextView
+                    android:id="@+id/tabCompleted"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:gravity="center"
+                    android:paddingHorizontal="20dp"
+                    android:layout_marginEnd="4dp"
+                    android:text="@string/order_tab_completed"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_order_tab_inactive"
+                    android:textColor="@color/order_tab_inactive_text" />
+
+                <!-- Tab: Chờ thanh toán -->
+                <TextView
+                    android:id="@+id/tabPending"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:gravity="center"
+                    android:paddingHorizontal="20dp"
+                    android:layout_marginEnd="4dp"
+                    android:text="@string/order_tab_pending"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_order_tab_inactive"
+                    android:textColor="@color/order_tab_inactive_text" />
+
+                <!-- Tab: Đã hủy -->
+                <TextView
+                    android:id="@+id/tabCancelled"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:gravity="center"
+                    android:paddingHorizontal="20dp"
+                    android:text="@string/order_tab_cancelled"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_order_tab_inactive"
+                    android:textColor="@color/order_tab_inactive_text" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- ── Glowing lip – thin gradient strip at header bottom ─ -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@drawable/bg_header_glowing_lip" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- Order list                                              -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvOrders"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="24dp"
+        android:overScrollMode="never"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:listitem="@layout/item_order_card" />
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- Empty state (shown when no orders match the active tab) -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/layoutOrderEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingHorizontal="32dp"
+        android:visibility="gone"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:visibility="gone">
+
+        <!-- Decorative icon -->
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/ic_empty_orders"
+            android:background="@drawable/bg_cart_empty_circle"
+            android:padding="16dp"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:text="@string/order_empty_title"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:gravity="center"
+            android:text="@string/order_empty_desc"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btnOrderEmptyBrowse"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:paddingHorizontal="28dp"
+            android:text="@string/order_empty_browse"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:background="@drawable/bg_gradient_button" />
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
