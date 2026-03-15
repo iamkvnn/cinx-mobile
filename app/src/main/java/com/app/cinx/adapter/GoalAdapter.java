@@ -19,10 +19,15 @@ import java.util.List;
 
 public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.VH> {
 
-    private final List<Goal> goals;
+    private List<Goal> goals;
 
     public GoalAdapter(List<Goal> goals) {
         this.goals = goals;
+    }
+
+    public void updateGoals(List<Goal> newGoals) {
+        this.goals = newGoals;
+        notifyDataSetChanged();
     }
 
     @NonNull @Override
