@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  item_calendar_day.xml
+  ─────────────────────
+  One cell in the calendar grid.
+  · todayBg  – semi-transparent purple oval, visible only on today's date
+  · tvDay    – day number text
+  · studiedDot – small primary-color dot shown when the user studied on that day
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="40dp"
+    android:layout_weight="1">
+
+    <!-- Today highlight -->
+    <View
+        android:id="@+id/todayBg"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_calendar_selected"
+        android:visibility="invisible" />
+
+    <!-- Day number -->
+    <TextView
+        android:id="@+id/tvDay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary" />
+
+    <!-- Studied indicator dot -->
+    <View
+        android:id="@+id/studiedDot"
+        android:layout_width="5dp"
+        android:layout_height="5dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/dot_indicator"
+        android:backgroundTint="@color/primary"
+        android:visibility="gone" />
+
+</FrameLayout>

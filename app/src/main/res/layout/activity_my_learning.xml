@@ -1,20 +1,310 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- This layout has been replaced by activity_my_learning_native.xml -->
-<!-- The native layout is now used directly in MyLearningActivity.java -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+  activity_my_learning.xml
+  ─────────────────────────
+  "Khóa học của tôi" screen — adapts the HTML prototype to native Android.
+
+  Structure:
+    ┌─────────────────────────────────────────────────────────────┐
+    │  AppBarLayout  (glass header, rounded bottom)               │
+    │    · title bar : back ← · "Khóa học của tôi" · bell 🔔     │
+    │    · search bar: [🔍 Tìm khóa học …]  [⚙ filter]           │
+    │    · tab bar  : Đang học (n) · Hoàn thành (n) · Đã lưu (n) │
+    ├─────────────────────────────────────────────────────────────┤
+    │  RecyclerView  (course cards, scrolls under the header)     │
+    │  Empty-state overlay (shown when list is empty)             │
+    ├─────────────────────────────────────────────────────────────┤
+    │  Floating navigation bar (bottom centre)                    │
+    └─────────────────────────────────────────────────────────────┘
+
+  The filter bottom-sheet is inflated as a BottomSheetDialog at runtime.
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8FAFC"
-    tools:context=".MyLearningActivity">
+    android:background="@drawable/bg_main_background"
+    tools:context=".activity.MyLearningActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!-- Glass header                                                     -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Redirected to native layout"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:background="@drawable/bg_purchase_history_header"
+        android:elevation="6dp"
+        app:elevation="6dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- ── Title bar ────────────────────────────────────────────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="4dp">
+
+            <!-- Back button -->
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_white_card"
+                android:padding="8dp"
+                android:src="@drawable/ic_chevron_left"
+                android:contentDescription="Quay lại"
+                android:elevation="2dp" />
+
+            <!-- Screen title -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Khóa học của tôi"
+                android:textColor="@color/text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <!-- Bell + notification dot -->
+            <FrameLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_white_card"
+                android:elevation="2dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_bell"
+                    app:tint="@color/text_secondary"
+                    android:contentDescription="Thông báo" />
+
+                <View
+                    android:layout_width="9dp"
+                    android:layout_height="9dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="7dp"
+                    android:layout_marginEnd="7dp"
+                    android:background="@drawable/bg_notification_dot" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <!-- ── Search bar ────────────────────────────────────────────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="8dp"
+            android:gravity="center_vertical">
+
+            <!-- Search input container -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_glass_input"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_search"
+                    app:tint="@color/text_placeholder"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="Tìm kiếm" />
+
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:hint="Tìm khóa học của bạn..."
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_placeholder"
+                    android:textSize="13sp"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch" />
+
+            </LinearLayout>
+
+            <!-- Filter icon button -->
+            <FrameLayout
+                android:id="@+id/btnFilter"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_white_card"
+                android:clickable="true"
+                android:focusable="true"
+                android:elevation="2dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_sliders"
+                    app:tint="@color/text_secondary"
+                    android:contentDescription="Bộ lọc" />
+
+                <!-- Active filter indicator dot -->
+                <View
+                    android:id="@+id/filterActiveDot"
+                    android:layout_width="9dp"
+                    android:layout_height="9dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/bg_cart_badge"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <!-- ── Tab bar ───────────────────────────────────────────────────── -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fillViewport="false"
+            android:scrollbars="none"
+            android:paddingHorizontal="12dp"
+            android:paddingBottom="12dp"
+            android:overScrollMode="never">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tabProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đang học"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_secondary"
+                    android:background="@drawable/bg_order_tab_inactive"
+                    android:paddingHorizontal="18dp"
+                    android:paddingVertical="9dp"
+                    android:layout_marginEnd="4dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/tabCompleted"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hoàn thành"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_secondary"
+                    android:background="@drawable/bg_order_tab_inactive"
+                    android:paddingHorizontal="18dp"
+                    android:paddingVertical="9dp"
+                    android:layout_marginEnd="4dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/tabSaved"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đã lưu"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_secondary"
+                    android:background="@drawable/bg_order_tab_inactive"
+                    android:paddingHorizontal="18dp"
+                    android:paddingVertical="9dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!-- Scrollable content area (RecyclerView + empty state)            -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <!-- Course list -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCourses"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="24dp"
+            android:clipToPadding="false"
+            android:scrollbars="none"
+            android:overScrollMode="never" />
+
+        <!-- Empty state (shown when no courses match current filters) -->
+        <LinearLayout
+            android:id="@+id/layoutEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="@drawable/bg_icon_purple">
+
+                <ImageView
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_empty_orders"
+                    app:tint="#A78BFA"
+                    android:contentDescription="Trống" />
+
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trống"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Không tìm thấy khóa học nào phù hợp với điều kiện của bạn."
+                android:textSize="13sp"
+                android:textColor="@color/text_secondary"
+                android:gravity="center"
+                android:paddingHorizontal="32dp"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

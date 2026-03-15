@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Violet-100 background for "TIẾP THEO" badge label -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#EDE9FE" />
+    <corners android:radius="4dp" />
+</shape>

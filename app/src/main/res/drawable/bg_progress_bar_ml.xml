@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Custom progress bar drawable for MyLearning screen.
+  Background: light slate (#E2E8F0), fill: violet→fuchsia gradient.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@android:id/background">
+        <shape>
+            <solid android:color="#E2E8F0" />
+            <corners android:radius="6dp" />
+        </shape>
+    </item>
+
+    <item android:id="@android:id/secondaryProgress">
+        <scale android:scaleWidth="100%">
+            <shape>
+                <solid android:color="#E2E8F0" />
+                <corners android:radius="6dp" />
+            </shape>
+        </scale>
+    </item>
+
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape>
+                <gradient
+                    android:startColor="#8B5CF6"
+                    android:endColor="#EC4899"
+                    android:angle="0" />
+                <corners android:radius="6dp" />
+            </shape>
+        </clip>
+    </item>
+
+</layer-list>

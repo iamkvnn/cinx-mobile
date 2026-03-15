@@ -1,21 +1,16 @@
 package com.app.cinx.util;
 
-import static com.app.cinx.util.Convert.dpToPx;
-
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.app.Activity;
 
-import androidx.core.content.res.ResourcesCompat;
-
-import com.app.cinx.DiscoveryActivity;
-import com.app.cinx.MainActivity;
-import com.app.cinx.ProfileActivity;
+import com.app.cinx.activity.DiscoveryActivity;
+import com.app.cinx.activity.MainActivity;
+import com.app.cinx.activity.ProfileActivity;
 import com.app.cinx.R;
+import com.app.cinx.activity.LearningScheduleActivity;
 
 public class NavHelper {
 
@@ -50,7 +45,7 @@ public class NavHelper {
 
         coursesBtn.setOnClickListener(v -> {
             if (activeTabId != R.id.navCourses) {
-                Intent intent = new Intent(activity, com.app.cinx.MyLearningActivity.class);
+                Intent intent = new Intent(activity, LearningScheduleActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 activity.startActivity(intent);
             }

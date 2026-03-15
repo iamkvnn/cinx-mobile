@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8FAFC"
-    tools:context=".MyLearningActivity">
+    tools:context=".activity.MyLearningActivity">
 
     <!-- Background Blobs -->
     <View
@@ -370,54 +370,45 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Segmented Tab Control -->
-                    <FrameLayout
-                        android:id="@+id/segmentedControl"
+                    <!-- Section header: label + "Xem tất cả" -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="24dp"
-                        android:layout_marginHorizontal="16dp"
-                        android:background="@drawable/bg_segmented_control"
-                        android:padding="4dp">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp"
+                        android:paddingHorizontal="4dp">
 
                         <View
-                            android:id="@+id/tabIndicator"
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:background="@drawable/dot_indicator"
+                            android:backgroundTint="@color/primary"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/bg_segment_active"
-                            android:elevation="2dp" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:elevation="3dp">
+                            android:layout_weight="1"
+                            android:text="ĐANG HỌC"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_secondary" />
 
-                            <TextView
-                                android:id="@+id/tabInProgress"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Đang học (3)"
-                                android:gravity="center"
-                                android:padding="10dp"
-                                android:textSize="13sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/text_primary" />
+                        <TextView
+                            android:id="@+id/btnViewAllCourses"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Xem tất cả →"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:paddingVertical="4dp" />
 
-                            <TextView
-                                android:id="@+id/tabCompleted"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Chứng chỉ (12)"
-                                android:gravity="center"
-                                android:padding="10dp"
-                                android:textSize="13sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/text_secondary" />
-                        </LinearLayout>
-                    </FrameLayout>
+                    </LinearLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/coursesRecyclerView"
@@ -425,6 +416,7 @@
                         android:layout_height="wrap_content"
                         android:nestedScrollingEnabled="false"
                         android:overScrollMode="never" />
+
                 </LinearLayout>
 
                 <!-- Bottom Spacing -->

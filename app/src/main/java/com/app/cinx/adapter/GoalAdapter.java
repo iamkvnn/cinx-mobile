@@ -1,6 +1,6 @@
 package com.app.cinx.adapter;
 
-import android.graphics.Color;
+import android.content.res.ColorStateList;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,92 +17,90 @@ import com.app.cinx.model.Goal;
 
 import java.util.List;
 
-public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.ViewHolder> {
+public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.VH> {
 
-    private List<Goal> goals;
+    private final List<Goal> goals;
 
     public GoalAdapter(List<Goal> goals) {
         this.goals = goals;
     }
 
-    public void updateGoals(List<Goal> newGoals) {
-        this.goals = newGoals;
-        notifyDataSetChanged();
-    }
-
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_goal, parent, false);
-        return new ViewHolder(view);
+    @NonNull @Override
+    public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_goal, parent, false);
+        return new VH(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull VH h, int position) {
         Goal goal = goals.get(position);
-        holder.bind(goal);
-    }
 
-    @Override
-    public int getItemCount() {
-        return goals.size();
-    }
+        int iconRes;
+        int iconTint;
+        int bgTint;
+        switch (goal.getType()) {
+            case "video":
+                iconRes  = R.drawable.ic_play;
+                iconTint = 0xFF3B82F6;
+                bgTint   = 0x1A3B82F6;
+                break;
+            case "quiz":
+                iconRes  = R.drawable.ic_quiz;
+                iconTint = 0xFFF59E0B;
+                bgTint   = 0x1AF59E0B;
+                break;
+            case "code":
+                iconRes  = R.drawable.ic_book;
+                iconTint = 0xFF10B981;
+                bgTint   = 0x1A10B981;
+                break;
+            default:
+                iconRes  = R.drawable.ic_zap;
+                iconTint = h.ivGoalIcon.getContext().getColor(R.color.primary);
+                bgTint   = 0x1A7C3AED;
+                break;
+        }
+        h.goalIconBg.setBackgroundTintList(ColorStateList.valueOf(bgTint));
+        h.ivGoalIcon.setImageResource(iconRes);
+        h.ivGoalIcon.setColorFilter(iconTint);
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        FrameLayout iconContainer;
-        ImageView icon;
-        TextView tvGoalText;
-        TextView tvTime;
-
-        ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            iconContainer = itemView.findViewById(R.id.iconContainer);
-            icon = itemView.findViewById(R.id.icon);
-            tvGoalText = itemView.findViewById(R.id.tvGoalText);
-            tvTime = itemView.findViewById(R.id.tvTime);
+        h.tvGoalText.setText(goal.getText());
+        if (goal.isDone()) {
+            h.tvGoalText.setPaintFlags(h.tvGoalText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            h.tvGoalText.setAlpha(0.45f);
+        } else {
+            h.tvGoalText.setPaintFlags(h.tvGoalText.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+            h.tvGoalText.setAlpha(1f);
         }
 
-        void bind(Goal goal) {
-            tvGoalText.setText(goal.getText());
-            tvTime.setText(goal.getTime());
+        h.tvGoalTime.setText(goal.getTime());
 
-            if (goal.isDone()) {
-                // Green done state
-                iconContainer.setBackgroundTintList(
-                        android.content.res.ColorStateList.valueOf(Color.parseColor("#DCFCE7")));
-                icon.setImageResource(R.drawable.ic_check_circle);
-                icon.setColorFilter(Color.parseColor("#16A34A"));
+        if (goal.isDone()) {
+            h.ivGoalCheck.setImageResource(R.drawable.ic_check_circle);
+            h.ivGoalCheck.setColorFilter(
+                    h.ivGoalCheck.getContext().getColor(R.color.success_green));
+        } else {
+            h.ivGoalCheck.setImageResource(R.drawable.ic_circle_outline);
+            h.ivGoalCheck.setColorFilter(
+                    h.ivGoalCheck.getContext().getColor(R.color.text_secondary));
+        }
+    }
 
-                tvGoalText.setTextColor(Color.parseColor("#94A3B8"));
-                tvGoalText.setPaintFlags(tvGoalText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            } else {
-                // Violet pending state
-                iconContainer.setBackgroundTintList(
-                        android.content.res.ColorStateList.valueOf(Color.parseColor("#F5F3FF")));
-                icon.setColorFilter(Color.parseColor("#7C3AED"));
+    @Override public int getItemCount() { return goals.size(); }
 
-                tvGoalText.setTextColor(Color.parseColor("#334155"));
-                tvGoalText.setPaintFlags(tvGoalText.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+    static class VH extends RecyclerView.ViewHolder {
+        final FrameLayout goalIconBg;
+        final ImageView   ivGoalIcon, ivGoalCheck;
+        final TextView    tvGoalText, tvGoalTime;
 
-                // Set icon based on type
-                switch (goal.getType()) {
-                    case "quiz":
-                        icon.setImageResource(R.drawable.ic_check_circle);
-                        break;
-                    case "video":
-                        icon.setImageResource(R.drawable.ic_play);
-                        break;
-                    case "code":
-                        icon.setImageResource(R.drawable.ic_book);
-                        break;
-                    case "add":
-                        icon.setImageResource(R.drawable.ic_zap);
-                        break;
-                    default:
-                        icon.setImageResource(R.drawable.ic_star);
-                        break;
-                }
-            }
+        VH(View v) {
+            super(v);
+            goalIconBg  = v.findViewById(R.id.goalIconBg);
+            ivGoalIcon  = v.findViewById(R.id.ivGoalIcon);
+            ivGoalCheck = v.findViewById(R.id.ivGoalCheck);
+            tvGoalText  = v.findViewById(R.id.tvGoalText);
+            tvGoalTime  = v.findViewById(R.id.tvGoalTime);
         }
     }
 }

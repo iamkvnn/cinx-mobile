@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EduFuture - Khóa học của tôi</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+        }
+
+        /* Animations */
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+        }
+
+        /* Khối Header liền mạch bo góc lơ lửng */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+            border-bottom-left-radius: 2rem;
+            border-bottom-right-radius: 2rem;
+            box-shadow: 0 12px 40px -10px rgba(124, 58, 237, 0.15);
+            position: relative;
+        }
+        .glass-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.6), transparent);
+            border-radius: 2px;
+        }
+
+        /* Search Input */
+        .search-glass {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.3s;
+        }
+        .search-glass:focus-within {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: #c4b5fd; /* violet-300 */
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1), inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        /* Tabs Styling (Pill shape) */
+        .tab-btn {
+            white-space: nowrap;
+            padding: 8px 20px;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #64748b; 
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: transparent;
+            border: 1px solid transparent;
+        }
+        .tab-btn:active { transform: scale(0.95); }
+        .tab-btn.active {
+            color: #7c3aed;
+            background: #ffffff;
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            box-shadow: 0 4px 16px rgba(124, 58, 237, 0.12), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Bottom Nav Styling */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.15);
+        }
+        .nav-item.active .nav-bg { opacity: 1; transform: scale(1); }
+        .nav-item.active .nav-icon { transform: translateY(-4px); color: #7c3aed; }
+        .nav-item.active .nav-icon svg { fill: #ddd6fe; stroke-width: 2.5; }
+        .nav-item.active .nav-dot { transform: scale(1); opacity: 1; }
+
+        /* Bottom Sheet (Filter) */
+        .bottom-sheet {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: translateY(100%);
+        }
+        .bottom-sheet.open {
+            transform: translateY(0);
+        }
+        .sheet-overlay {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .sheet-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* Filter Option Chips */
+        .filter-chip {
+            padding: 8px 16px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            transition: all 0.2s;
+            background: transparent;
+        }
+        .filter-chip.active {
+            background: #7c3aed;
+            color: white;
+            border-color: #7c3aed;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.2);
+        }
+
+        /* Hide Scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-slate-800 pb-10 overflow-x-hidden relative min-h-screen flex flex-col">
+
+<div class="fixed inset-0 z-0 pointer-events-none">
+    <div class="absolute top-[-10%] left-[-10%] w-[70%] h-[50%] bg-blue-200/30 rounded-full blur-[80px] mix-blend-multiply animate-blob"></div>
+    <div class="absolute top-[30%] right-[-20%] w-[70%] h-[50%] bg-violet-200/30 rounded-full blur-[80px] mix-blend-multiply animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-[-10%] left-[10%] w-[70%] h-[50%] bg-fuchsia-200/30 rounded-full blur-[80px] mix-blend-multiply animate-blob animation-delay-4000"></div>
+</div>
+
+<div class="max-w-md mx-auto w-full relative z-10 flex flex-col min-h-screen">
+
+    <header class="fixed top-0 w-full max-w-md z-50 transition-all duration-300 glass-header flex flex-col pt-3 pb-3">
+        <div class="flex justify-between items-center px-4 mb-4">
+            <button class="w-10 h-10 rounded-full bg-slate-100/80 flex items-center justify-center text-slate-700 shadow-sm active:scale-95 transition-transform shrink-0" onclick="window.history.back()">
+                <i data-lucide="chevron-left" class="w-6 h-6"></i>
+            </button>
+            <h1 class="text-lg font-black text-slate-800 tracking-tight flex-1 text-center">Khóa học của tôi</h1>
+            <button class="w-10 h-10 rounded-full flex items-center justify-center text-slate-600 active:bg-slate-100 transition-colors relative shrink-0">
+                <i data-lucide="bell" class="w-5 h-5"></i>
+                <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
+            </button>
+        </div>
+
+        <div class="px-4 mb-4">
+            <div class="search-glass rounded-2xl flex items-center p-2.5">
+                <i data-lucide="search" class="w-5 h-5 text-slate-400 ml-1"></i>
+                <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Tìm khóa học của bạn..." class="bg-transparent border-none outline-none w-full px-2 text-sm font-semibold text-slate-700 placeholder:text-slate-400 placeholder:font-medium">
+                <button onclick="openFilterSheet()" class="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 active:bg-slate-200 transition-colors relative">
+                    <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                    <!-- Dấu chấm thông báo khi có bộ lọc đang bật -->
+                    <span id="filter-active-dot" class="hidden absolute top-0 right-0 w-2.5 h-2.5 bg-violet-500 border-2 border-slate-100 rounded-full"></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="w-full">
+            <div class="flex overflow-x-auto no-scrollbar gap-2 px-4 snap-x pb-1">
+                <button class="tab-btn active snap-start" onclick="switchTab('progress', this)">Đang học (3)</button>
+                <button class="tab-btn snap-start" onclick="switchTab('completed', this)">Hoàn thành (12)</button>
+                <button class="tab-btn snap-start" onclick="switchTab('saved', this)">Đã lưu (5)</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-[180px] px-4 pb-8 flex-1 flex flex-col space-y-5" id="courses-container">
+        </main>
+
+    <!-- Filter Bottom Sheet -->
+    <div class="fixed inset-0 z-[100] sheet-overlay bg-slate-900/40 backdrop-blur-sm" id="filter-overlay" onclick="closeFilterSheet()"></div>
+
+    <div class="fixed bottom-0 left-0 right-0 z-[110] bottom-sheet" id="filter-sheet">
+        <div class="max-w-md mx-auto bg-white/95 backdrop-blur-2xl rounded-t-[2.5rem] shadow-2xl flex flex-col h-[60vh]">
+            <!-- Drag Handle -->
+            <div class="w-full pt-4 pb-2 flex justify-center shrink-0 cursor-pointer" onclick="closeFilterSheet()">
+                <div class="w-12 h-1.5 bg-slate-300 rounded-full"></div>
+            </div>
+
+            <div class="px-6 pb-4 border-b border-slate-100 shrink-0 flex justify-between items-center">
+                <h3 class="text-xl font-black text-slate-800">Bộ lọc</h3>
+                <button onclick="resetFilters()" class="text-xs font-bold text-slate-500 hover:text-violet-600 active:scale-95 transition-transform">Đặt lại</button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto px-6 py-6 space-y-6 no-scrollbar">
+                <!-- Sắp xếp -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Sắp xếp theo</h4>
+                    <div class="flex flex-wrap gap-2" id="sort-filters">
+                        <button class="filter-chip active" onclick="setTempSort('recent', this)">Truy cập gần đây</button>
+                        <button class="filter-chip" onclick="setTempSort('progress_high', this)">Tiến độ cao nhất</button>
+                        <button class="filter-chip" onclick="setTempSort('progress_low', this)">Tiến độ thấp nhất</button>
+                    </div>
+                </div>
+
+                <!-- Danh mục -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Danh mục</h4>
+                    <div class="flex flex-wrap gap-2" id="category-filters">
+                        <button class="filter-chip active" onclick="setTempCategory('all', this)">Tất cả</button>
+                        <button class="filter-chip" onclick="setTempCategory('Design', this)">Design</button>
+                        <button class="filter-chip" onclick="setTempCategory('Coding', this)">Coding</button>
+                        <button class="filter-chip" onclick="setTempCategory('Business', this)">Business</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-slate-100 shrink-0 bg-white/50 backdrop-blur-md">
+                <button class="w-full h-14 rounded-2xl bg-slate-900 text-white font-bold text-sm shadow-xl shadow-slate-900/20 active:scale-95 transition-all flex items-center justify-center" onclick="applyFilters()">
+                    Áp dụng
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- MOCK DATA ---
+    const myCoursesData = [
+        {
+            id: 1,
+            status: 'progress',
+            title: "UI/UX Design Masterclass: Từ Cơ Bản Đến Nâng Cao",
+            instructor: "Hà Linh",
+            image: "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80",
+            progress: 65,
+            nextLesson: "Bài 4.2: Component & Auto Layout",
+            lastAccessed: "2 giờ trước",
+            category: "Design" // Đã thêm danh mục
+        },
+        {
+            id: 2,
+            status: 'progress',
+            title: "Fullstack React & Node.js cho người mới",
+            instructor: "Minh Tuấn",
+            image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=300&q=80",
+            progress: 15,
+            nextLesson: "Bài 2.1: Cài đặt môi trường Node.js",
+            lastAccessed: "Hôm qua",
+            category: "Coding"
+        },
+        {
+            id: 3,
+            status: 'progress',
+            title: "Mobile App Design với Figma",
+            instructor: "Hà Linh",
+            image: "https://images.unsplash.com/photo-1555099962-4199c345e5dd?w=300&q=80",
+            progress: 2,
+            nextLesson: "Bài 1.1: Giới thiệu khóa học",
+            lastAccessed: "Tuần trước",
+            category: "Design"
+        },
+        {
+            id: 4,
+            status: 'completed',
+            title: "Digital Marketing 101: SEO & Ads",
+            instructor: "Sarah Nguyễn",
+            image: "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=300&q=80",
+            progress: 100,
+            completionDate: "15/04/2026",
+            grade: "9.5/10",
+            category: "Business"
+        }
+    ];
+
+    // --- GLOBAL STATES ---
+    let currentTab = 'progress';
+    let searchQuery = '';
+    
+    // Trạng thái đã được áp dụng
+    let activeSort = 'recent'; 
+    let activeCategory = 'all';
+
+    // Trạng thái tạm thời khi thao tác trên bảng lọc
+    let tempSort = 'recent';
+    let tempCategory = 'all';
+
+    // --- RENDER LOGIC ---
+    function renderCourses() {
+        const container = document.getElementById('courses-container');
+        
+        // Lọc theo Tab (Status)
+        let filteredCourses = myCoursesData.filter(course => course.status === currentTab);
+
+        // Lọc theo Tìm kiếm (Search)
+        if (searchQuery.trim() !== '') {
+            const query = searchQuery.toLowerCase();
+            filteredCourses = filteredCourses.filter(course => 
+                course.title.toLowerCase().includes(query) || 
+                course.instructor.toLowerCase().includes(query)
+            );
+        }
+
+        // Lọc theo Danh mục (Category)
+        if (activeCategory !== 'all') {
+            filteredCourses = filteredCourses.filter(course => course.category === activeCategory);
+        }
+
+        // Sắp xếp (Sort)
+        if (activeSort === 'progress_high') {
+            filteredCourses.sort((a, b) => (b.progress || 0) - (a.progress || 0));
+        } else if (activeSort === 'progress_low') {
+            filteredCourses.sort((a, b) => (a.progress || 0) - (b.progress || 0));
+        } else {
+            // recent: Mặc định giữ thứ tự như mock data
+            filteredCourses.sort((a, b) => a.id - b.id);
+        }
+
+        // Reset Animation
+        container.classList.remove('animate-fade-in');
+        void container.offsetWidth; // trigger reflow
+        container.classList.add('animate-fade-in');
+
+        // Render Empty State
+        if (filteredCourses.length === 0) {
+            container.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center py-12 opacity-80">
+                    <div class="w-32 h-32 bg-white/50 rounded-full flex items-center justify-center mb-6 shadow-inner relative">
+                        <div class="absolute inset-0 bg-violet-200/40 rounded-full blur-xl animate-pulse"></div>
+                        <i data-lucide="inbox" class="w-12 h-12 text-violet-400 relative z-10 stroke-[1.5]"></i>
+                    </div>
+                    <h2 class="text-lg font-bold text-slate-800 mb-2">Trống</h2>
+                    <p class="text-sm text-slate-500 text-center px-4">Không tìm thấy khóa học nào phù hợp với điều kiện của bạn.</p>
+                </div>
+            `;
+            lucide.createIcons();
+            return;
+        }
+
+        // Render List
+        container.innerHTML = filteredCourses.map((course, index) => {
+            
+            // Layout riêng cho Đang học (Progress)
+            if (course.status === 'progress') {
+                return `
+                    <div class="glass-panel p-4 rounded-[1.5rem] flex flex-col gap-4 animate-slide-up" style="animation-delay: ${index * 0.1}s">
+                        
+                        <div class="flex gap-4 relative">
+                            <button class="absolute -top-1 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-slate-400 active:bg-slate-100 transition-colors">
+                                <i data-lucide="more-vertical" class="w-5 h-5"></i>
+                            </button>
+
+                            <img src="${course.image}" class="w-20 h-20 md:w-24 md:h-24 rounded-2xl object-cover shadow-sm shrink-0">
+                            
+                            <div class="flex-1 pr-6 flex flex-col justify-center">
+                                <h3 class="font-bold text-sm md:text-base text-slate-800 line-clamp-2 leading-snug mb-1">${course.title}</h3>
+                                <p class="text-[11px] text-slate-500 font-medium">Bởi ${course.instructor} <span class="mx-1">•</span> <span class="text-violet-600">${course.category}</span></p>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+                            <div class="flex justify-between items-end mb-2">
+                                <p class="text-[10px] font-bold text-violet-600 bg-violet-100 px-2 py-0.5 rounded uppercase tracking-wide">Tiếp theo</p>
+                                <p class="text-[10px] text-slate-400 font-semibold flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> ${course.lastAccessed}</p>
+                            </div>
+                            <p class="text-xs font-bold text-slate-700 mb-3 truncate pr-2">${course.nextLesson}</p>
+                            
+                            <div class="flex items-center gap-3">
+                                <div class="flex-1 bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                                    <div class="bg-gradient-to-r from-violet-500 to-fuchsia-500 h-full rounded-full transition-all duration-1000" style="width: ${course.progress}%"></div>
+                                </div>
+                                <span class="text-[10px] font-black text-slate-500 w-8 text-right">${course.progress}%</span>
+                            </div>
+                        </div>
+
+                        <button class="w-full py-3.5 bg-slate-900 text-white rounded-[14px] font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-transform shadow-lg shadow-slate-900/20">
+                            Tiếp tục học <i data-lucide="play-circle" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+            } 
+            
+            // Layout riêng cho Đã hoàn thành (Completed)
+            else if (course.status === 'completed') {
+                return `
+                    <div class="glass-panel p-4 rounded-[1.5rem] flex flex-col gap-4 animate-slide-up opacity-95 hover:opacity-100" style="animation-delay: ${index * 0.1}s">
+                        <div class="flex gap-4 relative">
+                            <button class="absolute -top-1 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-slate-400 active:bg-slate-100 transition-colors">
+                                <i data-lucide="more-vertical" class="w-5 h-5"></i>
+                            </button>
+
+                            <div class="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden shrink-0">
+                                <img src="${course.image}" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-green-500/20 flex items-center justify-center backdrop-blur-[1px]">
+                                    <i data-lucide="check-circle-2" class="w-8 h-8 text-white drop-shadow-md"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="flex-1 pr-6 flex flex-col justify-center">
+                                <h3 class="font-bold text-sm md:text-base text-slate-800 line-clamp-2 leading-snug mb-1">${course.title}</h3>
+                                <p class="text-[11px] text-slate-500 font-medium">Hoàn thành: ${course.completionDate} <span class="mx-1">•</span> <span class="text-violet-600">${course.category}</span></p>
+                                <div class="mt-2">
+                                    <span class="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded border border-green-200">Điểm: ${course.grade}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button class="flex-1 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-[12px] font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-transform">
+                                <i data-lucide="star" class="w-3.5 h-3.5"></i> Đánh giá
+                            </button>
+                            <button class="flex-1 py-2.5 bg-violet-100 text-violet-700 rounded-[12px] font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-transform">
+                                <i data-lucide="award" class="w-3.5 h-3.5"></i> Nhận chứng chỉ
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }).join('');
+
+        lucide.createIcons();
+    }
+
+    // --- TAB SWITCH LOGIC ---
+    function switchTab(status, btnElement) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+        btnElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+        currentTab = status;
+        renderCourses();
+    }
+
+    // --- SEARCH LOGIC ---
+    function handleSearch(value) {
+        searchQuery = value;
+        renderCourses();
+    }
+
+    // --- FILTER BOTTOM SHEET LOGIC ---
+    function openFilterSheet() {
+        // Đồng bộ UI nút bấm với trạng thái temp
+        updateFilterUI();
+        document.getElementById('filter-sheet').classList.add('open');
+        document.getElementById('filter-overlay').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeFilterSheet() {
+        document.getElementById('filter-sheet').classList.remove('open');
+        document.getElementById('filter-overlay').classList.remove('open');
+        document.body.style.overflow = '';
+        
+        // Hủy bỏ các thao tác chưa bấm Áp dụng
+        tempSort = activeSort;
+        tempCategory = activeCategory;
+    }
+
+    function setTempSort(val, btnElement) {
+        tempSort = val;
+        document.querySelectorAll('#sort-filters .filter-chip').forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+    }
+
+    function setTempCategory(val, btnElement) {
+        tempCategory = val;
+        document.querySelectorAll('#category-filters .filter-chip').forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+    }
+
+    function applyFilters() {
+        // Lưu trạng thái
+        activeSort = tempSort;
+        activeCategory = tempCategory;
+        
+        // Hiển thị/ẩn dấu chấm thông báo có bộ lọc
+        const dot = document.getElementById('filter-active-dot');
+        if(activeSort !== 'recent' || activeCategory !== 'all') {
+            dot.classList.remove('hidden');
+        } else {
+            dot.classList.add('hidden');
+        }
+
+        renderCourses();
+        closeFilterSheet();
+    }
+
+    function resetFilters() {
+        tempSort = 'recent';
+        tempCategory = 'all';
+        updateFilterUI();
+    }
+
+    function updateFilterUI() {
+        // Update Sort Chips
+        const sortButtons = document.querySelectorAll('#sort-filters .filter-chip');
+        sortButtons[0].classList.toggle('active', tempSort === 'recent');
+        sortButtons[1].classList.toggle('active', tempSort === 'progress_high');
+        sortButtons[2].classList.toggle('active', tempSort === 'progress_low');
+
+        // Update Category Chips
+        const catButtons = document.querySelectorAll('#category-filters .filter-chip');
+        catButtons[0].classList.toggle('active', tempCategory === 'all');
+        catButtons[1].classList.toggle('active', tempCategory === 'Design');
+        catButtons[2].classList.toggle('active', tempCategory === 'Coding');
+        catButtons[3].classList.toggle('active', tempCategory === 'Business');
+    }
+
+    // --- INIT ---
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        renderCourses(); // Mặc định dùng state hiện tại
+    });
+
+</script>
+</body>
+</html>

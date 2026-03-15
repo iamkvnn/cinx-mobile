@@ -195,6 +195,7 @@
             </FrameLayout>
 
             <TextView
+                android:id="@+id/btn_forgot_password"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
@@ -202,6 +203,8 @@
                 android:textColor="@color/primary"
                 android:textStyle="bold"
                 android:textSize="12sp"
+                android:clickable="true"
+                android:focusable="true"
                 android:layout_marginBottom="20dp"/>
 
             <androidx.appcompat.widget.AppCompatButton

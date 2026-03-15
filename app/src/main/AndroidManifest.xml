@@ -5,6 +5,7 @@
     <application
         android:hardwareAccelerated="true"
         android:allowBackup="true"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -13,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Cinx">
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,75 +24,85 @@
         </activity>
         
         <activity
-            android:name=".LoginActivity"
+            android:name=".activity.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         
         <activity
-            android:name=".RegisterActivity"
+            android:name=".activity.RegisterActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
+        <activity
+            android:name=".activity.ForgotPasswordActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+
         
         <activity
-            android:name=".DiscoveryActivity"
+            android:name=".activity.DiscoveryActivity"
             android:exported="false" />
 
         <activity
-            android:name=".MyLearningActivity"
+            android:name=".activity.MyLearningActivity"
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".CourseDetailActivity"
+            android:name=".activity.LearningScheduleActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.CourseDetailActivity"
             android:exported="false" />
 
         <activity
-            android:name=".LessonActivity"
+            android:name=".activity.LessonActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".CartActivity"
+            android:name=".activity.CartActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".CheckoutActivity"
+            android:name=".activity.CheckoutActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".PaymentSuccessActivity"
+            android:name=".activity.PaymentSuccessActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ProfileActivity"
+            android:name=".activity.ProfileActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".CertificatesActivity"
+            android:name=".activity.CertificatesActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".VouchersActivity"
+            android:name=".activity.VouchersActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".PaymentMethodsActivity"
+            android:name=".activity.PaymentMethodsActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".PurchaseHistoryActivity"
+            android:name=".activity.PurchaseHistoryActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
