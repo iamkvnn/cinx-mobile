@@ -1,5 +1,6 @@
 package com.app.cinx.adapter;
 
+import com.app.cinx.util.PriceUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +60,8 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
         ImageView instructorAvatar;
         TextView instructorName;
         TextView coursePrice;
+        TextView originalPrice;
+        TextView discountRate;
         View favButton;
 
         public CourseViewHolder(@NonNull View itemView) {
@@ -71,6 +74,8 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
             instructorAvatar = itemView.findViewById(R.id.instructorAvatar);
             instructorName = itemView.findViewById(R.id.instructorName);
             coursePrice = itemView.findViewById(R.id.coursePrice);
+            originalPrice = itemView.findViewById(R.id.originalPrice);
+            discountRate = itemView.findViewById(R.id.discountRate);
             favButton = itemView.findViewById(R.id.favButton);
         }
 
@@ -80,7 +85,24 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
             courseStudents.setText("(" + course.getStudents() + ")");
             courseTitle.setText(course.getTitle());
             instructorName.setText(course.getInstructor());
-            coursePrice.setText(course.getPrice());
+            
+            if (course.getDiscountRate() > 0) {
+                coursePrice.setText(PriceUtil.formatPrice(course.getDiscountedPrice()));
+                if (originalPrice != null) {
+                    originalPrice.setVisibility(View.VISIBLE);
+                    originalPrice.setText(PriceUtil.formatPrice(course.getPrice()));
+                    originalPrice.setPaintFlags(originalPrice.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+                }
+                if (discountRate != null) {
+                    discountRate.setVisibility(View.VISIBLE);
+                    discountRate.setText("-" + course.getDiscountRate() + "%");
+                }
+            } else {
+                coursePrice.setText(PriceUtil.formatPrice(course.getPrice()));
+                if (originalPrice != null) originalPrice.setVisibility(View.GONE);
+                if (discountRate != null) discountRate.setVisibility(View.GONE);
+            }
+
 
             // Load course image
             Glide.with(itemView.getContext())

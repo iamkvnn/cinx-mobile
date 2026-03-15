@@ -64,8 +64,9 @@
     <!-- Radio button -->
     <RadioButton
         android:id="@+id/rbVoucher"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:buttonTint="@color/primary"
         android:clickable="false"
         android:focusable="false" />

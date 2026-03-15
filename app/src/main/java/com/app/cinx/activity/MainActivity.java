@@ -184,6 +184,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCourseClick(Course course) {
                 android.content.Intent intent = new android.content.Intent(MainActivity.this, CourseDetailActivity.class);
+                intent.putExtra("COURSE_ID", course.getId());
+                intent.putExtra("COURSE_TITLE", course.getTitle());
+                intent.putExtra("COURSE_PRICE", course.getPrice());
+                intent.putExtra("COURSE_DISCOUNTED_PRICE", course.getDiscountedPrice());
                 startActivity(intent);
             }
 
@@ -219,13 +223,11 @@ public class MainActivity extends AppCompatActivity {
 
     private List<Course> getCoursesList() {
         List<Course> courses = new ArrayList<>();
-        courses.add(new Course(1, "UI/UX Design Masterclass", "Hà Linh", 4.9, "12k", "599k",
-                "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80", "Design"));
-        courses.add(new Course(2, "Fullstack React & Node.js", "Minh Tuấn", 4.8, "8.5k", "899k",
-                "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80", "Coding"));
-        courses.add(new Course(3, "Digital Marketing 101", "Sarah Nguyễn", 4.7, "15k", "450k",
+        courses.add(new Course(1, "UI/UX Design Masterclass", "Hà Linh", 4.9, "12k", 1200000L, 599000L, 50, "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80", "Design", "22h"));
+        courses.add(new Course(2, "Fullstack React & Node.js", "Minh Tuấn", 4.8, "8.5k", 1200000L, 899000L, 25, "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80", "Coding", "40h"));
+        courses.add(new Course(3, "Digital Marketing 101", "Sarah Nguyễn", 4.7, "15k", 450000L,
                 "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=800&q=80", "Business"));
-        courses.add(new Course(4, "Nhiếp ảnh đường phố", "Quang Hải", 4.9, "5k", "399k",
+        courses.add(new Course(4, "Nhiếp ảnh đường phố", "Quang Hải", 4.9, "5k", 399000L,
                 "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=800&q=80", "Art"));
         return courses;
     }

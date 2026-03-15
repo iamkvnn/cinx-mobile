@@ -3,6 +3,7 @@ package com.app.cinx.activity;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -16,6 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
+import com.app.cinx.util.UserManager;
+import android.widget.Toast;
 import com.app.cinx.adapter.CourseCurriculumAdapter;
 import com.app.cinx.data.SampleCourseData;
 import com.app.cinx.data.CartRepository;
@@ -28,7 +31,7 @@ import java.util.List;
 public class CourseDetailActivity extends AppCompatActivity {
 
     // Purchase state — replace with actual API result in production
-    private boolean isPurchased = true;
+    private boolean isPurchased = false;
     private boolean isDescriptionExpanded = false;
 
     // ── Layout views ──────────────────────────────────────────────────────
@@ -115,10 +118,43 @@ public class CourseDetailActivity extends AppCompatActivity {
 
         // Strike-through original price
         TextView tvOriginalPrice = findViewById(R.id.tvOriginalPrice);
-        if (tvOriginalPrice != null) {
-            tvOriginalPrice.setPaintFlags(
-                    tvOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        TextView tvCurrentPrice = findViewById(R.id.tvCurrentPrice);
+        int courseId = getIntent().getIntExtra("COURSE_ID", -1);
+        if (courseId == 1 && UserManager.getInstance().isLoggedIn()) {
+            isPurchased = true; // Simulate course already purchased for course ID 1
         }
+        long originalPriceVal = getIntent().getLongExtra("COURSE_PRICE", 1200000L);
+        long currentPriceVal = getIntent().getLongExtra("COURSE_DISCOUNTED_PRICE", 599000L);
+        String courseTitle = getIntent().getStringExtra("COURSE_TITLE");
+        
+        if (courseTitle != null) {
+            TextView titleView = findViewById(R.id.tvCourseTitle); // Assuming there's a title view, if not it's fine
+            if (titleView != null) titleView.setText(courseTitle);
+        }
+
+        if (tvOriginalPrice != null) {
+            tvOriginalPrice.setText(com.app.cinx.util.PriceUtil.formatPrice(originalPriceVal));
+            tvOriginalPrice.setPaintFlags(tvOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        }
+        if (tvCurrentPrice != null) {
+            tvCurrentPrice.setText(com.app.cinx.util.PriceUtil.formatPrice(currentPriceVal));
+        }
+
+        View btnAddCart = findViewById(R.id.btnAddCart);
+        View btnBuyNow = findViewById(R.id.btnBuyNow);
+
+        View.OnClickListener buyAction = v -> {
+            boolean isLoggedIn = UserManager.getInstance().isLoggedIn();
+            if (!isLoggedIn) {
+                Intent loginIntent = new Intent(CourseDetailActivity.this, com.app.cinx.activity.LoginActivity.class);
+                startActivity(loginIntent);
+            } else {
+                Toast.makeText(CourseDetailActivity.this, "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        if (btnAddCart != null) btnAddCart.setOnClickListener(buyAction);
+        if (btnBuyNow != null) btnBuyNow.setOnClickListener(buyAction);
     }
 
     private void setupNavButtons() {
@@ -134,8 +170,13 @@ public class CourseDetailActivity extends AppCompatActivity {
 
         // Cart button — navigate to CartActivity
         if (cartBadgeFrame != null) {
-            cartBadgeFrame.setOnClickListener(v ->
-                    startActivity(new Intent(this, CartActivity.class)));
+            cartBadgeFrame.setOnClickListener(v -> {
+                if (!UserManager.getInstance().isLoggedIn()) {
+                    startActivity(new Intent(this, com.app.cinx.activity.LoginActivity.class));
+                } else {
+                    startActivity(new Intent(this, CartActivity.class));
+                }
+            });
         }
     }
 

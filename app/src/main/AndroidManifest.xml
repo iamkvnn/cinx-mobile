@@ -106,6 +106,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <activity android:name=".activity.OrderDetailActivity" android:exported="false" android:screenOrientation="portrait" />
     </application>
 
 </manifest>

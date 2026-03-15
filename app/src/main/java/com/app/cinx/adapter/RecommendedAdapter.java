@@ -1,16 +1,20 @@
 package com.app.cinx.adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
+import com.app.cinx.activity.CourseDetailActivity;
 import com.app.cinx.model.Course;
+import com.app.cinx.util.PriceUtil;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
@@ -51,6 +55,8 @@ public class RecommendedAdapter extends RecyclerView.Adapter<RecommendedAdapter.
         TextView coursePrice;
         TextView courseDuration;
         TextView courseRating;
+        TextView originalPrice;
+        TextView discountRate;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -61,6 +67,8 @@ public class RecommendedAdapter extends RecyclerView.Adapter<RecommendedAdapter.
             coursePrice = itemView.findViewById(R.id.coursePrice);
             courseDuration = itemView.findViewById(R.id.courseDuration);
             courseRating = itemView.findViewById(R.id.courseRating);
+            originalPrice = itemView.findViewById(R.id.originalPrice);
+            discountRate = itemView.findViewById(R.id.discountRate);
         }
 
         public void bind(Course course) {
@@ -82,7 +90,25 @@ public class RecommendedAdapter extends RecyclerView.Adapter<RecommendedAdapter.
                 }
             }
             
-            if (coursePrice != null) coursePrice.setText(course.getPrice());
+            if (course.getDiscountRate() > 0) {
+                if (coursePrice != null) coursePrice.setText(PriceUtil.formatPrice(course.getDiscountedPrice()));
+                if (originalPrice != null) {
+                    originalPrice.setVisibility(View.VISIBLE);
+                    originalPrice.setText(PriceUtil.formatPrice(course.getPrice()));
+                    originalPrice.setPaintFlags(originalPrice.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+                }
+                if (discountRate != null) {
+                    discountRate.setVisibility(View.VISIBLE);
+                    discountRate.setText("-" + course.getDiscountRate() + "%");
+                }
+            } else {
+                if (coursePrice != null) {
+                     coursePrice.setText(PriceUtil.formatPrice(course.getPrice()));
+                     coursePrice.setTextColor(android.graphics.Color.parseColor("#1E293B"));
+                }
+                if (originalPrice != null) originalPrice.setVisibility(View.GONE);
+                if (discountRate != null) discountRate.setVisibility(View.GONE);
+            }
             if (courseDuration != null) courseDuration.setText(course.getDuration());
             if (courseRating != null) courseRating.setText(String.valueOf(course.getRating()));
 
@@ -90,6 +116,16 @@ public class RecommendedAdapter extends RecyclerView.Adapter<RecommendedAdapter.
                     .load(course.getImageUrl())
                     .apply(new RequestOptions().transform(new RoundedCorners(24)))
                     .into(courseImage);
+
+            // Add click listener to navigate to CourseDetailActivity
+            itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(v.getContext(), CourseDetailActivity.class);
+                intent.putExtra("COURSE_ID", course.getId());
+                intent.putExtra("COURSE_TITLE", course.getTitle());
+                  intent.putExtra("COURSE_PRICE", course.getPrice());
+                  intent.putExtra("COURSE_DISCOUNTED_PRICE", course.getDiscountedPrice());
+                v.getContext().startActivity(intent);
+            });
         }
     }
 }

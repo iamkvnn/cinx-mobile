@@ -1,6 +1,10 @@
 package com.app.cinx.activity;
 
 import android.content.Intent;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Button;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -28,6 +32,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     // ── Profile Card ──────────────────────────────────────────────────
     private ImageView ivAvatar;
+    private View btnEditProfile;
     private TextView  tvProfileName;
     private TextView  tvProfileEmail;
     private TextView  tvMembershipLabel;
@@ -61,6 +66,7 @@ public class ProfileActivity extends AppCompatActivity {
         bindViews();
         populateUserData();
         setupMenuListeners();
+        setupEditProfileListener();
         setupToggles();
 
         NavHelper.setupNavigation(this, R.id.navProfile);
@@ -72,6 +78,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void bindViews() {
         ivAvatar          = findViewById(R.id.ivAvatar);
+        btnEditProfile = findViewById(R.id.btnEditProfile);
         tvProfileName     = findViewById(R.id.tvProfileName);
         tvProfileEmail    = findViewById(R.id.tvProfileEmail);
         tvMembershipLabel = findViewById(R.id.tvMembershipLabel);
@@ -127,6 +134,39 @@ public class ProfileActivity extends AppCompatActivity {
     // ─────────────────────────────────────────────────────────────────
     // Menu click listeners
     // ─────────────────────────────────────────────────────────────────
+
+        private void setupEditProfileListener() {
+        if (btnEditProfile != null) {
+            btnEditProfile.setOnClickListener(v -> showEditProfileDialog());
+        }
+    }
+
+    private void showEditProfileDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View view = getLayoutInflater().inflate(R.layout.layout_profile_edit_bottom_sheet, null);
+        dialog.setContentView(view);
+        
+        EditText inputName = view.findViewById(R.id.inputName);
+        EditText inputEmail = view.findViewById(R.id.inputEmail);
+        View btnSave = view.findViewById(R.id.btnSaveProfile);
+        View btnClose = view.findViewById(R.id.btnClose);
+        
+        inputName.setText(tvProfileName.getText());
+        inputEmail.setText(tvProfileEmail.getText());
+        
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+        btnSave.setOnClickListener(v -> {
+            String newName = inputName.getText().toString();
+            String newEmail = inputEmail.getText().toString();
+            if (!newName.isEmpty()) tvProfileName.setText(newName);
+            if (!newEmail.isEmpty()) tvProfileEmail.setText(newEmail);
+            UserManager.getInstance().setUserEmail(newEmail);
+            ToastUtil.showCustomToast(this, "Đã cập nhật hồ sơ");
+            dialog.dismiss();
+        });
+        
+        dialog.show();
+    }
 
     private void setupMenuListeners() {
         // Learning group

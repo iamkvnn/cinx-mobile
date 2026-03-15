@@ -5,9 +5,9 @@ public class CourseDto {
     private String  title;
     private String  description;
     private String  category;
-    private double  price;
+    private long    price;
     private long    discountedPrice;
-    private int     discountRate;
+    private long    discountRate;
     private double  rating;
     private int     enrollmentCount;
     private boolean isPublished;
@@ -20,9 +20,9 @@ public class CourseDto {
     public String  getTitle()            { return title; }
     public String  getDescription()      { return description; }
     public String  getCategory()         { return category; }
-    public double  getPrice()            { return price; }
+    public long    getPrice()            { return price; }
     public long    getDiscountedPrice()  { return discountedPrice; }
-    public int     getDiscountRate()     { return discountRate; }
+    public long    getDiscountRate()     { return discountRate; }
     public double  getRating()           { return rating; }
     public int     getEnrollmentCount()  { return enrollmentCount; }
     public boolean isPublished()         { return isPublished; }

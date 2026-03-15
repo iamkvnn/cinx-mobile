@@ -69,6 +69,8 @@ public class CartActivity extends AppCompatActivity
     private LinearLayout     layoutCartContent;
     private LinearLayout     layoutEmptyState;
     private AppCompatButton  btnExplore;
+    private View             layoutVoucherRow;
+    private View             cvPaymentSummary;
 
     // ─────────────────────────────────────────────────────────────────────
     // Data
@@ -136,6 +138,8 @@ public class CartActivity extends AppCompatActivity
         layoutCartContent = findViewById(R.id.layoutCartContent);
         layoutEmptyState  = findViewById(R.id.layoutEmptyState);
         btnExplore        = findViewById(R.id.btnExplore);
+        layoutVoucherRow  = findViewById(R.id.layoutVoucherRow);
+        cvPaymentSummary  = findViewById(R.id.cvPaymentSummary);
 
         btnBack.setOnClickListener(v -> finish());
         btnClearAll.setOnClickListener(v -> clearAll());
@@ -247,8 +251,7 @@ public class CartActivity extends AppCompatActivity
         });
 
         // Voucher row → open bottom sheet
-        View voucherRow = findViewById(R.id.layoutVoucherRow);
-        voucherRow.setOnClickListener(v -> showVoucherBottomSheet());
+        layoutVoucherRow.setOnClickListener(v -> showVoucherBottomSheet());
 
         // Explore button on empty state
         btnExplore.setOnClickListener(v -> finish()); // navigate back / to Discovery
@@ -319,6 +322,17 @@ public class CartActivity extends AppCompatActivity
         int count = 0;
         for (CartItem item : cartItems) if (item.isSelected()) count++;
 
+        // Only show voucher row & payment summary if at least 1 item is selected
+        if (count > 0) {
+            layoutVoucherRow.setVisibility(View.VISIBLE);
+            cvPaymentSummary.setVisibility(View.VISIBLE);
+        } else {
+            layoutVoucherRow.setVisibility(View.GONE);
+            cvPaymentSummary.setVisibility(View.GONE);
+            appliedVoucher = null; // Clear voucher if nothing is selected
+            total = 0; // Ensure total is 0
+        }
+
         // Subtotal label
         tvSubtotalLabel.setText(getString(R.string.cart_subtotal_label, count));
         tvSubtotalValue.setText(Convert.formatVnd(subtotal));
@@ -380,7 +394,7 @@ public class CartActivity extends AppCompatActivity
     // ─────────────────────────────────────────────────────────────────────
 
     private void showVoucherBottomSheet() {
-        BottomSheetDialog dialog = new BottomSheetDialog(this, R.style.CartBottomSheetTheme);
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
         View sheetView = LayoutInflater.from(this)
                 .inflate(R.layout.layout_voucher_bottom_sheet, null);
         dialog.setContentView(sheetView);
@@ -391,17 +405,22 @@ public class CartActivity extends AppCompatActivity
 
         // Voucher RecyclerView
         RecyclerView rvVouchers = sheetView.findViewById(R.id.rvVouchers);
+        AppCompatButton btnConfirmVoucher = sheetView.findViewById(R.id.btnConfirmVoucher);
         String currentId = appliedVoucher != null ? appliedVoucher.getId() : null;
 
         VoucherAdapter voucherAdapter = new VoucherAdapter(vouchers, currentId, selected -> {
-            appliedVoucher = selected;
-            refreshSummary();
-            dialog.dismiss();
+            // Just select, don't dismiss
         });
 
         rvVouchers.setLayoutManager(new LinearLayoutManager(this));
         rvVouchers.setAdapter(voucherAdapter);
-        rvVouchers.setNestedScrollingEnabled(false);
+
+        // Confirm button click
+        btnConfirmVoucher.setOnClickListener(v -> {
+            appliedVoucher = voucherAdapter.getSelectedVoucher();
+            refreshSummary();
+            dialog.dismiss();
+        });
 
         // Apply typed promo code
         btnApply.setOnClickListener(v -> {
@@ -428,5 +447,10 @@ public class CartActivity extends AppCompatActivity
         });
 
         dialog.show();
+        View bottomSheet = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+        if (bottomSheet != null) {
+            com.google.android.material.bottomsheet.BottomSheetBehavior.from(bottomSheet)
+                    .setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
+        }
     }
 }

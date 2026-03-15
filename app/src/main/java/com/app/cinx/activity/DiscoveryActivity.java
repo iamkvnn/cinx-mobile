@@ -124,9 +124,9 @@ public class DiscoveryActivity extends AppCompatActivity {
         List<Course> courses = new ArrayList<>();
         
         // Add sample data matching HTML
-        courses.add(new Course(1, "Python Data Science Pro", "Build 5 real-world projects", 4.8, "1.2k", "$49", "https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=300&auto=format&fit=crop", "Code", "22h"));
-        courses.add(new Course(2, "Instagram Growth 2026", "Strategies for influencers", 4.6, "800", "$29", "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=300&auto=format&fit=crop", "Marketing", "5h"));
-        courses.add(new Course(3, "Startup 101 Guide", "From idea to launch", 4.9, "2k", "Free", "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=300&auto=format&fit=crop", "Business", "2h"));
+        courses.add(new Course(1, "Python Data Science Pro", "Build 5 real-world projects", 4.8, "1.2k", 980000L, 490000L, 50, "https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=300&auto=format&fit=crop", "Code", "22h"));
+        courses.add(new Course(2, "Instagram Growth 2026", "Strategies for influencers", 4.6, "800", 580000L, 290000L, 50, "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=300&auto=format&fit=crop", "Marketing", "5h"));
+        courses.add(new Course(3, "Startup 101 Guide", "From idea to launch", 4.9, "2k", 500000L, 0L, 100, "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=300&auto=format&fit=crop", "Business", "2h"));
         
         RecommendedAdapter adapter = new RecommendedAdapter(courses);
         coursesRecyclerView.setAdapter(adapter);

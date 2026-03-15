@@ -22,13 +22,17 @@
         android:orientation="horizontal"
         android:padding="12dp">
 
-        <!-- Checkbox -->
+        <!-- Checkbox using custom icons -->
         <CheckBox
             android:id="@+id/cbSelect"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
-            android:buttonTint="@color/primary" />
+            android:button="@drawable/checkbox_selector"
+            android:buttonTint="@color/primary"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:minWidth="48dp"
+            android:minHeight="48dp" />
 
         <!-- Course thumbnail -->
         <ImageView

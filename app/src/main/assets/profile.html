@@ -56,7 +56,7 @@
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
         }
 
-        /* Bottom Nav (From home.html context) */
+        /* Bottom Nav */
         .glass-nav {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(25px) saturate(200%);
@@ -107,6 +107,12 @@
         /* Hide Scrollbar */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Custom Input Focus transition */
+        .custom-input:focus-within {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+        }
     </style>
 </head>
 <body class="text-slate-800 pb-[100px] overflow-x-hidden relative min-h-screen">
@@ -121,7 +127,7 @@
 <div class="max-w-md mx-auto w-full relative z-10 flex flex-col">
 
     <!-- Header (Sticky) -->
-    <header class="fixed top-0 w-full max-w-md z-50 transition-all duration-300 glass-header flex justify-between items-center py-3 px-4 rounded-b-[2rem]">
+    <header class="fixed top-0 w-full max-w-md z-40 transition-all duration-300 glass-header flex justify-between items-center py-3 px-4 rounded-b-[2rem]">
         <div class="w-10 h-10"></div> <!-- Spacer -->
         <h1 class="text-base font-bold text-slate-800">Tài khoản</h1>
         <button class="w-10 h-10 rounded-full bg-slate-100/50 flex items-center justify-center text-slate-700 shadow-sm active:scale-95 transition-transform">
@@ -132,23 +138,33 @@
     <main class="pt-[88px] px-4 space-y-6">
         
         <!-- 1. Profile Info Card -->
-        <section class="glass-panel rounded-[2rem] p-5 flex flex-col items-center animate-slide-up" style="animation-delay: 0s;">
+        <section class="glass-panel rounded-[2rem] p-5 flex flex-col items-center animate-slide-up relative" style="animation-delay: 0s;">
+            <!-- Nút chỉnh sửa nhanh góc phải -->
+            <button onclick="openEditModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-violet-50 text-violet-600 flex items-center justify-center hover:bg-violet-100 transition-colors active:scale-95">
+                <i data-lucide="pen-line" class="w-4 h-4"></i>
+            </button>
+
             <div class="relative mb-3">
                 <div class="w-20 h-20 rounded-full p-1 border-2 border-violet-500 border-dashed">
-                    <img src="https://i.pravatar.cc/150?u=my_user" alt="Avatar" class="w-full h-full rounded-full object-cover">
+                    <img id="profileAvatar" src="https://i.pravatar.cc/150?u=my_user" alt="Avatar" class="w-full h-full rounded-full object-cover">
                 </div>
-                <button class="absolute bottom-0 right-0 w-7 h-7 bg-slate-900 rounded-full text-white flex items-center justify-center border-2 border-white shadow-md active:scale-95">
+                <button onclick="openEditModal()" class="absolute bottom-0 right-0 w-7 h-7 bg-slate-900 rounded-full text-white flex items-center justify-center border-2 border-white shadow-md active:scale-95">
                     <i data-lucide="camera" class="w-3.5 h-3.5"></i>
                 </button>
             </div>
             
-            <h2 class="text-xl font-black text-slate-800 tracking-tight">Nguyễn Hoàng Minh</h2>
-            <p class="text-sm font-medium text-slate-500 mb-3">minh.nguyen@example.com</p>
+            <h2 id="profileNameDisplay" class="text-xl font-black text-slate-800 tracking-tight">Nguyễn Hoàng Minh</h2>
+            <p id="profileEmailDisplay" class="text-sm font-medium text-slate-500 mb-3">minh.nguyen@example.com</p>
             
             <div class="flex items-center gap-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 px-3 py-1 rounded-full border border-amber-200/50 shadow-sm mb-4">
                 <i data-lucide="crown" class="w-4 h-4 fill-amber-500"></i>
                 <span class="text-xs font-bold tracking-wide">PRO MEMBER</span>
             </div>
+
+            <!-- Nút chỉnh sửa hồ sơ -->
+            <button onclick="openEditModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition-colors mb-4 flex justify-center items-center gap-2 active:scale-95">
+                Chỉnh sửa hồ sơ
+            </button>
 
             <!-- Stats Grid -->
             <div class="w-full grid grid-cols-3 gap-3 border-t border-slate-200/60 pt-4">
@@ -299,10 +315,9 @@
 
     </main>
 
-    <!-- Floating Bottom Nav (Reused from context) -->
-    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[380px]">
+    <!-- Floating Bottom Nav -->
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-[380px]">
         <div class="glass-nav p-1.5 md:p-2 flex justify-between items-center relative">
-            
             <button class="nav-item relative flex flex-col items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full transition-all duration-300 ease-out group" onclick="setActiveTab(this)">
                 <span class="nav-bg absolute inset-1 bg-gradient-to-tr from-violet-100 to-fuchsia-100 rounded-full transition-all duration-300 opacity-0 scale-50 shadow-inner"></span>
                 <div class="nav-icon relative z-10 transition-all duration-300 text-slate-400 group-hover:text-slate-600">
@@ -327,7 +342,6 @@
                 <span class="nav-dot absolute bottom-2.5 md:bottom-3 w-1.5 h-1.5 bg-violet-500 rounded-full shadow-lg shadow-violet-500/50 transition-all duration-300 scale-0 opacity-0"></span>
             </button>
 
-            <!-- ACTIVE TAB: USER -->
             <button class="nav-item active relative flex flex-col items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full transition-all duration-300 ease-out group" onclick="setActiveTab(this)">
                 <span class="nav-bg absolute inset-1 bg-gradient-to-tr from-violet-100 to-fuchsia-100 rounded-full transition-all duration-300 opacity-0 scale-50 shadow-inner"></span>
                 <div class="nav-icon relative z-10 transition-all duration-300 text-slate-400 group-hover:text-slate-600">
@@ -335,10 +349,67 @@
                 </div>
                 <span class="nav-dot absolute bottom-2.5 md:bottom-3 w-1.5 h-1.5 bg-violet-500 rounded-full shadow-lg shadow-violet-500/50 transition-all duration-300 scale-0 opacity-0"></span>
             </button>
-
         </div>
     </div>
 
+</div>
+
+<!-- EDIT PROFILE MODAL (BOTTOM SHEET) -->
+<div id="editProfileModal" class="fixed inset-0 z-[100] hidden">
+    <!-- Overlay/Backdrop -->
+    <div id="editModalOverlay" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300" onclick="closeEditModal()"></div>
+    
+    <!-- Bottom Sheet Content -->
+    <div id="editModalSheet" class="absolute bottom-0 w-full max-w-md mx-auto left-1/2 -translate-x-1/2 bg-white rounded-t-[2rem] p-6 pb-10 transform translate-y-full transition-transform duration-300 shadow-2xl">
+        
+        <!-- Handle for dragging feeling -->
+        <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"></div>
+
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-black text-slate-800">Chỉnh sửa hồ sơ</h3>
+            <button onclick="closeEditModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 active:scale-95 transition-transform">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <!-- Avatar Upload UI inside Modal -->
+        <div class="flex flex-col items-center mb-6">
+            <div class="relative">
+                <img id="modalAvatarPreview" src="https://i.pravatar.cc/150?u=my_user" alt="Avatar" class="w-24 h-24 rounded-full object-cover border-4 border-slate-50 shadow-sm">
+                <button class="absolute bottom-0 right-0 w-8 h-8 bg-violet-600 rounded-full text-white flex items-center justify-center border-2 border-white shadow-md hover:bg-violet-700 active:scale-95 transition-transform">
+                    <i data-lucide="camera" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <span class="text-xs font-semibold text-violet-600 mt-2 cursor-pointer hover:underline">Thay đổi ảnh</span>
+        </div>
+
+        <!-- Form Inputs -->
+        <div class="space-y-4">
+            <!-- Name Input -->
+            <div class="custom-input flex flex-col bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2 transition-all duration-200">
+                <label for="inputName" class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Họ và tên</label>
+                <input type="text" id="inputName" class="bg-transparent border-none outline-none text-slate-800 font-semibold text-sm py-1" placeholder="Nhập tên của bạn...">
+            </div>
+
+            <!-- Email Input -->
+            <div class="custom-input flex flex-col bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2 transition-all duration-200">
+                <label for="inputEmail" class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Email</label>
+                <input type="email" id="inputEmail" class="bg-transparent border-none outline-none text-slate-800 font-semibold text-sm py-1" placeholder="Nhập email của bạn...">
+            </div>
+            
+            <!-- Phone Input -->
+            <div class="custom-input flex flex-col bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2 transition-all duration-200">
+                <label for="inputPhone" class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Số điện thoại</label>
+                <input type="tel" id="inputPhone" class="bg-transparent border-none outline-none text-slate-800 font-semibold text-sm py-1" placeholder="Ví dụ: 0987654321" value="0987 654 321">
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <button onclick="saveProfile()" class="w-full mt-8 py-3.5 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-2xl shadow-lg shadow-violet-600/30 transition-all active:scale-95 flex justify-center items-center gap-2">
+            <i data-lucide="save" class="w-5 h-5"></i>
+            Lưu thay đổi
+        </button>
+    </div>
 </div>
 
 <script>
@@ -349,6 +420,65 @@
     function setActiveTab(element) {
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         element.classList.add('active');
+    }
+
+    // Modal / Bottom Sheet Logic
+    const modal = document.getElementById('editProfileModal');
+    const overlay = document.getElementById('editModalOverlay');
+    const sheet = document.getElementById('editModalSheet');
+    
+    // Elements on the main page
+    const displayElement_Name = document.getElementById('profileNameDisplay');
+    const displayElement_Email = document.getElementById('profileEmailDisplay');
+    
+    // Elements in the form
+    const inputElement_Name = document.getElementById('inputName');
+    const inputElement_Email = document.getElementById('inputEmail');
+
+    function openEditModal() {
+        // Prepare data: Copy current info to the form
+        inputElement_Name.value = displayElement_Name.innerText;
+        inputElement_Email.value = displayElement_Email.innerText;
+
+        // Show Modal Container
+        modal.classList.remove('hidden');
+        
+        // Small timeout to allow display:block to render before triggering transitions
+        setTimeout(() => {
+            overlay.classList.remove('opacity-0');
+            sheet.classList.remove('translate-y-full');
+        }, 10);
+    }
+
+    function closeEditModal() {
+        // Start transition to hide
+        overlay.classList.add('opacity-0');
+        sheet.classList.add('translate-y-full');
+
+        // Wait for transition to finish before hiding container
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300); // 300ms matches duration-300 in Tailwind
+    }
+
+    function saveProfile() {
+        // Validation basic
+        const newName = inputElement_Name.value.trim();
+        const newEmail = inputElement_Email.value.trim();
+
+        if(!newName || !newEmail) {
+            alert("Vui lòng điền đầy đủ Tên và Email.");
+            return;
+        }
+
+        // Update main page UI
+        displayElement_Name.innerText = newName;
+        displayElement_Email.innerText = newEmail;
+
+        // Close modal
+        closeEditModal();
+        
+        // Optional: Show a small visual feedback (toast) here if needed.
     }
 </script>
 </body>

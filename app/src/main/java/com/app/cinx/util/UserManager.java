@@ -31,4 +31,8 @@ public class UserManager {
     public String getUserEmail() {
         return userEmail;
     }
+
+    public void setUserEmail(String email) {
+        this.userEmail = email;
+    }
 }
