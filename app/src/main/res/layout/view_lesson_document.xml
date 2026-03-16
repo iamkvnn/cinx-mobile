@@ -9,7 +9,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="16dp"
+    android:background="@drawable/bg_glass_card"
+    android:orientation="vertical"
+    android:padding="20dp">
 
     <!-- ===== TOP META ROW ===== -->
     <LinearLayout
@@ -66,7 +70,18 @@
         android:layout_width="48dp"
         android:layout_height="3dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/bg_gradient_button" />
+        android:background="#A855F7" />
+
+    <!-- ===== TITLE ===== -->
+    <TextView
+        android:id="@+id/tvDocumentTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:textColor="@color/text_primary"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        tools:text="Nguyên tắc phối màu trong UI Design" />
 
     <!-- ===== HTML CONTENT VIA WEBVIEW ===== -->
     <WebView

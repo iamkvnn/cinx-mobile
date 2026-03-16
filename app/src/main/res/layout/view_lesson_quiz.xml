@@ -81,48 +81,41 @@
         android:id="@+id/quizProgressBar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="6dp"
+        android:layout_height="8dp"
         android:progress="30"
-        android:progressDrawable="@drawable/bg_progress_bar_fill"
-        android:background="@drawable/bg_progress_bar_track"
+        android:progressDrawable="@drawable/bg_quiz_progress_bar"
         android:layout_marginBottom="20dp" />
 
     <!-- ===== QUESTION CARD ===== -->
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="0dp"
-        app:cardBackgroundColor="@android:color/white"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        android:orientation="vertical"
+        android:background="@drawable/bg_glass_card"
+        android:padding="20dp">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvQuestionText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:layout_marginBottom="20dp"
+            android:lineSpacingMultiplier="1.4"
+            android:textColor="@color/text_primary"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            tools:text="Trong Figma, phím tắt nào được sử dụng để chuyển đối tượng thành một Component?" />
 
-            <TextView
-                android:id="@+id/tvQuestionText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:lineSpacingMultiplier="1.4"
-                tools:text="Trong Figma, phím tắt nào được sử dụng để chuyển đối tượng thành một Component?" />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+        <!-- ===== OPTIONS LIST ===== -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvQuizOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"
+            tools:itemCount="4" />
 
-    <!-- ===== OPTIONS LIST ===== -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvQuizOptions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:nestedScrollingEnabled="false"
-        android:overScrollMode="never"
-        tools:itemCount="4" />
+    </LinearLayout>
 
     <!-- ===== RESULT FEEDBACK CARD (visible after answering) ===== -->
     <LinearLayout
@@ -133,7 +126,7 @@
         android:gravity="center_vertical"
         android:background="@drawable/bg_icon_purple"
         android:padding="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:visibility="gone">
 
         <ImageView

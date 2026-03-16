@@ -80,7 +80,6 @@ public class LessonActivity extends AppCompatActivity {
     private View btnVideoPlay;
     private ImageView ivPlayPauseIcon;
     private TextView tvVideoDuration;
-    private TextView tvVideoMeta;
     private TextView tvVideoTitle;
     private TextView tvVideoChapter;
     private ProgressBar videoProgressBar;
@@ -88,6 +87,7 @@ public class LessonActivity extends AppCompatActivity {
 
     // ── DOCUMENT views ────────────────────────────────────────────────────
     private TextView tvDocMeta;
+    private TextView tvDocumentTitle;
     private WebView webViewDocument;
 
     // ── QUIZ views ────────────────────────────────────────────────────────
@@ -187,7 +187,6 @@ public class LessonActivity extends AppCompatActivity {
         btnVideoPlay      = findViewById(R.id.btnVideoPlay);
         ivPlayPauseIcon   = findViewById(R.id.ivPlayPauseIcon);
         tvVideoDuration   = findViewById(R.id.tvVideoDuration);
-        tvVideoMeta       = findViewById(R.id.tvVideoMeta);
         tvVideoTitle      = findViewById(R.id.tvVideoTitle);
         tvVideoChapter    = findViewById(R.id.tvVideoChapter);
         videoProgressBar  = findViewById(R.id.videoProgressBar);
@@ -196,6 +195,7 @@ public class LessonActivity extends AppCompatActivity {
 
         // Document sub-views
         tvDocMeta        = findViewById(R.id.tvDocMeta);
+        tvDocumentTitle  = findViewById(R.id.tvDocumentTitle);
         webViewDocument  = findViewById(R.id.webViewDocument);
 
         // Quiz sub-views
@@ -283,7 +283,6 @@ public class LessonActivity extends AppCompatActivity {
         tvVideoTitle.setText(lesson.getTitle());
         tvVideoChapter.setText(lesson.getChapterTitle());
         tvVideoDuration.setText(lesson.getDuration());
-        tvVideoMeta.setText(lesson.getDuration());
 
         if (lesson.getVideoThumbnailUrl() != null && !lesson.getVideoThumbnailUrl().isEmpty()) {
             Glide.with(this)
@@ -312,6 +311,7 @@ public class LessonActivity extends AppCompatActivity {
     @SuppressLint("SetJavaScriptEnabled")
     private void bindDocument(Lesson lesson) {
         tvDocMeta.setText("Bài đọc • " + lesson.getDuration());
+        tvDocumentTitle.setText(lesson.getTitle());
 
         WebSettings settings = webViewDocument.getSettings();
         settings.setJavaScriptEnabled(false);
@@ -387,8 +387,7 @@ public class LessonActivity extends AppCompatActivity {
         quizOptionAdapter = new QuizOptionAdapter(this, question.getOptions());
         quizOptionAdapter.setOnOptionSelectedListener((pos, option) -> {
             selectedOptionIndex = pos;
-            // Visual "selected" state — highlight only (don't reveal yet)
-            notifyOptionSelected(pos, question.getOptions().size());
+            quizOptionAdapter.selectOption(pos);
         });
         rvQuizOptions.setAdapter(quizOptionAdapter);
 

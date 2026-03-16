@@ -58,6 +58,18 @@ public class QuizOptionAdapter extends RecyclerView.Adapter<QuizOptionAdapter.Op
     }
 
     /**
+     * Mark an option as selected (before answering).
+     * @param selectedIndex index tapped by user
+     */
+    public void selectOption(int selectedIndex) {
+        if (answered) return;
+        for (int i = 0; i < options.size(); i++) {
+            states[i] = (i == selectedIndex) ? OptionState.SELECTED : OptionState.DEFAULT;
+        }
+        notifyDataSetChanged();
+    }
+
+    /**
      * Reveal the results after the user has submitted an answer.
      * @param selectedIndex index tapped by user
      */
@@ -109,6 +121,7 @@ public class QuizOptionAdapter extends RecyclerView.Adapter<QuizOptionAdapter.Op
     class OptionViewHolder extends RecyclerView.ViewHolder {
         private final LinearLayout optionContainer;
         private final View viewRadioDefault;
+        private final ImageView ivRadioSelected;
         private final ImageView ivOptionResult;
         private final TextView tvOptionText;
         private final TextView tvOptionLabel;
@@ -117,6 +130,7 @@ public class QuizOptionAdapter extends RecyclerView.Adapter<QuizOptionAdapter.Op
             super(itemView);
             optionContainer = itemView.findViewById(R.id.optionContainer);
             viewRadioDefault= itemView.findViewById(R.id.viewRadioDefault);
+            ivRadioSelected = itemView.findViewById(R.id.ivRadioSelected);
             ivOptionResult  = itemView.findViewById(R.id.ivOptionResult);
             tvOptionText    = itemView.findViewById(R.id.tvOptionText);
             tvOptionLabel   = itemView.findViewById(R.id.tvOptionLabel);
@@ -153,6 +167,7 @@ public class QuizOptionAdapter extends RecyclerView.Adapter<QuizOptionAdapter.Op
         private void applyDefault() {
             optionContainer.setBackgroundResource(R.drawable.bg_quiz_option);
             viewRadioDefault.setVisibility(View.VISIBLE);
+            ivRadioSelected.setVisibility(View.GONE);
             ivOptionResult.setVisibility(View.GONE);
             tvOptionText.setTextColor(context.getResources().getColor(R.color.text_primary, null));
             tvOptionLabel.setVisibility(View.GONE);
@@ -161,6 +176,7 @@ public class QuizOptionAdapter extends RecyclerView.Adapter<QuizOptionAdapter.Op
         private void applySelected() {
             optionContainer.setBackgroundResource(R.drawable.bg_quiz_option_selected);
             viewRadioDefault.setVisibility(View.GONE);
+            ivRadioSelected.setVisibility(View.VISIBLE);
             ivOptionResult.setVisibility(View.GONE);
             tvOptionText.setTextColor(context.getResources().getColor(R.color.primary, null));
             tvOptionLabel.setVisibility(View.GONE);
@@ -169,6 +185,7 @@ public class QuizOptionAdapter extends RecyclerView.Adapter<QuizOptionAdapter.Op
         private void applyCorrect() {
             optionContainer.setBackgroundResource(R.drawable.bg_quiz_option_correct);
             viewRadioDefault.setVisibility(View.GONE);
+            ivRadioSelected.setVisibility(View.GONE);
             ivOptionResult.setVisibility(View.VISIBLE);
             ivOptionResult.setImageResource(R.drawable.ic_check_circle);
             ivOptionResult.setColorFilter(
@@ -184,6 +201,7 @@ public class QuizOptionAdapter extends RecyclerView.Adapter<QuizOptionAdapter.Op
         private void applyWrong() {
             optionContainer.setBackgroundResource(R.drawable.bg_quiz_option_wrong);
             viewRadioDefault.setVisibility(View.GONE);
+            ivRadioSelected.setVisibility(View.GONE);
             ivOptionResult.setVisibility(View.VISIBLE);
             ivOptionResult.setImageResource(R.drawable.ic_close);
             ivOptionResult.setColorFilter(

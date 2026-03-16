@@ -31,16 +31,26 @@
             <!-- Default radio outline -->
             <View
                 android:id="@+id/viewRadioDefault"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:background="@drawable/bg_circle_outline"
                 android:layout_gravity="center" />
+
+            <!-- Selected radio inner dot -->
+            <ImageView
+                android:id="@+id/ivRadioSelected"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_radio_selected"
+                android:contentDescription="Selected"
+                android:visibility="gone" />
 
             <!-- Result icon (hidden by default) -->
             <ImageView
                 android:id="@+id/ivOptionResult"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_check_circle"
                 android:contentDescription="Result"
