@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.app.cinx.R;
 import com.app.cinx.model.Order;
 import com.app.cinx.model.OrderItem;
-import com.app.cinx.util.Convert;
+import com.app.cinx.utils.Convert;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;

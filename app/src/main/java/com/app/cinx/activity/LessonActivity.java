@@ -25,6 +25,7 @@ import com.app.cinx.model.Chapter;
 import com.app.cinx.model.Lesson;
 import com.app.cinx.model.LessonType;
 import com.app.cinx.model.QuizQuestion;
+import com.app.cinx.utils.ToastUtil;
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.button.MaterialButton;
@@ -407,7 +408,7 @@ public class LessonActivity extends AppCompatActivity {
 
     private void checkQuizAnswer() {
         if (selectedOptionIndex < 0) {
-            com.app.cinx.util.ToastUtil.showCustomToast(this, "Vui lòng chọn một đáp án!");
+            ToastUtil.showCustomToast(this, "Vui lòng chọn một đáp án!");
             return;
         }
         quizOptionAdapter.revealAnswer(selectedOptionIndex);
@@ -532,7 +533,7 @@ public class LessonActivity extends AppCompatActivity {
             loadLesson(next);
         } else {
             // End of course or next is locked
-            com.app.cinx.util.ToastUtil.showCustomToast(this, "Bạn đã hoàn thành bài học! 🎉");
+            ToastUtil.showCustomToast(this, "Bạn đã hoàn thành bài học! 🎉");
             finish();
         }
     }

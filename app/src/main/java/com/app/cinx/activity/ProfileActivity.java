@@ -3,7 +3,7 @@ package com.app.cinx.activity;
 import android.content.Intent;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Button;
+
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -15,10 +15,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 
 import com.app.cinx.R;
-import com.app.cinx.util.NavHelper;
-import com.app.cinx.util.ToastUtil;
-import com.app.cinx.util.UserManager;
+import com.app.cinx.utils.NavHelper;
+import com.app.cinx.utils.ToastUtil;
+import com.app.cinx.utils.UserManager;
 import com.bumptech.glide.Glide;
+
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.UserService;
+import com.app.cinx.api.dto.ApiResponse;
+import com.app.cinx.api.dto.UserDto;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import android.util.Log;
 
 /**
  * ProfileActivity
@@ -58,13 +67,20 @@ public class ProfileActivity extends AppCompatActivity {
     private static final int XP_POINTS    = 2_450;
     private static final int LEARN_HOURS  = 38;
 
+    private UserDto currentUserDto;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
         bindViews();
+        // Fallback demo data
         populateUserData();
+        
+        // Fetch real data
+        fetchUserProfile();
+
         setupMenuListeners();
         setupEditProfileListener();
         setupToggles();
@@ -131,6 +147,43 @@ public class ProfileActivity extends AppCompatActivity {
         tvHours.setText(String.valueOf(LEARN_HOURS));
     }
 
+    private void fetchUserProfile() {
+        UserService userService = RetrofitClient.getInstance().getUserService();
+        if (userService == null) return;
+
+        userService.getCurrentUser().enqueue(new Callback<ApiResponse<UserDto>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<UserDto>> call, Response<ApiResponse<UserDto>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    currentUserDto = response.body().getData();
+                    runOnUiThread(() -> updateProfileUI(currentUserDto));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<UserDto>> call, Throwable t) {
+                Log.e("ProfileActivity", "Failed to fetch user profile", t);
+            }
+        });
+    }
+
+    private void updateProfileUI(UserDto userDto) {
+        if (userDto.getName() != null && !userDto.getName().isEmpty()) {
+            tvProfileName.setText(userDto.getName());
+        }
+        if (userDto.getEmail() != null && !userDto.getEmail().isEmpty()) {
+            tvProfileEmail.setText(userDto.getEmail());
+            UserManager.getInstance().setUserEmail(userDto.getEmail());
+        }
+        if (userDto.getAvatarUrl() != null && !userDto.getAvatarUrl().isEmpty()) {
+            Glide.with(this)
+                    .load(userDto.getAvatarUrl())
+                    .circleCrop()
+                    .placeholder(R.drawable.ic_profile_placeholder)
+                    .into(ivAvatar);
+        }
+    }
+
     // ─────────────────────────────────────────────────────────────────
     // Menu click listeners
     // ─────────────────────────────────────────────────────────────────
@@ -161,7 +214,8 @@ public class ProfileActivity extends AppCompatActivity {
             if (!newName.isEmpty()) tvProfileName.setText(newName);
             if (!newEmail.isEmpty()) tvProfileEmail.setText(newEmail);
             UserManager.getInstance().setUserEmail(newEmail);
-            ToastUtil.showCustomToast(this, "Đã cập nhật hồ sơ");
+            // In a real app, we would call an API here to update the user
+            ToastUtil.showCustomToast(this, "Đã cập nhật hồ sơ locally");
             dialog.dismiss();
         });
         

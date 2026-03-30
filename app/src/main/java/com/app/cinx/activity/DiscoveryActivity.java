@@ -21,11 +21,24 @@ import com.app.cinx.R;
 import com.app.cinx.adapter.RecommendedAdapter;
 import com.app.cinx.data.CartRepository;
 import com.app.cinx.model.Course;
-import com.app.cinx.util.NavHelper;
+import com.app.cinx.utils.NavHelper;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import com.app.cinx.api.CourseService;
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.dto.ApiResponse;
+import com.app.cinx.api.dto.CategoryResponse;
+import com.app.cinx.api.dto.CourseResponse;
+import com.app.cinx.api.dto.PaginatedApiQuery;
+import com.app.cinx.api.dto.PaginatedApiResponseCourseResponse;
 
 public class DiscoveryActivity extends AppCompatActivity {
 
@@ -110,34 +123,53 @@ public class DiscoveryActivity extends AppCompatActivity {
     private void loadData() {
         // Setup Categories
         categoriesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        List<String> categories = new ArrayList<>();
-        categories.add("Tất cả");
-        categories.add("Lập trình");
-        categories.add("Thiết kế");
-        categories.add("Kinh doanh");
-        categories.add("Marketing");
-        categories.add("Ngoại ngữ");
-        categoriesRecyclerView.setAdapter(new CategoryAdapter(categories));
+        
+        CourseService courseService = RetrofitClient.getInstance().getCourseService();
+        courseService.getAllCategories().enqueue(new Callback<ApiResponse<List<CategoryResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<CategoryResponse>>> call, Response<ApiResponse<List<CategoryResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    List<CategoryResponse> cats = new ArrayList<>();
+                    CategoryResponse allCat = new CategoryResponse();
+                    allCat.setId(null);
+                    allCat.setName("Tất cả");
+                    cats.add(allCat);
+                    cats.addAll(response.body().getData());
+                    categoriesRecyclerView.setAdapter(new CategoryAdapter(cats));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<CategoryResponse>>> call, Throwable t) {
+                // handle error
+            }
+        });
 
         // Setup Courses
         coursesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        List<Course> courses = new ArrayList<>();
-        
-        // Add sample data matching HTML
-        courses.add(new Course(1, "Python Data Science Pro", "Build 5 real-world projects", 4.8, "1.2k", 980000L, 490000L, 50, "https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=300&auto=format&fit=crop", "Code", "22h"));
-        courses.add(new Course(2, "Instagram Growth 2026", "Strategies for influencers", 4.6, "800", 580000L, 290000L, 50, "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=300&auto=format&fit=crop", "Marketing", "5h"));
-        courses.add(new Course(3, "Startup 101 Guide", "From idea to launch", 4.9, "2k", 500000L, 0L, 100, "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=300&auto=format&fit=crop", "Business", "2h"));
-        
-        RecommendedAdapter adapter = new RecommendedAdapter(courses);
-        coursesRecyclerView.setAdapter(adapter);
+        courseService.getAllCourses(null, null).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
+            @Override
+            public void onResponse(Call<PaginatedApiResponseCourseResponse> call, Response<PaginatedApiResponseCourseResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    List<CourseResponse> courseResponses = response.body().getData();
+                    RecommendedAdapter adapter = new RecommendedAdapter(courseResponses);
+                    coursesRecyclerView.setAdapter(adapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PaginatedApiResponseCourseResponse> call, Throwable t) {
+                // handle error
+            }
+        });
     }
 
     // Inner class for Chip/Category Adapter
     private class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
-        private List<String> categories;
+        private List<CategoryResponse> categories;
         private int selectedPosition = 0;
 
-        public CategoryAdapter(List<String> categories) {
+        public CategoryAdapter(List<CategoryResponse> categories) {
             this.categories = categories;
         }
 
@@ -151,7 +183,7 @@ public class DiscoveryActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             TextView tv = (TextView) holder.itemView;
-            tv.setText(categories.get(position));
+            tv.setText(categories.get(position).getName());
             
             final int pos = position; // effectively final for lambda
 
@@ -179,7 +211,7 @@ public class DiscoveryActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return categories.size();
+            return categories != null ? categories.size() : 0;
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {

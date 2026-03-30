@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
 import com.app.cinx.activity.CourseDetailActivity;
-import com.app.cinx.model.Course;
-import com.app.cinx.util.PriceUtil;
+import com.app.cinx.api.dto.CourseResponse;
+import com.app.cinx.utils.PriceUtil;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
@@ -23,9 +23,9 @@ import java.util.List;
 
 public class RecommendedAdapter extends RecyclerView.Adapter<RecommendedAdapter.ViewHolder> {
 
-    private List<Course> courses;
+    private List<CourseResponse> courses;
 
-    public RecommendedAdapter(List<Course> courses) {
+    public RecommendedAdapter(List<CourseResponse> courses) {
         this.courses = courses;
     }
 
@@ -38,13 +38,13 @@ public class RecommendedAdapter extends RecyclerView.Adapter<RecommendedAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Course course = courses.get(position);
+        CourseResponse course = courses.get(position);
         holder.bind(course);
     }
 
     @Override
     public int getItemCount() {
-        return courses.size();
+        return courses != null ? courses.size() : 0;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -71,12 +71,12 @@ public class RecommendedAdapter extends RecyclerView.Adapter<RecommendedAdapter.
             discountRate = itemView.findViewById(R.id.discountRate);
         }
 
-        public void bind(Course course) {
+        public void bind(CourseResponse course) {
             courseTitle.setText(course.getTitle());
-            courseDesc.setText(course.getInstructor());
-            
+            courseDesc.setText(course.getDescription() != null ? course.getDescription() : "Giảng viên"); // fallback instructor or description
+
             if (courseCategory != null) {
-                courseCategory.setText(course.getCategory());
+                courseCategory.setText(course.getCategory() != null ? course.getCategory() : "Khóa học");
                 // Simple logic to change color based on category if needed
                 if ("Code".equalsIgnoreCase(course.getCategory())) {
                     courseCategory.setTextColor(android.graphics.Color.parseColor("#0EA5E9")); // Sky 500
@@ -90,30 +90,40 @@ public class RecommendedAdapter extends RecyclerView.Adapter<RecommendedAdapter.
                 }
             }
             
-            if (course.getDiscountRate() > 0) {
-                if (coursePrice != null) coursePrice.setText(PriceUtil.formatPrice(course.getDiscountedPrice()));
+            long price = course.getPrice() != null ? course.getPrice() : 0L;
+            long discountedPriceObj = course.getDiscountedPrice() != null ? course.getDiscountedPrice() : price;
+            long discountPct = course.getDiscountRate() != null ? course.getDiscountRate() : 0L;
+
+            if (discountPct > 0) {
+                if (coursePrice != null) coursePrice.setText(PriceUtil.formatPrice(discountedPriceObj));
                 if (originalPrice != null) {
                     originalPrice.setVisibility(View.VISIBLE);
-                    originalPrice.setText(PriceUtil.formatPrice(course.getPrice()));
+                    originalPrice.setText(PriceUtil.formatPrice(price));
                     originalPrice.setPaintFlags(originalPrice.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
                 }
                 if (discountRate != null) {
                     discountRate.setVisibility(View.VISIBLE);
-                    discountRate.setText("-" + course.getDiscountRate() + "%");
+                    discountRate.setText("-" + discountPct + "%");
                 }
             } else {
                 if (coursePrice != null) {
-                     coursePrice.setText(PriceUtil.formatPrice(course.getPrice()));
+                     coursePrice.setText(PriceUtil.formatPrice(price));
                      coursePrice.setTextColor(android.graphics.Color.parseColor("#1E293B"));
                 }
                 if (originalPrice != null) originalPrice.setVisibility(View.GONE);
                 if (discountRate != null) discountRate.setVisibility(View.GONE);
             }
-            if (courseDuration != null) courseDuration.setText(course.getDuration());
-            if (courseRating != null) courseRating.setText(String.valueOf(course.getRating()));
+            if (courseDuration != null) {
+                long duration = course.getDuration() != null ? course.getDuration() : 0L;
+                courseDuration.setText(duration + "h");
+            }
+            if (courseRating != null) {
+                double rating = course.getRating() != null ? course.getRating() : 0.0;
+                courseRating.setText(String.valueOf(rating));
+            }
 
             Glide.with(itemView.getContext())
-                    .load(course.getImageUrl())
+                    .load("https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=800&q=80")
                     .apply(new RequestOptions().transform(new RoundedCorners(24)))
                     .into(courseImage);
 
@@ -122,8 +132,8 @@ public class RecommendedAdapter extends RecyclerView.Adapter<RecommendedAdapter.
                 Intent intent = new Intent(v.getContext(), CourseDetailActivity.class);
                 intent.putExtra("COURSE_ID", course.getId());
                 intent.putExtra("COURSE_TITLE", course.getTitle());
-                  intent.putExtra("COURSE_PRICE", course.getPrice());
-                  intent.putExtra("COURSE_DISCOUNTED_PRICE", course.getDiscountedPrice());
+                intent.putExtra("COURSE_PRICE", price);
+                intent.putExtra("COURSE_DISCOUNTED_PRICE", discountedPriceObj);
                 v.getContext().startActivity(intent);
             });
         }

@@ -18,8 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
 import com.app.cinx.adapter.CheckoutCourseAdapter;
-import com.app.cinx.model.Order;
-import com.app.cinx.util.ToastUtil;
+import com.app.cinx.utils.ToastUtil;
 
 import java.util.ArrayList;
 

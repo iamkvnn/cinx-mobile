@@ -3,7 +3,6 @@ package com.app.cinx.activity;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -17,14 +16,26 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
-import com.app.cinx.util.UserManager;
+import com.app.cinx.utils.UserManager;
 import android.widget.Toast;
 import com.app.cinx.adapter.CourseCurriculumAdapter;
 import com.app.cinx.data.SampleCourseData;
 import com.app.cinx.data.CartRepository;
 import com.app.cinx.model.Chapter;
 import com.app.cinx.model.Lesson;
+import com.app.cinx.utils.ToastUtil;
 import com.google.android.material.tabs.TabLayout;
+
+import com.app.cinx.api.CourseService;
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.dto.ApiResponse;
+import com.app.cinx.api.dto.CourseDetailResponse;
+import com.app.cinx.api.dto.AddToCartRequest;
+import com.app.cinx.utils.PriceUtil;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import android.util.Log;
 
 import java.util.List;
 
@@ -119,25 +130,28 @@ public class CourseDetailActivity extends AppCompatActivity {
         // Strike-through original price
         TextView tvOriginalPrice = findViewById(R.id.tvOriginalPrice);
         TextView tvCurrentPrice = findViewById(R.id.tvCurrentPrice);
-        int courseId = getIntent().getIntExtra("COURSE_ID", -1);
-        if (courseId == 1 && UserManager.getInstance().isLoggedIn()) {
-            isPurchased = true; // Simulate course already purchased for course ID 1
-        }
+        
+        String courseIdStr = getIntent().getStringExtra("COURSE_ID");
+
         long originalPriceVal = getIntent().getLongExtra("COURSE_PRICE", 1200000L);
         long currentPriceVal = getIntent().getLongExtra("COURSE_DISCOUNTED_PRICE", 599000L);
         String courseTitle = getIntent().getStringExtra("COURSE_TITLE");
         
         if (courseTitle != null) {
-            TextView titleView = findViewById(R.id.tvCourseTitle); // Assuming there's a title view, if not it's fine
+            TextView titleView = findViewById(R.id.tvCourseTitle);
             if (titleView != null) titleView.setText(courseTitle);
         }
 
         if (tvOriginalPrice != null) {
-            tvOriginalPrice.setText(com.app.cinx.util.PriceUtil.formatPrice(originalPriceVal));
+            tvOriginalPrice.setText(PriceUtil.formatPrice(originalPriceVal));
             tvOriginalPrice.setPaintFlags(tvOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         }
         if (tvCurrentPrice != null) {
-            tvCurrentPrice.setText(com.app.cinx.util.PriceUtil.formatPrice(currentPriceVal));
+            tvCurrentPrice.setText(PriceUtil.formatPrice(currentPriceVal));
+        }
+
+        if (courseIdStr != null && !courseIdStr.isEmpty()) {
+            fetchCourseDetails(courseIdStr);
         }
 
         View btnAddCart = findViewById(R.id.btnAddCart);
@@ -149,12 +163,82 @@ public class CourseDetailActivity extends AppCompatActivity {
                 Intent loginIntent = new Intent(CourseDetailActivity.this, com.app.cinx.activity.LoginActivity.class);
                 startActivity(loginIntent);
             } else {
-                Toast.makeText(CourseDetailActivity.this, "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                if (courseIdStr != null) {
+                    RetrofitClient.getInstance().getCartService().addToCart(new AddToCartRequest(courseIdStr)).enqueue(new Callback<ApiResponse<Void>>() {
+                        @Override
+                        public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                            if (response.isSuccessful()) {
+                                Toast.makeText(CourseDetailActivity.this, "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                                refreshCartBadge(); // update badge async if we change it to fetch from API, for now it relies on local state
+                            } else {
+                                Toast.makeText(CourseDetailActivity.this, "Lỗi thêm giỏ hàng", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                            Toast.makeText(CourseDetailActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         };
 
         if (btnAddCart != null) btnAddCart.setOnClickListener(buyAction);
         if (btnBuyNow != null) btnBuyNow.setOnClickListener(buyAction);
+    }
+
+    private void fetchCourseDetails(String courseId) {
+        CourseService courseService = RetrofitClient.getInstance().getCourseService();
+        courseService.getCourseById(courseId).enqueue(new Callback<ApiResponse<CourseDetailResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<CourseDetailResponse>> call, Response<ApiResponse<CourseDetailResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    CourseDetailResponse detail = response.body().getData();
+                    updateUIWithCourseDetail(detail);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<CourseDetailResponse>> call, Throwable t) {
+                Log.e("CourseDetail", "Failed to fetch details", t);
+            }
+        });
+    }
+
+    private void updateUIWithCourseDetail(CourseDetailResponse detail) {
+        TextView tvCourseTitle = findViewById(R.id.tvCourseTitle);
+        if (tvCourseTitle != null && detail.getTitle() != null) {
+            tvCourseTitle.setText(detail.getTitle());
+        }
+
+        if (tvCourseDescription != null && detail.getDescription() != null) {
+            tvCourseDescription.setText(detail.getDescription());
+        }
+
+        TextView tvOriginalPrice = findViewById(R.id.tvOriginalPrice);
+        TextView tvCurrentPrice = findViewById(R.id.tvCurrentPrice);
+
+        long price = detail.getPrice() != null ? detail.getPrice() : 0L;
+        long discountedPrice = detail.getDiscountedPrice() != null ? detail.getDiscountedPrice() : price;
+
+        if (tvCurrentPrice != null) {
+            tvCurrentPrice.setText(PriceUtil.formatPrice(discountedPrice));
+        }
+
+        if (tvOriginalPrice != null && detail.getDiscountRate() != null && detail.getDiscountRate() > 0) {
+            tvOriginalPrice.setVisibility(View.VISIBLE);
+            tvOriginalPrice.setText(PriceUtil.formatPrice(price));
+            tvOriginalPrice.setPaintFlags(tvOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        } else if (tvOriginalPrice != null) {
+            tvOriginalPrice.setVisibility(View.GONE);
+        }
+
+        // Set real purchase state if available from API
+        if (detail.getIsInSubscription() != null && detail.getIsInSubscription()) {
+            isPurchased = true;
+            updatePurchaseState(isPurchased);
+        }
     }
 
     private void setupNavButtons() {
@@ -270,7 +354,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         for (Lesson l : lessons) {
             if (l.getId() == lessonId) {
                 if (l.isLocked()) {
-                    com.app.cinx.util.ToastUtil.showCustomToast(this, "Bài học chưa mở khoá!");
+                    ToastUtil.showCustomToast(this, "Bài học chưa mở khoá!");
                     return;
                 }
                 startActivity(LessonActivity.newIntent(this, lessonId));

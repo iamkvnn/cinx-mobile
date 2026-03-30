@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.app.cinx.R;
 import com.app.cinx.adapter.VoucherProfileAdapter;
 import com.app.cinx.model.ProfileVoucher;
-import com.app.cinx.util.ToastUtil;
+import com.app.cinx.utils.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;

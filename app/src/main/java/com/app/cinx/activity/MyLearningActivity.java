@@ -18,8 +18,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.app.cinx.R;
 import com.app.cinx.adapter.MyLearningAdapter;
 import com.app.cinx.model.EnrolledCourse;
-import com.app.cinx.util.ToastUtil;
+import com.app.cinx.utils.ToastUtil;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+
+import com.app.cinx.api.EnrollmentService;
+import com.app.cinx.api.SocialService;
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.dto.ApiResponse;
+import com.app.cinx.api.dto.CourseResponse;
+import com.app.cinx.api.dto.EnrollmentResponse;
+import com.app.cinx.api.dto.PaginatedApiResponseEnrollmentResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,93 +86,92 @@ public class MyLearningActivity extends AppCompatActivity
         setContentView(R.layout.activity_my_learning);
         if (getSupportActionBar() != null) getSupportActionBar().hide();
 
-        initMockData();
+        allCourses.clear();
         bindViews();
         setupRecyclerView();
         setupTabs();
         setupSearch();
         setupFilterDialog();
-        renderCourses();
+        
+        fetchData();
     }
 
-    private void initMockData() {
-        allCourses.add(EnrolledCourse.progress(1,
-                "UI/UX Design Masterclass: Từ Cơ Bản Đến Nâng Cao", "Hà Linh",
-                "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80",
-                "Design", 65, "Bài 4.2: Component & Auto Layout", "2 giờ trước"));
-        allCourses.add(EnrolledCourse.progress(2,
-                "Fullstack React & Node.js cho người mới", "Minh Tuấn",
-                "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=300&q=80",
-                "Coding", 15, "Bài 2.1: Cài đặt môi trường Node.js", "Hôm qua"));
-        allCourses.add(EnrolledCourse.progress(3,
-                "Mobile App Design với Figma", "Hà Linh",
-                "https://images.unsplash.com/photo-1555099962-4199c345e5dd?w=300&q=80",
-                "Design", 2, "Bài 1.1: Giới thiệu khóa học", "Tuần trước"));
+    private void fetchData() {
+        fetchEnrolledCourses();
+        fetchWishlist();
+    }
+    
+    private void fetchEnrolledCourses() {
+        EnrollmentService enrollmentService = RetrofitClient.getInstance().getEnrollmentService();
+        enrollmentService.getEnrolledCourses(0, 100).enqueue(new Callback<PaginatedApiResponseEnrollmentResponse>() {
+            @Override
+            public void onResponse(Call<PaginatedApiResponseEnrollmentResponse> call, Response<PaginatedApiResponseEnrollmentResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    List<EnrollmentResponse> enrollments = response.body().getData();
+                    for (EnrollmentResponse e : enrollments) {
+                        CourseResponse cr = e.getCourse();
+                        if (cr == null) continue;
+                        
+                        String idStr = e.getId() != null ? e.getId() : cr.getId();
+                        int id = (idStr != null) ? idStr.hashCode() : 0;
+                        String title = cr.getTitle();
+                        String instructor = cr.getDescription(); // fallback
+                        String thumbnail = "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80";
+                        String category = cr.getCategory();
+                        
+                        boolean isCompleted = e.getIsCompleted() != null && e.getIsCompleted();
+                        if (isCompleted) {
+                            allCourses.add(EnrolledCourse.completed(id, title, instructor, thumbnail, category, e.getEnrolledAt(), "N/A"));
+                        } else {
+                            Double progress = e.getProgress() != null ? e.getProgress() : 0.0;
+                            allCourses.add(EnrolledCourse.progress(id, title, instructor, thumbnail, category, progress.intValue(), "N/A", "N/A"));
+                        }
+                    }
+                    runOnUiThread(() -> {
+                        setupTabs();
+                        renderCourses();
+                    });
+                }
+            }
 
-        String[][] completed = {
-                {"Digital Marketing 101: SEO & Ads", "Sarah Nguyễn",
-                 "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=300&q=80",
-                 "Business", "15/04/2026", "9.5/10"},
-                {"Python cho Data Science", "Minh Tuấn",
-                 "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300&q=80",
-                 "Coding", "10/03/2026", "8.7/10"},
-                {"Thiết kế Logo chuyên nghiệp", "Hà Linh",
-                 "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=300&q=80",
-                 "Design", "01/02/2026", "9.0/10"},
-                {"Google Ads: Từ A đến Z", "Sarah Nguyễn",
-                 "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&q=80",
-                 "Business", "20/01/2026", "8.5/10"},
-                {"JavaScript ES6+ nâng cao", "Minh Tuấn",
-                 "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=300&q=80",
-                 "Coding", "15/01/2026", "9.2/10"},
-                {"Adobe Illustrator cơ bản", "Hà Linh",
-                 "https://images.unsplash.com/photo-1609921212029-bb5a28e60960?w=300&q=80",
-                 "Design", "05/01/2026", "8.0/10"},
-                {"Excel cho dân văn phòng", "Sarah Nguyễn",
-                 "https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?w=300&q=80",
-                 "Business", "20/12/2025", "9.8/10"},
-                {"Vue.js 3 căn bản", "Minh Tuấn",
-                 "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=300&q=80",
-                 "Coding", "10/12/2025", "8.9/10"},
-                {"Photoshop retouching", "Hà Linh",
-                 "https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?w=300&q=80",
-                 "Design", "01/12/2025", "9.1/10"},
-                {"Email Marketing pro", "Sarah Nguyễn",
-                 "https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?w=300&q=80",
-                 "Business", "15/11/2025", "8.3/10"},
-                {"Flutter đa nền tảng", "Minh Tuấn",
-                 "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=300&q=80",
-                 "Coding", "01/11/2025", "9.4/10"},
-                {"Brand Identity Design", "Hà Linh",
-                 "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&q=80",
-                 "Design", "20/10/2025", "8.6/10"},
-        };
-        int id = 4;
-        for (String[] d : completed) {
-            allCourses.add(EnrolledCourse.completed(id++, d[0], d[1], d[2], d[3], d[4], d[5]));
-        }
+            @Override
+            public void onFailure(Call<PaginatedApiResponseEnrollmentResponse> call, Throwable t) {
+                Log.e("MyLearning", "Failed to fetch enrollments", t);
+            }
+        });
+    }
 
-        String[][] saved = {
-                {"Advanced iOS Development", "Lê Tuấn",
-                 "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=300&q=80",
-                 "Coding", "1.299.000đ", "4.8"},
-                {"Web Animation với GSAP", "Hà Linh",
-                 "https://images.unsplash.com/photo-1547082299-de196ea013d6?w=300&q=80",
-                 "Design", "899.000đ", "4.7"},
-                {"Facebook Ads 2026", "Sarah Nguyễn",
-                 "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=300&q=80",
-                 "Business", "699.000đ", "4.6"},
-                {"TypeScript masterclass", "Minh Tuấn",
-                 "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=300&q=80",
-                 "Coding", "999.000đ", "4.9"},
-                {"3D modeling với Blender", "Hoàng Long",
-                 "https://images.unsplash.com/photo-1617854818583-09e7f077a156?w=300&q=80",
-                 "Design", "1.099.000đ", "4.5"},
-        };
-        for (String[] d : saved) {
-            allCourses.add(EnrolledCourse.saved(id++, d[0], d[1], d[2], d[3], d[4],
-                    Double.parseDouble(d[5])));
-        }
+    private void fetchWishlist() {
+        SocialService socialService = RetrofitClient.getInstance().getSocialService();
+        if (socialService == null) return; // if not initialized
+        socialService.getWishlist().enqueue(new Callback<ApiResponse<List<CourseResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<CourseResponse>>> call, Response<ApiResponse<List<CourseResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    List<CourseResponse> wishlist = response.body().getData();
+                    for (CourseResponse cr : wishlist) {
+                        int id = cr.getId() != null ? cr.getId().hashCode() : 0;
+                        String title = cr.getTitle();
+                        String instructor = cr.getDescription(); // fallback
+                        String thumbnail = "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80";
+                        String category = cr.getCategory();
+                        double rating = cr.getRating() != null ? cr.getRating() : 0.0;
+                        long price = cr.getDiscountedPrice() != null ? cr.getDiscountedPrice() : (cr.getPrice() != null ? cr.getPrice() : 0L);
+                        
+                        allCourses.add(EnrolledCourse.saved(id, title, instructor, thumbnail, category, com.app.cinx.utils.PriceUtil.formatPrice(price), rating));
+                    }
+                    runOnUiThread(() -> {
+                        setupTabs();
+                        renderCourses();
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<CourseResponse>>> call, Throwable t) {
+                Log.e("MyLearning", "Failed to fetch wishlist", t);
+            }
+        });
     }
 
     private void bindViews() {

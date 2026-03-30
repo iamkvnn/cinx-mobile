@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
 import com.app.cinx.R;
-import com.app.cinx.util.UserManager;
+import com.app.cinx.utils.UserManager;
 
 public class LoginActivity extends AppCompatActivity {
 

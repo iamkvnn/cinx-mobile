@@ -1,10 +1,30 @@
 package com.app.cinx.api.dto;
 
-/** A single item in the server cart response. */
-public class CartItemDto {
-    private String    id;
-    private CourseDto course;
+import com.google.gson.annotations.SerializedName;
+import java.util.List;
 
-    public String    getId()     { return id; }
-    public CourseDto getCourse() { return course; }
+public class CartItemDto {
+    @SerializedName("id")
+    private String id;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @SerializedName("course")
+    private CourseResponse course;
+
+    public CourseResponse getCourse() {
+        return course;
+    }
+
+    public void setCourse(CourseResponse course) {
+        this.course = course;
+    }
+
+    // mock field preserved for ui consistency
 }

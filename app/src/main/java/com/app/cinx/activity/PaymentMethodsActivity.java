@@ -21,7 +21,7 @@ import com.app.cinx.R;
 import com.app.cinx.adapter.LinkedWalletAdapter;
 import com.app.cinx.model.BankCard;
 import com.app.cinx.model.LinkedWallet;
-import com.app.cinx.util.ToastUtil;
+import com.app.cinx.utils.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;

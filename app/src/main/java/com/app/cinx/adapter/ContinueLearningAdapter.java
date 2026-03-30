@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
-import com.app.cinx.model.Course;
+import com.app.cinx.api.dto.CourseResponse;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
@@ -20,9 +20,9 @@ import java.util.List;
 
 public class ContinueLearningAdapter extends RecyclerView.Adapter<ContinueLearningAdapter.ViewHolder> {
 
-    private List<Course> courses;
+    private List<CourseResponse> courses;
 
-    public ContinueLearningAdapter(List<Course> courses) {
+    public ContinueLearningAdapter(List<CourseResponse> courses) {
         this.courses = courses;
     }
 
@@ -35,13 +35,13 @@ public class ContinueLearningAdapter extends RecyclerView.Adapter<ContinueLearni
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Course course = courses.get(position);
+        CourseResponse course = courses.get(position);
         holder.bind(course);
     }
 
     @Override
     public int getItemCount() {
-        return courses.size();
+        return courses != null ? courses.size() : 0;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -56,9 +56,9 @@ public class ContinueLearningAdapter extends RecyclerView.Adapter<ContinueLearni
             progressBar = itemView.findViewById(R.id.progressBar);
         }
 
-        public void bind(Course course) {
+        public void bind(CourseResponse course) {
             courseTitle.setText(course.getTitle());
-            chapterTitle.setText(course.getCategory()); 
+            chapterTitle.setText(course.getCategory() != null ? course.getCategory() : "Khóa học"); 
             // Mock progress
             progressBar.setProgress((int)(Math.random() * 100));
         }

@@ -1,13 +1,41 @@
 package com.app.cinx.api.dto;
 
+import com.google.gson.annotations.SerializedName;
+import java.util.List;
+
 public class ResetPasswordRequest {
+    @SerializedName("email")
     private String email;
-    private String newPassword;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @SerializedName("otp")
     private String otp;
 
-    public ResetPasswordRequest(String email, String newPassword, String otp) {
-        this.email       = email;
-        this.newPassword = newPassword;
-        this.otp         = otp;
+    public String getOtp() {
+        return otp;
     }
+
+    public void setOtp(String otp) {
+        this.otp = otp;
+    }
+
+    @SerializedName("newPassword")
+    private String newPassword;
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    // mock field preserved for ui consistency
 }

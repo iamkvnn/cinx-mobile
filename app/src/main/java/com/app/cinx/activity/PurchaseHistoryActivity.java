@@ -15,27 +15,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
 import com.app.cinx.adapter.OrderAdapter;
-import com.app.cinx.data.OrderRepository;
 import com.app.cinx.model.Order;
-import com.app.cinx.util.ToastUtil;
+import com.app.cinx.model.OrderItem;
+import com.app.cinx.api.OrderService;
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.dto.ApiListResponse;
+import com.app.cinx.api.dto.OrderDto;
+import com.app.cinx.api.dto.OrderItemDto;
+import com.app.cinx.utils.TokenManager;
+import com.app.cinx.utils.ToastUtil;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * PurchaseHistoryActivity
- * ───────────────────────
- * Displays the user's purchase history grouped into four filterable
- * status tabs: All · Completed · Pending · Cancelled.
- *
- * Architecture notes:
- *  - Data access is delegated to {@link OrderRepository}; swap the
- *    implementation for a ViewModel + LiveData when adding a real API.
- *  - The adapter receives interaction callbacks through
- *    {@link OrderAdapter.OnOrderActionListener} – no coupling between
- *    adapter and Activity beyond the interface.
- *  - Tab selection state is managed here (not in the adapter) to keep
- *    the adapter purely presentational.
- */
 public class PurchaseHistoryActivity extends AppCompatActivity
         implements OrderAdapter.OnOrderActionListener {
 
@@ -65,7 +60,7 @@ public class PurchaseHistoryActivity extends AppCompatActivity
     // Data
     // ─────────────────────────────────────────────────────────────────
 
-    private final OrderRepository repository = OrderRepository.getInstance();
+    private final List<Order> allOrders = new ArrayList<>();
 
     /** Currently selected filter; null = "All". */
     private Order.Status activeFilter = null;
@@ -84,8 +79,50 @@ public class PurchaseHistoryActivity extends AppCompatActivity
         setupTabListeners();
         setupActionBarButtons();
 
-        // Load all orders initially
-        loadOrders(null);
+        fetchOrders();
+    }
+
+    private void fetchOrders() {
+        String token = TokenManager.getInstance().getBearerToken();
+        OrderService service = RetrofitClient.getInstance().getOrderService();
+        service.getOrders(token).enqueue(new Callback<ApiListResponse<OrderDto>>() {
+            @Override
+            public void onResponse(Call<ApiListResponse<OrderDto>> call, Response<ApiListResponse<OrderDto>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    allOrders.clear();
+                    for (OrderDto dto : response.body().getData()) {
+                        Order.Status status = Order.Status.PENDING;
+                        if (dto.getStatus() != null) {
+                            try {
+                                status = Order.Status.valueOf(dto.getStatus().toUpperCase());
+                            } catch (Exception e) {}
+                        }
+                        
+                        List<OrderItem> items = new ArrayList<>();
+                        if (dto.getItems() != null) {
+                            for (OrderItemDto itemDto : dto.getItems()) {
+                                items.add(new OrderItem(
+                                        itemDto.getTitle(), 
+                                        "Instructor", // Fallback if no instructor in dto
+                                        "https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=300", // Fallback image
+                                        itemDto.getPrice(), 
+                                        itemDto.getDiscountedPrice()
+                                ));
+                            }
+                        }
+                        
+                        long totalAmount = dto.getTotalPrice(); // Get total price from DTO
+                        allOrders.add(new Order(dto.getId(), dto.getOrderDate(), status, items, totalAmount));
+                    }
+                    runOnUiThread(() -> loadOrders(activeFilter));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiListResponse<OrderDto>> call, Throwable t) {
+                ToastUtil.showCustomToast(PurchaseHistoryActivity.this, "Failed to load orders");
+            }
+        });
     }
 
     // ─────────────────────────────────────────────────────────────────
@@ -113,7 +150,7 @@ public class PurchaseHistoryActivity extends AppCompatActivity
     // ─────────────────────────────────────────────────────────────────
 
     private void setupRecyclerView() {
-        adapter = new OrderAdapter(repository.getOrders(null), this);
+        adapter = new OrderAdapter(new ArrayList<>(), this);
         rvOrders.setLayoutManager(new LinearLayoutManager(this));
         rvOrders.setAdapter(adapter);
         rvOrders.setHasFixedSize(false);
@@ -177,10 +214,20 @@ public class PurchaseHistoryActivity extends AppCompatActivity
     // ─────────────────────────────────────────────────────────────────
 
     private void loadOrders(Order.Status filter) {
-        List<Order> orders = repository.getOrders(filter);
-        adapter.updateOrders(orders);
+        List<Order> filtered = new ArrayList<>();
+        if (filter == null) {
+            filtered.addAll(allOrders);
+        } else {
+            for (Order o : allOrders) {
+                if (o.getStatus() == filter) {
+                    filtered.add(o);
+                }
+            }
+        }
+        
+        adapter.updateOrders(filtered);
 
-        boolean isEmpty = orders.isEmpty();
+        boolean isEmpty = filtered.isEmpty();
         rvOrders.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
         layoutOrderEmpty.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
     }

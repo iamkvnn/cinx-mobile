@@ -14,7 +14,7 @@ import androidx.appcompat.widget.AppCompatButton;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.app.cinx.R;
-import com.app.cinx.util.ToastUtil;
+import com.app.cinx.utils.ToastUtil;
 
 /**
  * Payment-success / "Thank you" screen.

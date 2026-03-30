@@ -7,7 +7,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -23,7 +22,7 @@ import com.app.cinx.adapter.GoalAdapter;
 import com.app.cinx.adapter.MyLearningAdapter;
 import com.app.cinx.model.EnrolledCourse;
 import com.app.cinx.model.Goal;
-import com.app.cinx.util.NavHelper;
+import com.app.cinx.utils.NavHelper;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;

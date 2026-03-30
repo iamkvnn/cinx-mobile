@@ -22,11 +22,18 @@ import com.app.cinx.adapter.RecommendedAdapter;
 import com.app.cinx.adapter.TestimonialAdapter;
 import com.app.cinx.model.Course;
 import com.app.cinx.model.Testimonial;
-import com.app.cinx.util.UserManager;
+import com.app.cinx.utils.UserManager;
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 
-import com.app.cinx.util.NavHelper;
+import com.app.cinx.utils.NavHelper;
+import com.app.cinx.api.CourseService;
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.dto.CourseResponse;
+import com.app.cinx.api.dto.PaginatedApiResponseCourseResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,15 +121,37 @@ public class MainActivity extends AppCompatActivity {
 
         // Setup Continue Learning
         continueLearningRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        List<Course> activeCourses = getCoursesList().subList(0, 2); // Mock some active courses
-        ContinueLearningAdapter continueAdapter = new ContinueLearningAdapter(activeCourses);
-        continueLearningRecyclerView.setAdapter(continueAdapter);
-
+        // Placeholder for active courses until we have API for it, for now load everything
+        
         // Setup Recommended
         recommendedRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        List<Course> recommendedCourses = getCoursesList();
-        RecommendedAdapter recommendedAdapter = new RecommendedAdapter(recommendedCourses);
-        recommendedRecyclerView.setAdapter(recommendedAdapter);
+        
+        CourseService courseService = RetrofitClient.getInstance().getCourseService();
+        courseService.getAllCourses(null, null).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
+            @Override
+            public void onResponse(Call<PaginatedApiResponseCourseResponse> call, Response<PaginatedApiResponseCourseResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    List<CourseResponse> courseResponses = response.body().getData();
+                    
+                    if (courseResponses.size() >= 2) {
+                        List<CourseResponse> activeCourses = courseResponses.subList(0, 2); 
+                        ContinueLearningAdapter continueAdapter = new ContinueLearningAdapter(activeCourses);
+                        continueLearningRecyclerView.setAdapter(continueAdapter);
+                    } else {
+                        ContinueLearningAdapter continueAdapter = new ContinueLearningAdapter(courseResponses);
+                        continueLearningRecyclerView.setAdapter(continueAdapter);
+                    }
+
+                    RecommendedAdapter recommendedAdapter = new RecommendedAdapter(courseResponses);
+                    recommendedRecyclerView.setAdapter(recommendedAdapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PaginatedApiResponseCourseResponse> call, Throwable t) {
+                Log.e("MainActivity", "Failed to load courses", t);
+            }
+        });
     }
 
     private void initGuestViews() {
@@ -179,24 +208,37 @@ public class MainActivity extends AppCompatActivity {
         partnersRecyclerView.setAdapter(partnerAdapter);
 
         // Courses
-        List<Course> courses = getCoursesList();
-        CourseAdapter courseAdapter = new CourseAdapter(courses, new CourseAdapter.OnCourseClickListener() {
+        CourseService courseService = RetrofitClient.getInstance().getCourseService();
+        courseService.getAllCourses(null, null).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
             @Override
-            public void onCourseClick(Course course) {
-                android.content.Intent intent = new android.content.Intent(MainActivity.this, CourseDetailActivity.class);
-                intent.putExtra("COURSE_ID", course.getId());
-                intent.putExtra("COURSE_TITLE", course.getTitle());
-                intent.putExtra("COURSE_PRICE", course.getPrice());
-                intent.putExtra("COURSE_DISCOUNTED_PRICE", course.getDiscountedPrice());
-                startActivity(intent);
+            public void onResponse(Call<PaginatedApiResponseCourseResponse> call, Response<PaginatedApiResponseCourseResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    List<CourseResponse> courseResponses = response.body().getData();
+                    CourseAdapter courseAdapter = new CourseAdapter(courseResponses, new CourseAdapter.OnCourseClickListener() {
+                        @Override
+                        public void onCourseClick(CourseResponse course) {
+                            android.content.Intent intent = new android.content.Intent(MainActivity.this, CourseDetailActivity.class);
+                            intent.putExtra("COURSE_ID", course.getId());
+                            intent.putExtra("COURSE_TITLE", course.getTitle());
+                            intent.putExtra("COURSE_PRICE", course.getPrice() != null ? course.getPrice() : 0L);
+                            intent.putExtra("COURSE_DISCOUNTED_PRICE", course.getDiscountedPrice() != null ? course.getDiscountedPrice() : (course.getPrice() != null ? course.getPrice() : 0L));
+                            startActivity(intent);
+                        }
+
+                        @Override
+                        public void onFavoriteClick(CourseResponse course) {
+                            Toast.makeText(MainActivity.this, "Added to favorites: " + course.getTitle(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    coursesRecyclerView.setAdapter(courseAdapter);
+                }
             }
 
             @Override
-            public void onFavoriteClick(Course course) {
-                Toast.makeText(MainActivity.this, "Added to favorites: " + course.getTitle(), Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<PaginatedApiResponseCourseResponse> call, Throwable t) {
+                Log.e("MainActivity", "Failed to load courses", t);
             }
         });
-        coursesRecyclerView.setAdapter(courseAdapter);
 
         // Testimonials
         List<Testimonial> testimonials = getTestimonialsList();
@@ -243,4 +285,3 @@ public class MainActivity extends AppCompatActivity {
         return testimonials;
     }
 }
-

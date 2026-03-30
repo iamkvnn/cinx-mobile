@@ -51,9 +51,9 @@ public class CartRepository {
         return items.size();
     }
 
-    public boolean containsCourse(int courseId) {
+    public boolean containsCourse(String courseId) {
         for (CartItem item : items) {
-            if (item.getId() == courseId) return true;
+            if (item.getId().equals(courseId)) return true;
         }
         return false;
     }
@@ -64,8 +64,8 @@ public class CartRepository {
         }
     }
 
-    public void removeItem(int courseId) {
-        items.removeIf(item -> item.getId() == courseId);
+    public void removeItem(String courseId) {
+        items.removeIf(item -> item.getId().equals(courseId));
     }
 
     public void clear() {
@@ -78,13 +78,13 @@ public class CartRepository {
 
     private void seedSampleData() {
         items.addAll(Arrays.asList(
-                new CartItem(1,
+                new CartItem("1",
                         "UI/UX Design Masterclass: Từ Cơ Bản Đến Nâng Cao",
                         "Hà Linh",
                         1_200_000L, 599_000L,
                         "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400",
                         "Design"),
-                new CartItem(2,
+                new CartItem("2",
                         "Fullstack React & Node.js cho người mới",
                         "Minh Tuấn",
                         1_500_000L, 899_000L,

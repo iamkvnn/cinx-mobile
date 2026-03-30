@@ -15,11 +15,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RetrofitClient {
 
-    private static final String BASE_URL = "http://10.0.2.2:9090/";
+    private static final String BASE_URL = "http://api.shinyjewelry.shop/";
 
     private static RetrofitClient instance;
 
     private final Retrofit retrofitMain;
+    private final OkHttpClient httpClient;
 
     // cached service singletons
     private AuthService         authService;
@@ -29,12 +30,16 @@ public class RetrofitClient {
     private OrderService        orderService;
     private EnrollmentService   enrollmentService;
     private PaymentService      paymentService;
+    private RecommendationService recommendationService;
+    private SocialService      socialService;
 
     private RetrofitClient() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-        OkHttpClient httpClient = new OkHttpClient.Builder()
+        httpClient = new OkHttpClient.Builder()
+                .addInterceptor(new AuthInterceptor())
+                .authenticator(new TokenAuthenticator())
                 .addInterceptor(logging)
                 .build();
 
@@ -90,5 +95,19 @@ public class RetrofitClient {
     public PaymentService getPaymentService() {
         if (paymentService == null) paymentService = retrofitMain.create(PaymentService.class);
         return paymentService;
+    }
+
+    public RecommendationService getRecommendationService() {
+        if (recommendationService == null) recommendationService = retrofitMain.create(RecommendationService.class);
+        return recommendationService;
+    }
+
+    public SocialService getSocialService() {
+        if (socialService == null) socialService = retrofitMain.create(SocialService.class);
+        return socialService;
+    }
+
+    public OkHttpClient getHttpClient() {
+        return httpClient;
     }
 }

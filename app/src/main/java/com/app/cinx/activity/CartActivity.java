@@ -31,8 +31,18 @@ import com.app.cinx.adapter.VoucherAdapter;
 import com.app.cinx.data.CartRepository;
 import com.app.cinx.model.CartItem;
 import com.app.cinx.model.Voucher;
-import com.app.cinx.util.Convert;
+import com.app.cinx.utils.Convert;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+
+import com.app.cinx.api.CartService;
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.dto.ApiResponse;
+import com.app.cinx.api.dto.CartItemResponse;
+import com.app.cinx.api.dto.CourseResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,7 +86,7 @@ public class CartActivity extends AppCompatActivity
     // Data
     // ─────────────────────────────────────────────────────────────────────
 
-    private final List<CartItem> cartItems = CartRepository.getInstance().getItems();
+    private final List<CartItem> cartItems = new ArrayList<>();
     private final List<Voucher>  vouchers  = new ArrayList<>();
     private       Voucher        appliedVoucher = null;
     private       CartAdapter    cartAdapter;
@@ -95,8 +105,52 @@ public class CartActivity extends AppCompatActivity
         setupRecyclerView();
         setupSwipeToDelete();
         setupClickListeners();
-        refreshSummary();
-        updateEmptyState();
+        
+        fetchCartItems();
+    }
+    
+    private void fetchCartItems() {
+        CartService cartService = RetrofitClient.getInstance().getCartService();
+        if (cartService == null) return;
+        
+        cartService.getCart().enqueue(new Callback<ApiResponse<List<CartItemResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<CartItemResponse>>> call, Response<ApiResponse<List<CartItemResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    cartItems.clear();
+                    CartRepository.getInstance().clear();
+                    
+                    List<CartItemResponse> responses = response.body().getData();
+                    for (CartItemResponse r : responses) {
+                        CourseResponse cr = r.getCourse();
+                        if (cr == null) continue;
+                        
+                        String id = r.getId() != null ? r.getId() : cr.getId();
+                        String title = cr.getTitle();
+                        String instructor = cr.getDescription(); // fallback
+                        long price = cr.getPrice() != null ? cr.getPrice() : 0L;
+                        long discountedPrice = cr.getDiscountedPrice() != null ? cr.getDiscountedPrice() : price;
+                        String thumbnail = "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80";
+                        String category = cr.getCategory();
+                        
+                        CartItem ci = new CartItem(id, title, instructor, price, discountedPrice, thumbnail, category);
+                        ci.setSelected(true); // default selected
+                        cartItems.add(ci);
+                        CartRepository.getInstance().addItem(ci);
+                    }
+                    runOnUiThread(() -> {
+                        cartAdapter.notifyDataSetChanged();
+                        refreshSummary();
+                        updateEmptyState();
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<CartItemResponse>>> call, Throwable t) {
+                Log.e("CartActivity", "Failed to fetch cart", t);
+            }
+        });
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -104,8 +158,7 @@ public class CartActivity extends AppCompatActivity
     // ─────────────────────────────────────────────────────────────────────
 
     private void initSampleData() {
-        // Cart items are managed by CartRepository — no duplication here.
-
+        // Vouchers mock
         vouchers.addAll(Arrays.asList(
                 new Voucher("v1", "Giảm 20% cho thành viên mới",
                         "Áp dụng cho mọi khóa học", "EDUFUTURE", 20),
@@ -179,8 +232,28 @@ public class CartActivity extends AppCompatActivity
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int pos = viewHolder.getAdapterPosition();
+                CartItem item = cartItems.get(pos);
+                
+                // Call API to remove
+                CartService cartService = RetrofitClient.getInstance().getCartService();
+                if (cartService != null) {
+                    cartService.removeFromCart(item.getId()).enqueue(new Callback<ApiResponse<Void>>() {
+                        @Override
+                        public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                            if (response.isSuccessful()) {
+                                // optional handling
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                            Log.e("CartActivity", "Failed to remove item", t);
+                        }
+                    });
+                }
+                
                 cartAdapter.removeItem(pos);
                 updateEmptyState();
+                // refreshSummary is called by cartAdapter via callback
             }
 
             @Override
@@ -281,6 +354,12 @@ public class CartActivity extends AppCompatActivity
     @Override
     public void onSelectionChanged() {
         refreshSummary();
+        // Sync cart repository so CheckoutActivity receives up-to-date selection state
+        CartRepository.getInstance().clear();
+        for (CartItem item: cartItems) {
+            CartRepository.getInstance().addItem(item);
+        }
+
         // Sync "select all" checkbox without triggering its own listener
         cbSelectAll.setOnCheckedChangeListener(null);
         cbSelectAll.setChecked(cartAdapter.areAllSelected());
@@ -290,6 +369,18 @@ public class CartActivity extends AppCompatActivity
 
     @Override
     public void onDeleteItem(int position) {
+        if (position >= 0 && position < cartItems.size()) {
+            CartItem item = cartItems.get(position);
+            CartService cartService = RetrofitClient.getInstance().getCartService();
+            if (cartService != null) {
+                cartService.removeFromCart(item.getId()).enqueue(new Callback<ApiResponse<Void>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {}
+                    @Override
+                    public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {}
+                });
+            }
+        }
         cartAdapter.removeItem(position);
         updateEmptyState();
         refreshSummary();
@@ -365,6 +456,16 @@ public class CartActivity extends AppCompatActivity
     // ─────────────────────────────────────────────────────────────────────
 
     private void clearAll() {
+        CartService cartService = RetrofitClient.getInstance().getCartService();
+        if (cartService != null) {
+            cartService.clearCart().enqueue(new Callback<ApiResponse<Void>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {}
+                @Override
+                public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {}
+            });
+        }
+        
         int size = cartItems.size();
         cartItems.clear();
         cartAdapter.notifyItemRangeRemoved(0, size);

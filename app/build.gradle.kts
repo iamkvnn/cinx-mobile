@@ -33,7 +33,12 @@ android {
     }
 }
 
+apply(from = "../generate.gradle")
+
 dependencies {
+    implementation(libs.stompprotocolandroid)
+    implementation(libs.rxjava)
+    implementation(libs.rxandroid)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

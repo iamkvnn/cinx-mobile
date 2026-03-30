@@ -1,4 +1,4 @@
-package com.app.cinx.util;
+package com.app.cinx.utils;
 
 import android.content.Intent;
 import android.view.View;

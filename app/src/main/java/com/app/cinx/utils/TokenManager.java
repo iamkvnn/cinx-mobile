@@ -1,4 +1,4 @@
-package com.app.cinx.util;
+package com.app.cinx.utils;
 
 /**
  * Singleton that stores JWT access/refresh tokens in memory.

@@ -9,7 +9,7 @@ package com.app.cinx.model;
  */
 public class CartItem {
 
-    private final int    id;
+    private final String id;
     private final String title;
     private final String instructor;
     private final long   originalPrice;   // e.g. 1_200_000
@@ -24,7 +24,7 @@ public class CartItem {
     // Constructor
     // ─────────────────────────────────────────────────────────────────────
 
-    public CartItem(int id,
+    public CartItem(String id,
                     String title,
                     String instructor,
                     long originalPrice,
@@ -45,7 +45,7 @@ public class CartItem {
     // Getters / Setters
     // ─────────────────────────────────────────────────────────────────────
 
-    public int    getId()            { return id; }
+    public String getId()            { return id; }
     public String getTitle()         { return title; }
     public String getInstructor()    { return instructor; }
     public long   getOriginalPrice() { return originalPrice; }

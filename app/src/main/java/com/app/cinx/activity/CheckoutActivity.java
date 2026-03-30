@@ -18,8 +18,20 @@ import com.app.cinx.adapter.PaymentMethodAdapter;
 import com.app.cinx.data.CartRepository;
 import com.app.cinx.model.CartItem;
 import com.app.cinx.model.PaymentMethod;
-import com.app.cinx.util.Convert;
-import com.app.cinx.util.UserManager;
+import com.app.cinx.utils.Convert;
+import com.app.cinx.utils.UserManager;
+
+import com.app.cinx.api.OrderService;
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.dto.ApiResponse;
+import com.app.cinx.api.dto.CreateOrderRequest;
+import com.app.cinx.api.dto.CartItemDto;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import android.util.Log;
+import com.app.cinx.utils.TokenManager;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -244,6 +256,8 @@ public class CheckoutActivity extends AppCompatActivity {
      *  3. Fade out this screen to match the screenshot transition.
      */
     private void startOrderProcessing() {
+        if (checkoutItems.isEmpty()) return;
+        
         isProcessing = true;
         btnPlaceOrder.setText(getString(R.string.checkout_processing));
         btnPlaceOrder.setEnabled(false);
@@ -255,9 +269,54 @@ public class CheckoutActivity extends AppCompatActivity {
                 .setDuration(400)
                 .start();
 
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            launchSuccessScreen();
-        }, 1500);
+        OrderService orderService = RetrofitClient.getInstance().getOrderService();
+        if (orderService == null) {
+            new Handler(Looper.getMainLooper()).postDelayed(this::launchSuccessScreen, 1500);
+            return;
+        }
+
+        CreateOrderRequest request = new CreateOrderRequest();
+        List<CartItemDto> cartItemDtos = new ArrayList<>();
+        for (CartItem ci : checkoutItems) {
+            CartItemDto dto = new CartItemDto();
+            dto.setId(ci.getId());
+            cartItemDtos.add(dto);
+        }
+        request.setCartItems(cartItemDtos);
+        
+        PaymentMethod pm = paymentAdapter.getSelectedMethod();
+        request.setPaymentMethod(pm != null ? pm.getName() : "CARD");
+        
+        if (voucherTitle != null) {
+            request.setVoucherCode(voucherTitle);
+        }
+
+        String token = TokenManager.getInstance().getBearerToken();
+        orderService.createOrder(token, request).enqueue(new Callback<ApiResponse<Void>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                if (response.isSuccessful()) {
+                    launchSuccessScreen();
+                } else {
+                    handleError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                Log.e("Checkout", "Failed to place order", t);
+                handleError();
+            }
+        });
+    }
+    
+    private void handleError() {
+        isProcessing = false;
+        btnPlaceOrder.setText("Thử lại");
+        btnPlaceOrder.setEnabled(true);
+        android.view.View rootView = findViewById(android.R.id.content);
+        rootView.animate().alpha(1.0f).setDuration(400).start();
+        Toast.makeText(this, "Order failed, please try again", Toast.LENGTH_SHORT).show();
     }
 
     private void launchSuccessScreen() {

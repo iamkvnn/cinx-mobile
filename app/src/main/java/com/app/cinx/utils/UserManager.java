@@ -1,4 +1,4 @@
-package com.app.cinx.util;
+package com.app.cinx.utils;
 
 public class UserManager {
     private static UserManager instance;

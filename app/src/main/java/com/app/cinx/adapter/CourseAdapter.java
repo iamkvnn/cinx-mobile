@@ -1,6 +1,6 @@
 package com.app.cinx.adapter;
 
-import com.app.cinx.util.PriceUtil;
+import com.app.cinx.utils.PriceUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
-import com.app.cinx.model.Course;
+import com.app.cinx.api.dto.CourseResponse;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
@@ -20,15 +20,15 @@ import java.util.List;
 
 public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseViewHolder> {
 
-    private List<Course> courses;
+    private List<CourseResponse> courses;
     private OnCourseClickListener listener;
 
     public interface OnCourseClickListener {
-        void onCourseClick(Course course);
-        void onFavoriteClick(Course course);
+        void onCourseClick(CourseResponse course);
+        void onFavoriteClick(CourseResponse course);
     }
 
-    public CourseAdapter(List<Course> courses, OnCourseClickListener listener) {
+    public CourseAdapter(List<CourseResponse> courses, OnCourseClickListener listener) {
         this.courses = courses;
         this.listener = listener;
     }
@@ -42,13 +42,13 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
 
     @Override
     public void onBindViewHolder(@NonNull CourseViewHolder holder, int position) {
-        Course course = courses.get(position);
+        CourseResponse course = courses.get(position);
         holder.bind(course, listener);
     }
 
     @Override
     public int getItemCount() {
-        return courses.size();
+        return courses != null ? courses.size() : 0;
     }
 
     static class CourseViewHolder extends RecyclerView.ViewHolder {
@@ -79,26 +79,31 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
             favButton = itemView.findViewById(R.id.favButton);
         }
 
-        public void bind(Course course, OnCourseClickListener listener) {
-            categoryBadge.setText(course.getCategory());
-            courseRating.setText(String.valueOf(course.getRating()));
-            courseStudents.setText("(" + course.getStudents() + ")");
+        public void bind(CourseResponse course, OnCourseClickListener listener) {
+            categoryBadge.setText(course.getCategory() != null ? course.getCategory() : "Khóa học");
+            courseRating.setText(String.valueOf(course.getRating() != null ? course.getRating() : 0.0));
+            long students = course.getEnrollmentCount() != null ? course.getEnrollmentCount() : 0L;
+            courseStudents.setText("(" + students + ")");
             courseTitle.setText(course.getTitle());
-            instructorName.setText(course.getInstructor());
-            
-            if (course.getDiscountRate() > 0) {
-                coursePrice.setText(PriceUtil.formatPrice(course.getDiscountedPrice()));
+            instructorName.setText(course.getDescription() != null ? course.getDescription() : "Giảng viên"); // fallback instructor
+
+            long price = course.getPrice() != null ? course.getPrice() : 0L;
+            long discountedPriceObj = course.getDiscountedPrice() != null ? course.getDiscountedPrice() : price;
+            long discountPct = course.getDiscountRate() != null ? course.getDiscountRate() : 0L;
+
+            if (discountPct > 0) {
+                coursePrice.setText(PriceUtil.formatPrice(discountedPriceObj));
                 if (originalPrice != null) {
                     originalPrice.setVisibility(View.VISIBLE);
-                    originalPrice.setText(PriceUtil.formatPrice(course.getPrice()));
+                    originalPrice.setText(PriceUtil.formatPrice(price));
                     originalPrice.setPaintFlags(originalPrice.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
                 }
                 if (discountRate != null) {
                     discountRate.setVisibility(View.VISIBLE);
-                    discountRate.setText("-" + course.getDiscountRate() + "%");
+                    discountRate.setText("-" + discountPct + "%");
                 }
             } else {
-                coursePrice.setText(PriceUtil.formatPrice(course.getPrice()));
+                coursePrice.setText(PriceUtil.formatPrice(price));
                 if (originalPrice != null) originalPrice.setVisibility(View.GONE);
                 if (discountRate != null) discountRate.setVisibility(View.GONE);
             }
@@ -106,7 +111,7 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
 
             // Load course image
             Glide.with(itemView.getContext())
-                    .load(course.getImageUrl())
+                    .load("https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=300&auto=format&fit=crop")
                     .apply(new RequestOptions().transform(new RoundedCorners(40)))
                     .into(courseImage);
 

@@ -9,10 +9,12 @@ public class OrderDto {
     private long             totalPrice;
     private long             discounted;
     private String           orderDate;
+    private String           status;
 
     public String             getId()         { return id; }
     public List<OrderItemDto> getItems()      { return items; }
     public long               getTotalPrice() { return totalPrice; }
     public long               getDiscounted() { return discounted; }
     public String             getOrderDate()  { return orderDate; }
+    public String             getStatus()     { return status; }
 }
