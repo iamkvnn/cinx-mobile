@@ -15,14 +15,8 @@ public interface PaymentService {
     @POST("api/v1/payments/momo-callback")
     Call<ApiResponse<Void>> handleMoMoCallback(@Body Object body);
 
-    @GET("api/v1/payments/{paymentId}")
-    Call<ApiResponse<PaymentResponse>> getPaymentById(@Path("paymentId") String paymentId);
-
-    @GET("api/v1/payments/orders")
+    @GET("api/v1/payments/ids")
     Call<ApiResponse<List<PaymentResponse>>> getPaymentByOrderIds(@Query("orderIds") List<String> orderIds);
-
-//    @POST("api/v1/payments/verify")
-//    Call<ApiResponse<PaymentResponse>> verifyPayment(@Body PaymentVerifyRequest body);
 
     @GET("api/v1/payments/IPN")
     Call<VNPayIPNResponse> handleVNPayIPN();

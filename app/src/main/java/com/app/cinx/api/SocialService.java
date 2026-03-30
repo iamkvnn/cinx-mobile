@@ -13,7 +13,7 @@ public interface SocialService {
     Call<ApiResponse<Object>> deleteReview(@Path("reviewId") String reviewId);
 
     @GET("api/v1/wishlist")
-    Call<ApiResponse<List<CourseResponse>>> getWishlist();
+    Call<ApiResponse<List<WishlistItemResponse>>> getWishlist();
 
     @POST("api/v1/wishlist")
     Call<ApiResponse<Object>> addToWishlist(@Body AddToWishlistRequest body);
@@ -22,7 +22,7 @@ public interface SocialService {
     Call<ApiResponse<Object>> removeFromWishlist(@Query("courseId") String courseId);
 
     @GET("api/v1/reviews")
-    Call<ApiResponse<Object>> getReviewsByCourseId(@Query("courseId") String courseId);
+    Call<ApiResponse<List<ReviewResponse>>> getReviewsByCourseId(@Query("courseId") String courseId);
 
     @POST("api/v1/reviews")
     Call<ApiResponse<Object>> createReview(@Body CreateReviewRequest body);

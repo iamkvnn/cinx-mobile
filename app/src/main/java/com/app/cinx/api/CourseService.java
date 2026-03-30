@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CourseService {
     @GET("api/v1/video-lessons")
-    Call<ApiResponse<Object>> getVideoByLessonId(@Query("lessonId") String lessonId);
+    Call<ApiResponse<VideoLessonResponse>> getVideoByLessonId(@Query("lessonId") String lessonId);
 
     @PUT("api/v1/video-lessons")
     Call<ApiResponse<Object>> updateVideoLesson(@Query("lessonId") String lessonId, @Body CreateVideoLessonRequest body);
@@ -19,7 +19,7 @@ public interface CourseService {
     Call<ApiResponse<Object>> deleteVideoLesson(@Query("lessonId") String lessonId);
 
     @GET("api/v1/quiz-lessons")
-    Call<ApiResponse<Object>> getQuizByLessonId(@Query("lessonId") String lessonId);
+    Call<ApiResponse<QuizLessonResponse>> getQuizByLessonId(@Query("lessonId") String lessonId);
 
     @PUT("api/v1/quiz-lessons")
     Call<ApiResponse<Object>> updateQuizLesson(@Query("lessonId") String lessonId, @Body CreateQuizLessonRequest body);
@@ -29,15 +29,6 @@ public interface CourseService {
 
     @DELETE("api/v1/quiz-lessons")
     Call<ApiResponse<Object>> deleteQuizLesson(@Query("lessonId") String lessonId);
-
-    @GET("api/v1/instructors/{id}")
-    Call<ApiResponse<Object>> getInstructorById(@Path("id") String id);
-
-    @PUT("api/v1/instructors/{id}")
-    Call<ApiResponse<Object>> updateInstructor(@Path("id") String id, @Body UpdateInstructorRequest body);
-
-    @DELETE("api/v1/instructors/{id}")
-    Call<ApiResponse<Object>> deleteInstructor(@Path("id") String id);
 
     @GET("api/v1/courses/{id}")
     Call<ApiResponse<CourseDetailResponse>> getCourseById(@Path("id") String id);
@@ -55,7 +46,7 @@ public interface CourseService {
     Call<ApiResponse<Object>> updateCategory(@Path("id") String id, @Body UpdateCategoryRequest body);
 
     @GET("api/v1/assignment-lessons")
-    Call<ApiResponse<Object>> getAssigmentByLessonId(@Query("lessonId") String lessonId);
+    Call<ApiResponse<AssignmentLessonResponse>> getAssigmentByLessonId(@Query("lessonId") String lessonId);
 
     @PUT("api/v1/assignment-lessons")
     Call<ApiResponse<Object>> updateAssigmentLesson(@Query("lessonId") String lessonId, @Body CreateAssignmentLessonRequest body);
@@ -67,7 +58,7 @@ public interface CourseService {
     Call<ApiResponse<Object>> deleteAssigmentLesson(@Query("lessonId") String lessonId);
 
     @GET("api/v1/article-lessons")
-    Call<ApiResponse<Object>> getArticleByLessonId(@Query("lessonId") String lessonId);
+    Call<ApiResponse<ArticleLessonResponse>> getArticleByLessonId(@Query("lessonId") String lessonId);
 
     @PUT("api/v1/article-lessons")
     Call<ApiResponse<Object>> updateArticleLesson(@Query("lessonId") String lessonId, @Body CreateArticleLessonRequest body);
@@ -77,12 +68,6 @@ public interface CourseService {
 
     @DELETE("api/v1/article-lessons")
     Call<ApiResponse<Object>> deleteArticleLesson(@Query("lessonId") String lessonId);
-
-    @GET("api/v1/instructors")
-    Call<PaginatedApiResponseObject> getAllInstructors(@Query("page") Integer page, @Query("size") Integer size);
-
-    @POST("api/v1/instructors")
-    Call<ApiResponse<Object>> createInstructor(@Body CreateInstructorRequest body);
 
     @GET("api/v1/courses")
     Call<PaginatedApiResponseCourseResponse> getAllCourses(@Query("apiQuery") PaginatedApiQuery apiQuery, @Query("categoryId") String categoryId);
@@ -101,5 +86,8 @@ public interface CourseService {
 
     @GET("api/v1/courses/upload/presigned-url")
     Call<ApiResponse<PresignedUrlResponse>> getPresignedUrl(@Query("fileName") String fileName, @Query("contentType") String contentType);
+
+    @GET("api/v1/courses/ids")
+    Call<ApiResponse<List<CourseResponse>>> getCourseById_1(@Query("ids") List<String> ids);
 
 }

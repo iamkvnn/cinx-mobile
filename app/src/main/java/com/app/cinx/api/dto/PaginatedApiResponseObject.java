@@ -19,5 +19,4 @@ public class PaginatedApiResponseObject {
     public PaginatedMetadata getMeta() { return meta; }
     public void setMeta(PaginatedMetadata val) { this.meta = val; }
 
-    // mock field preserved for ui consistency
 }

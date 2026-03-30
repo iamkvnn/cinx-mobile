@@ -2,11 +2,11 @@
 
 ## Scope
 - Android app module is `:app` (Java, minSdk 31, target/compile 36) from `settings.gradle.kts` and `app/build.gradle.kts`.
-- Networking targets local backend by default: `http://10.0.2.2:9090/` and `ws://10.0.2.2:9090/...` (`RetrofitClient`, `WebSocketService`, `network_security_config.xml`).
+- Networking connects REST to `http://api.shinyjewelry.shop/` and STOMP websockets to `ws://10.0.2.2:9090/...` (`RetrofitClient`, `WebSocketService`, `network_security_config.xml`).
 
 ## Architecture Map (What Talks to What)
 - UI is Activity-centric in `app/src/main/java/com/app/cinx/activity` (no Fragments/ViewModels yet).
-- API layer is Retrofit interfaces in `app/src/main/java/com/app/cinx/api`; DTO contracts are in `api/dto`.
+- API layer is Retrofit interfaces in `app/src/main/java/com/app/cinx/api`; DTO contracts are in `api/dto` (these auto-generate from JSON via `app/src/main/assets/`).
 - State is mostly in-memory singletons:
   - Auth/session: `TokenManager` + `UserManager`
   - Cart/order demo data: `CartRepository`, `OrderRepository`
@@ -29,6 +29,7 @@
 ## Build, Test, and Local Dev Commands
 ```powershell
 .\gradlew.bat -q projects
+.\gradlew.bat generateApi
 .\gradlew.bat :app:assembleDebug
 .\gradlew.bat :app:testDebugUnitTest
 .\gradlew.bat :app:connectedDebugAndroidTest
@@ -38,10 +39,10 @@
 
 ## Integration Notes
 - Some services still declare explicit `@Header("Authorization")` while interceptor already injects token; follow existing method signature when extending a service.
-- Network security currently permits cleartext to emulator hostnames only (`10.0.2.2`, `localhost`).
+- Network security currently permits cleartext to emulator hostnames (`10.0.2.2`, `localhost`) AND the remote server (`api.shinyjewelry.shop`).
 
 ## Safe Change Checklist for Agents
-- Update both API interface and matching DTOs when backend contract changes.
+- Update the JSON schemas in `app/src/main/assets/` and run `.\gradlew.bat generateApi` (or `python generate_api.py`) when the backend contract changes, rather than editing API interface/DTO files directly.
 - If adding a new bottom-tab screen, wire it in `NavHelper` and manifest.
 - If adding persisted auth/session, replace `TokenManager`/`UserManager` memory assumptions across login/logout paths.
 - Do not infer production readiness from sample repositories (`CartRepository`, `OrderRepository`) or TODOs in Activities.

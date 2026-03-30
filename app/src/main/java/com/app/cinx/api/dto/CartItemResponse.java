@@ -1,30 +1,14 @@
 package com.app.cinx.api.dto;
 
-import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class CartItemResponse {
-    @SerializedName("id")
     private String id;
+    public String getId() { return id; }
+    public void setId(String val) { this.id = val; }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @SerializedName("course")
     private CourseResponse course;
+    public CourseResponse getCourse() { return course; }
+    public void setCourse(CourseResponse val) { this.course = val; }
 
-    public CourseResponse getCourse() {
-        return course;
-    }
-
-    public void setCourse(CourseResponse course) {
-        this.course = course;
-    }
-
-    // mock field preserved for ui consistency
 }

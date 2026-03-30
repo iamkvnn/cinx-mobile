@@ -10,7 +10,7 @@ public interface NotificationService {
     Call<ApiResponse<Void>> toggleRead(@Path("notificationId") String notificationId);
 
     @GET("api/v1/notifications")
-    Call<PaginatedApiResponseObject> getNotifications(@Query("page") Integer page, @Query("size") Integer size);
+    Call<PaginatedApiResponseUserNotificationResponse> getNotifications(@Query("page") Integer page, @Query("size") Integer size);
 
     @GET("api/v1/notifications/unread-count")
     Call<ApiResponse<Long>> countUnreadNotifications();

@@ -1,30 +1,10 @@
 package com.app.cinx.api.dto;
 
-import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class ImageDto {
-    @SerializedName("imageUrl")
-    private String imageUrl;
+    private String fileKey;
+    public String getFileKey() { return fileKey; }
+    public void setFileKey(String val) { this.fileKey = val; }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    @SerializedName("s3ObjectKey")
-    private String s3ObjectKey;
-
-    public String getS3ObjectKey() {
-        return s3ObjectKey;
-    }
-
-    public void setS3ObjectKey(String s3ObjectKey) {
-        this.s3ObjectKey = s3ObjectKey;
-    }
-
-    // mock field preserved for ui consistency
 }

@@ -26,8 +26,9 @@ import com.app.cinx.api.SocialService;
 import com.app.cinx.api.RetrofitClient;
 import com.app.cinx.api.dto.ApiResponse;
 import com.app.cinx.api.dto.CourseResponse;
-import com.app.cinx.api.dto.EnrollmentResponse;
-import com.app.cinx.api.dto.PaginatedApiResponseEnrollmentResponse;
+import com.app.cinx.api.dto.WishlistItemResponse;
+import com.app.cinx.api.CourseService;
+import com.app.cinx.api.dto.PaginatedApiResponseCourseResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -103,28 +104,27 @@ public class MyLearningActivity extends AppCompatActivity
     
     private void fetchEnrolledCourses() {
         EnrollmentService enrollmentService = RetrofitClient.getInstance().getEnrollmentService();
-        enrollmentService.getEnrolledCourses(0, 100).enqueue(new Callback<PaginatedApiResponseEnrollmentResponse>() {
+        enrollmentService.getEnrolledCourses(0, 100).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
             @Override
-            public void onResponse(Call<PaginatedApiResponseEnrollmentResponse> call, Response<PaginatedApiResponseEnrollmentResponse> response) {
+            public void onResponse(Call<PaginatedApiResponseCourseResponse> call, Response<PaginatedApiResponseCourseResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
-                    List<EnrollmentResponse> enrollments = response.body().getData();
-                    for (EnrollmentResponse e : enrollments) {
-                        CourseResponse cr = e.getCourse();
+                    List<CourseResponse> enrollments = response.body().getData();
+                    for (CourseResponse cr : enrollments) {
                         if (cr == null) continue;
                         
-                        String idStr = e.getId() != null ? e.getId() : cr.getId();
+                        String idStr = cr.getId();
                         int id = (idStr != null) ? idStr.hashCode() : 0;
                         String title = cr.getTitle();
                         String instructor = cr.getDescription(); // fallback
                         String thumbnail = "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80";
                         String category = cr.getCategory();
                         
-                        boolean isCompleted = e.getIsCompleted() != null && e.getIsCompleted();
+                        // Fake progress since its not in CourseResponse 
+                        boolean isCompleted = false;
                         if (isCompleted) {
-                            allCourses.add(EnrolledCourse.completed(id, title, instructor, thumbnail, category, e.getEnrolledAt(), "N/A"));
+                            allCourses.add(EnrolledCourse.completed(id, title, instructor, thumbnail, category, "N/A", "N/A"));
                         } else {
-                            Double progress = e.getProgress() != null ? e.getProgress() : 0.0;
-                            allCourses.add(EnrolledCourse.progress(id, title, instructor, thumbnail, category, progress.intValue(), "N/A", "N/A"));
+                            allCourses.add(EnrolledCourse.progress(id, title, instructor, thumbnail, category, 0, "N/A", "N/A"));
                         }
                     }
                     runOnUiThread(() -> {
@@ -135,7 +135,7 @@ public class MyLearningActivity extends AppCompatActivity
             }
 
             @Override
-            public void onFailure(Call<PaginatedApiResponseEnrollmentResponse> call, Throwable t) {
+            public void onFailure(Call<PaginatedApiResponseCourseResponse> call, Throwable t) {
                 Log.e("MyLearning", "Failed to fetch enrollments", t);
             }
         });
@@ -144,31 +144,56 @@ public class MyLearningActivity extends AppCompatActivity
     private void fetchWishlist() {
         SocialService socialService = RetrofitClient.getInstance().getSocialService();
         if (socialService == null) return; // if not initialized
-        socialService.getWishlist().enqueue(new Callback<ApiResponse<List<CourseResponse>>>() {
+        socialService.getWishlist().enqueue(new Callback<ApiResponse<List<WishlistItemResponse>>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<CourseResponse>>> call, Response<ApiResponse<List<CourseResponse>>> response) {
+            public void onResponse(Call<ApiResponse<List<WishlistItemResponse>>> call, Response<ApiResponse<List<WishlistItemResponse>>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
-                    List<CourseResponse> wishlist = response.body().getData();
-                    for (CourseResponse cr : wishlist) {
-                        int id = cr.getId() != null ? cr.getId().hashCode() : 0;
-                        String title = cr.getTitle();
-                        String instructor = cr.getDescription(); // fallback
-                        String thumbnail = "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80";
-                        String category = cr.getCategory();
-                        double rating = cr.getRating() != null ? cr.getRating() : 0.0;
-                        long price = cr.getDiscountedPrice() != null ? cr.getDiscountedPrice() : (cr.getPrice() != null ? cr.getPrice() : 0L);
-                        
-                        allCourses.add(EnrolledCourse.saved(id, title, instructor, thumbnail, category, com.app.cinx.utils.PriceUtil.formatPrice(price), rating));
+                    List<WishlistItemResponse> wishlist = response.body().getData();
+                    CourseService courseService = RetrofitClient.getInstance().getCourseService();
+                    if (wishlist.isEmpty()) {
+                        runOnUiThread(() -> {
+                            setupTabs();
+                            renderCourses();
+                        });
+                        return;
                     }
-                    runOnUiThread(() -> {
-                        setupTabs();
-                        renderCourses();
+                    
+                    List<String> ids = new ArrayList<>();
+                    for (WishlistItemResponse item : wishlist) {
+                        ids.add(item.getCourseId());
+                    }
+                    
+                    courseService.getCourseById_1(ids).enqueue(new Callback<ApiResponse<List<CourseResponse>>>() {
+                        @Override
+                        public void onResponse(Call<ApiResponse<List<CourseResponse>>> cc, Response<ApiResponse<List<CourseResponse>>> cr) {
+                            if (cr.isSuccessful() && cr.body() != null && cr.body().getData() != null) {
+                                for (CourseResponse course : cr.body().getData()) {
+                                    int id = course.getId() != null ? course.getId().hashCode() : 0;
+                                    String title = course.getTitle();
+                                    String instructor = course.getDescription(); // fallback
+                                    String thumbnail = "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80";
+                                    String category = course.getCategory();
+                                    double rating = course.getRating() != null ? course.getRating() : 0.0;
+                                    long price = course.getDiscountedPrice() != null ? course.getDiscountedPrice() : (course.getPrice() != null ? course.getPrice() : 0L);
+                                    
+                                    allCourses.add(EnrolledCourse.saved(id, title, instructor, thumbnail, category, com.app.cinx.utils.PriceUtil.formatPrice(price), rating));
+                                }
+                                runOnUiThread(() -> {
+                                    setupTabs();
+                                    renderCourses();
+                                });
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<ApiResponse<List<CourseResponse>>> cc, Throwable t) {
+                            Log.e("MyLearning", "Failed to fetch wishlist courses", t);
+                        }
                     });
                 }
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<CourseResponse>>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<List<WishlistItemResponse>>> call, Throwable t) {
                 Log.e("MyLearning", "Failed to fetch wishlist", t);
             }
         });
