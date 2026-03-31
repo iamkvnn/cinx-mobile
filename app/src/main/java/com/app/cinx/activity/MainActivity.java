@@ -20,7 +20,7 @@ import com.app.cinx.adapter.CourseAdapter;
 import com.app.cinx.adapter.PartnerAdapter;
 import com.app.cinx.adapter.RecommendedAdapter;
 import com.app.cinx.adapter.TestimonialAdapter;
-import com.app.cinx.model.Course;
+
 import com.app.cinx.model.Testimonial;
 import com.app.cinx.utils.UserManager;
 import com.bumptech.glide.Glide;
@@ -28,9 +28,12 @@ import com.google.android.material.button.MaterialButton;
 
 import com.app.cinx.utils.NavHelper;
 import com.app.cinx.api.CourseService;
+import com.app.cinx.api.RecommendationService;
 import com.app.cinx.api.RetrofitClient;
 import com.app.cinx.api.dto.CourseResponse;
 import com.app.cinx.api.dto.PaginatedApiResponseCourseResponse;
+import com.app.cinx.api.dto.RecommendationResponse;
+import com.app.cinx.api.dto.RecommendedCourse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -109,13 +112,19 @@ public class MainActivity extends AppCompatActivity {
         recommendedRecyclerView = findViewById(R.id.recommendedRecyclerView);
         TextView tvUserName = findViewById(R.id.tvUserName);
         
-        if (tvUserName != null && UserManager.getInstance().getUserEmail() != null) {
+        if (tvUserName != null && UserManager.getInstance().getUserName() != null) {
+            tvUserName.setText(UserManager.getInstance().getUserName() + " 👋");
+        } else if (tvUserName != null && UserManager.getInstance().getUserEmail() != null) {
             tvUserName.setText(UserManager.getInstance().getUserEmail() + " 👋");
         }
 
         // Load Avatar
+        String avatarUrl = UserManager.getInstance().getAvatarUrl();
+        if (avatarUrl == null || avatarUrl.isEmpty()) {
+            avatarUrl = "https://i.pravatar.cc/150?u=my_user";
+        }
         Glide.with(this)
-                .load("https://i.pravatar.cc/150?u=my_user")
+                .load(avatarUrl)
                 .circleCrop()
                 .into(userAvatar);
 
@@ -141,15 +150,51 @@ public class MainActivity extends AppCompatActivity {
                         ContinueLearningAdapter continueAdapter = new ContinueLearningAdapter(courseResponses);
                         continueLearningRecyclerView.setAdapter(continueAdapter);
                     }
-
-                    RecommendedAdapter recommendedAdapter = new RecommendedAdapter(courseResponses);
-                    recommendedRecyclerView.setAdapter(recommendedAdapter);
                 }
             }
 
             @Override
             public void onFailure(Call<PaginatedApiResponseCourseResponse> call, Throwable t) {
                 Log.e("MainActivity", "Failed to load courses", t);
+            }
+        });
+
+        // Load Recommended Courses
+        RecommendationService recommendationService = RetrofitClient.getInstance().getRecommendationService();
+        String userId = UserManager.getInstance().getUserId();
+        if (userId == null) userId = "84d1d53c-1d77-4a10-a8eb-63e5d47d879e"; // Hardcoded fallback if missing
+        recommendationService.getRecommendations(userId).enqueue(new Callback<RecommendationResponse>() {
+            @Override
+            public void onResponse(Call<RecommendationResponse> call, Response<RecommendationResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getRecommendations() != null) {
+                    List<RecommendedCourse> recommendedCourses = response.body().getRecommendations();
+                    List<CourseResponse> mappedCourses = new ArrayList<>();
+                    for (RecommendedCourse rc : recommendedCourses) {
+                        CourseResponse cr = new CourseResponse();
+                        cr.setId(rc.getId());
+                        cr.setTitle(rc.getTitle());
+                        cr.setDescription(rc.getDescription());
+                        cr.setCategory(rc.getCategory());
+                        cr.setPrice((long) rc.getPrice());
+                        cr.setDiscountedPrice((long) rc.getDiscountedPrice());
+                        cr.setRating(rc.getRating());
+                        if (rc.getPrice() > 0 && rc.getDiscountedPrice() < rc.getPrice()) {
+                            long discountPct = Math.round(((rc.getPrice() - rc.getDiscountedPrice()) / rc.getPrice()) * 100);
+                            cr.setDiscountRate(discountPct);
+                        } else {
+                            cr.setDiscountRate(0L);
+                        }
+                        cr.setDuration((long) rc.getDuration());
+                        mappedCourses.add(cr);
+                    }
+                    RecommendedAdapter recommendedAdapter = new RecommendedAdapter(mappedCourses);
+                    recommendedRecyclerView.setAdapter(recommendedAdapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RecommendationResponse> call, Throwable t) {
+                Log.e("MainActivity", "Failed to load recommendations", t);
             }
         });
     }
@@ -263,14 +308,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private List<Course> getCoursesList() {
-        List<Course> courses = new ArrayList<>();
-        courses.add(new Course(1, "UI/UX Design Masterclass", "Hà Linh", 4.9, "12k", 1200000L, 599000L, 50, "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80", "Design", "22h"));
-        courses.add(new Course(2, "Fullstack React & Node.js", "Minh Tuấn", 4.8, "8.5k", 1200000L, 899000L, 25, "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80", "Coding", "40h"));
-        courses.add(new Course(3, "Digital Marketing 101", "Sarah Nguyễn", 4.7, "15k", 450000L,
-                "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=800&q=80", "Business"));
-        courses.add(new Course(4, "Nhiếp ảnh đường phố", "Quang Hải", 4.9, "5k", 399000L,
-                "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=800&q=80", "Art"));
+    private List<CourseResponse> getCoursesList() {
+        List<CourseResponse> courses = new ArrayList<>();
         return courses;
     }
 

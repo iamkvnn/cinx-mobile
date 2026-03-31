@@ -12,8 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
-import com.app.cinx.model.Chapter;
-import com.app.cinx.model.Lesson;
+import com.app.cinx.api.dto.SectionResponse;
+import com.app.cinx.api.dto.LessonResponse;
 
 import java.util.HashSet;
 import java.util.List;
@@ -37,26 +37,38 @@ public class CourseCurriculumAdapter
 
     // ── Callback ──────────────────────────────────────────────────────────
     public interface OnLessonClickListener {
-        void onLessonClick(Lesson lesson);
+        void onLessonClick(LessonResponse lesson);
     }
 
-    // ── Fields ────────────────────────────────────────────────────────────
+    // ── Fields ──────────────────────────────────────────────────────────────────────
     private final Context context;
-    private final List<Chapter> chapters;
+    private final List<SectionResponse> chapters;
     private final Set<Integer> collapsedIndices = new HashSet<>(); // indices of collapsed chapters
-    private int activeLessonId = -1;
+    private String activeLessonId = null;
+    private boolean isAllLocked = false;
+    private Set<String> completedLessonIds = new HashSet<>();
     private OnLessonClickListener lessonClickListener;
 
-    public CourseCurriculumAdapter(Context context, List<Chapter> chapters) {
+    public CourseCurriculumAdapter(Context context, List<SectionResponse> chapters) {
         this.context = context;
         this.chapters = chapters;
         // Default: all chapters expanded (no entries in collapsedIndices)
     }
 
-    // ── Public API ────────────────────────────────────────────────────────
+    // ── Public API ──────────────────────────────────────────────────────────────────
 
-    public void setActiveLessonId(int id) {
+    public void setActiveLessonId(String id) {
         this.activeLessonId = id;
+        notifyDataSetChanged();
+    }
+    
+    public void setLockState(boolean isAllLocked) {
+        this.isAllLocked = isAllLocked;
+        notifyDataSetChanged();
+    }
+    
+    public void setCompletedLessons(Set<String> completedLessonIds) {
+        this.completedLessonIds = completedLessonIds;
         notifyDataSetChanged();
     }
 
@@ -102,10 +114,13 @@ public class CourseCurriculumAdapter
             lessonsContainer = itemView.findViewById(R.id.lessonsContainer);
         }
 
-        void bind(Chapter chapter, int index) {
-            // ── Header text ───────────────────────────────────────────────
+        void bind(SectionResponse chapter, int index) {
+            // ── Header text ──────────────────────────────────────────────────────────
             tvChapterTitle.setText(chapter.getTitle());
-            String metaText = chapter.getLessonCount() + " Bài học";
+            
+            int lessonCount = (chapter.getLessons() != null) ? chapter.getLessons().size() : 0;
+            String metaText = lessonCount + " Bài học";
+            
             String dur = computeDuration(chapter);
             if (!dur.isEmpty()) metaText += " • " + dur;
             tvChapterMeta.setText(metaText);
@@ -128,17 +143,19 @@ public class CourseCurriculumAdapter
                 notifyItemChanged(pos);
             });
 
-            // ── Populate lesson rows ──────────────────────────────────────
+            // ── Populate lesson rows ─────────────────────────────────────────────────
             rebuildLessonRows(chapter.getLessons());
         }
 
         /** Clears and re-inflates all lesson rows for this chapter. */
-        private void rebuildLessonRows(List<Lesson> lessons) {
+        private void rebuildLessonRows(List<LessonResponse> lessons) {
             lessonsContainer.removeAllViews();
             LayoutInflater inflater = LayoutInflater.from(context);
 
+            if (lessons == null) return;
+
             for (int i = 0; i < lessons.size(); i++) {
-                Lesson lesson = lessons.get(i);
+                LessonResponse lesson = lessons.get(i);
                 boolean isFirst = (i == 0);
 
                 View row = inflater.inflate(R.layout.item_lesson_row, lessonsContainer, false);
@@ -154,22 +171,21 @@ public class CourseCurriculumAdapter
                 TextView tvPreview   = row.findViewById(R.id.tvPreviewBadge);
                 View     rowContent  = row.findViewById(R.id.lessonRowContent);
 
-                // ── Title with lesson number prefix ───────────────────────
-                String displayTitle = lesson.getChapterNumber()
-                        + "." + lesson.getLessonNumber()
-                        + " " + lesson.getTitle();
+                // ── Title with lesson number prefix ──────────────────────────────────
+                String displayTitle = "Bài " + (lesson.getOrderIndex() != null ? lesson.getOrderIndex() : (i + 1))
+                        + ": " + lesson.getTitle();
                 tvTitle.setText(displayTitle);
-                tvMeta.setText(lesson.getTypeLabel() + " • " + lesson.getDuration());
+                tvMeta.setText((lesson.getLessonType() != null ? lesson.getLessonType() : "Unknown") + " • " + (lesson.getDuration() != null ? (lesson.getDuration()/60) + " phút" : ""));
 
-                // ── Preview badge ─────────────────────────────────────────
-                tvPreview.setVisibility(
-                        lesson.isPreview() && !lesson.isLocked() ? View.VISIBLE : View.GONE);
+                // ── Preview badge ───────────────────────────────────────────────────
+                tvPreview.setVisibility(View.GONE); // No preview concept in DTO yet
 
-                // ── Icon ──────────────────────────────────────────────────
-                boolean isActive  = lesson.getId() == activeLessonId;
-                boolean isLocked  = lesson.isLocked();
+                // ── Icon ───────────────────────────────────────────────────────────
+                boolean isActive  = lesson.getId().equals(activeLessonId);
+                boolean isLocked  = isAllLocked;
+                boolean isCompleted = completedLessonIds.contains(lesson.getId());
 
-                ivIcon.setBackground(context.getDrawable(
+                ivIcon.setBackground(androidx.appcompat.content.res.AppCompatResources.getDrawable(context,
                         isLocked ? R.drawable.bg_icon_gray : R.drawable.bg_icon_purple));
 
                 if (isLocked) {
@@ -178,30 +194,34 @@ public class CourseCurriculumAdapter
                             context.getResources().getColor(R.color.text_secondary, null));
                 } else {
                     ivIcon.clearColorFilter();
-                    switch (lesson.getType()) {
-                        case VIDEO:
-                            ivIcon.setImageResource(R.drawable.ic_play_circle);
-                            break;
-                        case DOCUMENT:
-                            ivIcon.setImageResource(R.drawable.ic_document);
-                            break;
-                        case QUIZ:
-                            ivIcon.setImageResource(R.drawable.ic_quiz);
-                            break;
+                    String t = lesson.getLessonType() != null ? lesson.getLessonType() : "";
+                    if (t.equalsIgnoreCase("VIDEO")) {
+                        ivIcon.setImageResource(R.drawable.ic_play_circle);
+                    } else if (t.equalsIgnoreCase("DOCUMENT") || t.equalsIgnoreCase("ARTICLE")) {
+                        ivIcon.setImageResource(R.drawable.ic_document);
+                    } else if (t.equalsIgnoreCase("QUIZ")) {
+                        ivIcon.setImageResource(R.drawable.ic_quiz);
+                    } else {
+                        ivIcon.setImageResource(R.drawable.ic_document); 
                     }
-                    // Tint icon with primary color when active
-                    if (isActive) {
+                    
+                    if (isCompleted) {
+                        ivIcon.setImageResource(R.drawable.ic_check_circle);
+                        ivIcon.setColorFilter(context.getResources().getColor(R.color.success_green, null));
+                    }
+                    else if (isActive) {
+                        // Tint icon with primary color when active
                         ivIcon.setColorFilter(
                                 context.getResources().getColor(R.color.primary, null));
                     }
                 }
 
-                // ── Dim locked rows ───────────────────────────────────────
+                // ── Dim locked rows ─────────────────────────────────────────────────
                 row.setAlpha(isLocked ? 0.45f : 1f);
 
-                // ── Click ─────────────────────────────────────────────────
+                // ── Click ───────────────────────────────────────────────────────────
                 if (!isLocked && lessonClickListener != null) {
-                    Lesson lessonRef = lesson;
+                    LessonResponse lessonRef = lesson;
                     rowContent.setOnClickListener(v -> lessonClickListener.onLessonClick(lessonRef));
                 } else {
                     rowContent.setOnClickListener(null);
@@ -212,36 +232,26 @@ public class CourseCurriculumAdapter
         }
     }
 
-    // ── Duration helper ───────────────────────────────────────────────────
+    // ── Duration helper ──────────────────────────────────────────────────────────────
 
     /**
      * Parses each lesson's duration string ("mm:ss" or "N phút") and sums the total
      * into a human-readable string, e.g. "20 phút" or "1 giờ 30 phút".
      * Quiz durations ("N câu") are skipped.
      */
-    private static String computeDuration(Chapter chapter) {
-        int totalMinutes = 0;
-        for (Lesson lesson : chapter.getLessons()) {
-            String dur = lesson.getDuration();
-            if (dur == null || dur.isEmpty()) continue;
-            if (dur.contains(":")) {
-                // "mm:ss" format
-                String[] parts = dur.split(":");
-                try {
-                    totalMinutes += Integer.parseInt(parts[0].trim());
-                } catch (NumberFormatException ignored) { /* skip */ }
-            } else if (dur.contains("phút")) {
-                // "N phút" format
-                String num = dur.replace("phút", "").trim();
-                try {
-                    totalMinutes += Integer.parseInt(num);
-                } catch (NumberFormatException ignored) { /* skip */ }
+    private static String computeDuration(SectionResponse chapter) {
+        long totalSeconds = 0;
+        if (chapter.getLessons() != null) {
+            for (LessonResponse lesson : chapter.getLessons()) {
+                if (lesson.getDuration() != null) {
+                    totalSeconds += lesson.getDuration();
+                }
             }
-            // "câu" (quiz question count) is not a time → skip
         }
+        long totalMinutes = totalSeconds / 60;
         if (totalMinutes <= 0) return "";
-        int hours = totalMinutes / 60;
-        int mins  = totalMinutes % 60;
+        long hours = totalMinutes / 60;
+        long mins  = totalMinutes % 60;
         if (hours > 0 && mins > 0) return hours + " giờ " + mins + " phút";
         if (hours > 0)              return hours + " giờ";
         return mins + " phút";

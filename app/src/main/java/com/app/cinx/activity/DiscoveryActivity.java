@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.app.cinx.R;
 import com.app.cinx.adapter.RecommendedAdapter;
 import com.app.cinx.data.CartRepository;
-import com.app.cinx.model.Course;
+
 import com.app.cinx.utils.NavHelper;
 import com.bumptech.glide.Glide;
 

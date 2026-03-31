@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -12,6 +13,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,63 +22,69 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.app.cinx.R;
 import com.app.cinx.adapter.LessonSheetAdapter;
 import com.app.cinx.adapter.QuizOptionAdapter;
-import com.app.cinx.data.SampleCourseData;
-import com.app.cinx.model.Chapter;
-import com.app.cinx.model.Lesson;
-import com.app.cinx.model.LessonType;
-import com.app.cinx.model.QuizQuestion;
+import com.app.cinx.api.CourseService;
+import com.app.cinx.api.LearningService;
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.dto.ApiResponse;
+import com.app.cinx.api.dto.ChooseQuizAnswerRequest;
+import com.app.cinx.api.dto.CourseDetailResponse;
+import com.app.cinx.api.dto.LessonResponse;
+import com.app.cinx.api.dto.QuizOptionResponse;
+import com.app.cinx.api.dto.QuizQuestionResponse;
+import com.app.cinx.api.dto.QuizSessionResponse;
+import com.app.cinx.api.dto.SectionResponse;
+import com.app.cinx.api.dto.SubmitQuizSessionRequest;
+import com.app.cinx.api.dto.TrackingVideoLessonRequest;
+import com.app.cinx.api.dto.VideoLessonResponse;
+import com.app.cinx.api.dto.ArticleLessonResponse;
+import com.app.cinx.api.dto.PaginatedApiResponseQuizSessionQuestionResponse;
+import com.app.cinx.api.dto.QuizSessionQuestionResponse;
+import com.app.cinx.api.dto.LearningItemProgressResponse;
+import com.app.cinx.api.dto.CheckEnrollmentStatus;
 import com.app.cinx.utils.ToastUtil;
+import com.app.cinx.utils.UserManager;
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.button.MaterialButton;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
-/**
- * LessonActivity
- * ─────────────────────────────────────────────────────────────────────────
- * Hosts all three lesson types (VIDEO, DOCUMENT, QUIZ) in a single screen.
- * The appropriate view section is shown/hidden based on the lesson's type.
- *
- * Navigation:
- *  • Prev / Next buttons navigate through the flat lesson list
- *  • Curriculum bottom sheet lets the user jump to any unlocked lesson
- *
- * Architecture notes:
- *  • Data is read from SampleCourseData (swap with Repository in production)
- *  • Each lesson type is self-contained in its own bind method
- *  • Extend by overriding bindVideo / bindDocument / bindQuiz
- */
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class LessonActivity extends AppCompatActivity {
 
-    // ── Intent extras ─────────────────────────────────────────────────────
+    public static final String EXTRA_COURSE_ID = "extra_course_id";
     public static final String EXTRA_LESSON_ID = "extra_lesson_id";
 
-    /** Convenience factory method; always prefer this over manual Intent construction. */
-    public static Intent newIntent(Context context, int lessonId) {
+    public static Intent newIntent(Context context, String courseId, String lessonId) {
         Intent intent = new Intent(context, LessonActivity.class);
+        intent.putExtra(EXTRA_COURSE_ID, courseId);
         intent.putExtra(EXTRA_LESSON_ID, lessonId);
         return intent;
     }
 
-    // ── Data ──────────────────────────────────────────────────────────────
-    private List<Lesson> lessons;
-    private List<Chapter> chapters;
-    private int currentIndex = 0;   // index into the flat lessons list
+    private String courseIdStr;
+    private String currentLessonId;
 
-    // ── Header views ──────────────────────────────────────────────────────
+    private List<LessonResponse> lessons = new ArrayList<>();
+    private List<SectionResponse> chapters = new ArrayList<>();
+    private int currentIndex = 0;
+
     private TextView tvChapterLabel;
     private TextView tvLessonTitle;
     private MaterialButton btnClose;
     private MaterialButton btnCurriculum;
 
-    // ── Content containers (toggled by lesson type) ───────────────────────
     private View viewVideo;
     private View viewDocument;
     private View viewQuiz;
 
-    // ── VIDEO views ───────────────────────────────────────────────────────
     private ImageView ivVideoThumbnail;
     private View btnVideoPlay;
     private ImageView ivPlayPauseIcon;
@@ -86,12 +94,14 @@ public class LessonActivity extends AppCompatActivity {
     private ProgressBar videoProgressBar;
     private boolean isVideoPlaying = false;
 
-    // ── DOCUMENT views ────────────────────────────────────────────────────
+    private android.os.Handler trackingHandler = new android.os.Handler();
+    private Runnable trackingRunnable;
+    private int currentVideoPositionSeconds = 0;
+
     private TextView tvDocMeta;
     private TextView tvDocumentTitle;
     private WebView webViewDocument;
 
-    // ── QUIZ views ────────────────────────────────────────────────────────
     private TextView tvQuestionCounter;
     private TextView tvQuizTimer;
     private ProgressBar quizProgressBar;
@@ -104,72 +114,185 @@ public class LessonActivity extends AppCompatActivity {
 
     private QuizOptionAdapter quizOptionAdapter;
     private int currentQuestionIndex = 0;
-    private int selectedOptionIndex = -1;
+    private QuizOptionResponse selectedOption = null;
     private CountDownTimer quizCountDownTimer;
-    private static final long QUIZ_TIME_MILLIS = 15 * 60 * 1000L; // 15 minutes
+    private static final long QUIZ_TIME_MILLIS = 15 * 60 * 1000L;
+    
+    private String currentQuizSessionId = null;
+    private List<QuizQuestionResponse> apiQuestions = new ArrayList<>();
 
-    // ── Bottom action bar ─────────────────────────────────────────────────
     private MaterialButton btnPrevLesson;
     private MaterialButton btnPrimaryAction;
 
-    // ── Bottom sheet ──────────────────────────────────────────────────────
     private BottomSheetBehavior<View> sheetBehavior;
     private View sheetOverlay;
     private LessonSheetAdapter sheetAdapter;
     private TextView tvSheetSubtitle;
     private TextView tvSheetProgress;
 
-    // ─────────────────────────────────────────────────────────────────────
-    // Lifecycle
-    // ─────────────────────────────────────────────────────────────────────
+    private CourseService courseService;
+    private LearningService learningService;
+
+
+
+    private String activeLessonId;
+    private Set<String> completedLessonIds = new HashSet<>();
+    private boolean isAllLocked = false;
+
+    private android.widget.VideoView videoView;
+    private View videoOverlay;
+    private String currentVideoUrl = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lesson);
 
-        loadData();
+        courseService = RetrofitClient.getInstance().getCourseService();
+        learningService = RetrofitClient.getInstance().getLearningService();
+
+        courseIdStr = getIntent().getStringExtra(EXTRA_COURSE_ID);
+        currentLessonId = getIntent().getStringExtra(EXTRA_LESSON_ID);
+
         initViews();
         setupBottomSheet();
         setupBottomBar();
 
-        // Determine which lesson to open
-        int lessonId = getIntent().getIntExtra(EXTRA_LESSON_ID, -1);
-        int startIndex = findLessonIndex(lessonId);
-        loadLesson(startIndex);
+        if (courseIdStr != null) {
+            loadCourseData();
+        } else {
+            ToastUtil.showCustomToast(this, "Không tìm thấy thông tin khóa học!");
+            finish();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        pauseVideo();
         cancelQuizTimer();
         if (webViewDocument != null) {
             webViewDocument.destroy();
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // Data
-    // ─────────────────────────────────────────────────────────────────────
+    private void loadCourseData() {
+        courseService.getCourseById(courseIdStr).enqueue(new Callback<ApiResponse<CourseDetailResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<CourseDetailResponse>> call, Response<ApiResponse<CourseDetailResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    CourseDetailResponse detail = response.body().getData();
+                    if (detail.getSections() != null) {
+                        chapters = detail.getSections();
+                        lessons.clear();
+                        for (SectionResponse sec : chapters) {
+                            if (sec.getLessons() != null) {
+                                lessons.addAll(sec.getLessons());
+                            }
+                        }
+                        
+                        checkEnrollmentAndLoadProgress();
+                    }
+                } else {
+                    ToastUtil.showCustomToast(LessonActivity.this, "Lỗi tải thông tin khóa học");
+                }
+            }
 
-    private void loadData() {
-        chapters = SampleCourseData.getChapters();
-        lessons  = SampleCourseData.getLessons();
+            @Override
+            public void onFailure(Call<ApiResponse<CourseDetailResponse>> call, Throwable t) {
+                ToastUtil.showCustomToast(LessonActivity.this, "Lỗi kết nối");
+            }
+        });
     }
 
-    private int findLessonIndex(int lessonId) {
-        for (int i = 0; i < lessons.size(); i++) {
-            if (lessons.get(i).getId() == lessonId) return i;
+    private void checkEnrollmentAndLoadProgress() {
+        if (!UserManager.getInstance().isLoggedIn() || courseIdStr == null) {
+            isAllLocked = true;
+            setupLessonInitial();
+            return;
         }
-        return 0; // default to first lesson
+
+        List<String> ids = new ArrayList<>();
+        ids.add(courseIdStr);
+
+        RetrofitClient.getInstance().getEnrollmentService().checkEnrollmentStatus(ids).enqueue(new Callback<ApiResponse<List<CheckEnrollmentStatus>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<CheckEnrollmentStatus>>> call, Response<ApiResponse<List<CheckEnrollmentStatus>>> response) {
+                boolean enrolled = false;
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    List<CheckEnrollmentStatus> statusList = response.body().getData();
+                    if (!statusList.isEmpty()) {
+                        Boolean st = statusList.get(0).getIsEnrolled();
+                        enrolled = (st != null && st);
+                    }
+                }
+                
+                isAllLocked = !enrolled;
+                if (!isAllLocked) {
+                    fetchLearningProgress();
+                } else {
+                    setupLessonInitial();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<CheckEnrollmentStatus>>> call, Throwable t) {
+                isAllLocked = true;
+                setupLessonInitial();
+            }
+        });
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // View initialisation
-    // ─────────────────────────────────────────────────────────────────────
+    private void fetchLearningProgress() {
+        learningService.getLearningItemProgressByCourseId(courseIdStr)
+                .enqueue(new Callback<ApiResponse<List<LearningItemProgressResponse>>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<List<LearningItemProgressResponse>>> call, Response<ApiResponse<List<LearningItemProgressResponse>>> response) {
+                        completedLessonIds.clear();
+                        if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                            for (LearningItemProgressResponse item : response.body().getData()) {
+                                if (item.getIsCompleted() != null && item.getIsCompleted()) {
+                                    completedLessonIds.add(item.getItemId());
+                                }
+                            }
+                        }
+                        setupLessonInitial();
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<List<LearningItemProgressResponse>>> call, Throwable t) {
+                        setupLessonInitial();
+                    }
+                });
+    }
+
+    private void setupLessonInitial() {
+        if (isAllLocked) {
+            ToastUtil.showCustomToast(this, "Bài học chưa mở khóa (chưa mua/chưa đăng nhập)");
+            finish();
+            return;
+        }
+        
+        currentIndex = findLessonIndex(currentLessonId);
+        if (currentIndex >= 0 && currentIndex < lessons.size()) {
+            loadLesson(currentIndex);
+        }
+        
+        if (sheetAdapter != null) {
+            sheetAdapter.setChapters(chapters);
+            refreshSheetAdapter();
+        }
+    }
+
+    private int findLessonIndex(String id) {
+        if (id == null) return 0;
+        for (int i = 0; i < lessons.size(); i++) {
+            if (id.equals(lessons.get(i).getId())) return i;
+        }
+        return 0;
+    }
 
     private void initViews() {
-        // Header
         tvChapterLabel  = findViewById(R.id.tvChapterLabel);
         tvLessonTitle   = findViewById(R.id.tvLessonTitle);
         btnClose        = findViewById(R.id.btnClose);
@@ -178,12 +301,10 @@ public class LessonActivity extends AppCompatActivity {
         btnClose.setOnClickListener(v -> onBackPressed());
         btnCurriculum.setOnClickListener(v -> toggleBottomSheet());
 
-        // Content containers
         viewVideo    = findViewById(R.id.viewVideo);
         viewDocument = findViewById(R.id.viewDocument);
         viewQuiz     = findViewById(R.id.viewQuiz);
 
-        // Video sub-views
         ivVideoThumbnail  = findViewById(R.id.ivVideoThumbnail);
         btnVideoPlay      = findViewById(R.id.btnVideoPlay);
         ivPlayPauseIcon   = findViewById(R.id.ivPlayPauseIcon);
@@ -191,15 +312,16 @@ public class LessonActivity extends AppCompatActivity {
         tvVideoTitle      = findViewById(R.id.tvVideoTitle);
         tvVideoChapter    = findViewById(R.id.tvVideoChapter);
         videoProgressBar  = findViewById(R.id.videoProgressBar);
+        
+        videoView         = findViewById(R.id.videoView);
+        videoOverlay      = findViewById(R.id.ivVideoThumbnail); // Optional, we can just cast it or find dark overlay
 
         btnVideoPlay.setOnClickListener(v -> toggleVideoPlayback());
 
-        // Document sub-views
         tvDocMeta        = findViewById(R.id.tvDocMeta);
         tvDocumentTitle  = findViewById(R.id.tvDocumentTitle);
         webViewDocument  = findViewById(R.id.webViewDocument);
 
-        // Quiz sub-views
         tvQuestionCounter = findViewById(R.id.tvQuestionCounter);
         tvQuizTimer       = findViewById(R.id.tvQuizTimer);
         quizProgressBar   = findViewById(R.id.quizProgressBar);
@@ -213,105 +335,167 @@ public class LessonActivity extends AppCompatActivity {
         rvQuizOptions.setLayoutManager(new LinearLayoutManager(this));
         rvQuizOptions.setNestedScrollingEnabled(false);
 
-        // Bottom action bar
         btnPrevLesson   = findViewById(R.id.btnPrevLesson);
         btnPrimaryAction= findViewById(R.id.btnPrimaryAction);
 
-        // Sheet overlay
         sheetOverlay = findViewById(R.id.sheetOverlay);
         sheetOverlay.setOnClickListener(v -> collapseBottomSheet());
 
-        // Sheet header
         tvSheetSubtitle = findViewById(R.id.tvSheetSubtitle);
         tvSheetProgress = findViewById(R.id.tvSheetProgress);
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // Load lesson
-    // ─────────────────────────────────────────────────────────────────────
-
-    /**
-     * Central "controller" — called any time the active lesson changes.
-     * Binds all data, shows/hides appropriate content views.
-     */
     private void loadLesson(int index) {
+        pauseVideo();
         currentIndex = index;
-        Lesson lesson = lessons.get(index);
+        LessonResponse lesson = lessons.get(index);
+        currentLessonId = lesson.getId();
 
-        // Mark as active in data layer
-        for (Lesson l : lessons) l.setActive(false);
-        lesson.setActive(true);
+        activeLessonId = lesson.getId();
 
-        // Header
-        tvChapterLabel.setText("Chương " + lesson.getChapterNumber());
-        tvLessonTitle.setText(lesson.getChapterTitle());
+        tvChapterLabel.setText("Bài học:");
+        tvLessonTitle.setText(lesson.getTitle());
 
-        // Hide all content sections, then show the matching one
         viewVideo.setVisibility(View.GONE);
         viewDocument.setVisibility(View.GONE);
         viewQuiz.setVisibility(View.GONE);
 
-        cancelQuizTimer(); // stop any running timer
+        cancelQuizTimer();
 
-        switch (lesson.getType()) {
-            case VIDEO:
-                viewVideo.setVisibility(View.VISIBLE);
-                bindVideo(lesson);
-                break;
-            case DOCUMENT:
-                viewDocument.setVisibility(View.VISIBLE);
-                bindDocument(lesson);
-                break;
-            case QUIZ:
-                viewQuiz.setVisibility(View.VISIBLE);
-                bindQuiz(lesson);
-                break;
+        String typeStr = lesson.getLessonType() != null ? lesson.getLessonType() : "";
+        if (typeStr.equalsIgnoreCase("VIDEO")) {
+            viewVideo.setVisibility(View.VISIBLE);
+            bindVideo(lesson);
+        } else if (typeStr.equalsIgnoreCase("DOCUMENT") || typeStr.equalsIgnoreCase("ARTICLE")) {
+            viewDocument.setVisibility(View.VISIBLE);
+            bindDocument(lesson);
+        } else if (typeStr.equalsIgnoreCase("QUIZ")) {
+            viewQuiz.setVisibility(View.VISIBLE);
+            bindQuiz(lesson);
+        } else {
+            viewDocument.setVisibility(View.VISIBLE);
+            bindDocument(lesson);
         }
 
         updateBottomBarState(lesson);
         refreshSheetAdapter();
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // VIDEO
-    // ─────────────────────────────────────────────────────────────────────
-
-    private void bindVideo(Lesson lesson) {
+    private void bindVideo(LessonResponse lesson) {
         isVideoPlaying = false;
+        currentVideoUrl = null;
+        videoView.setVisibility(View.GONE);
+        ivVideoThumbnail.setVisibility(View.VISIBLE);
+        
         ivPlayPauseIcon.setImageResource(R.drawable.ic_play);
         videoProgressBar.setProgress(0);
+        currentVideoPositionSeconds = 0;
 
         tvVideoTitle.setText(lesson.getTitle());
-        tvVideoChapter.setText(lesson.getChapterTitle());
-        tvVideoDuration.setText(lesson.getDuration());
+        tvVideoChapter.setText("");
+        tvVideoDuration.setText(lesson.getDuration() != null ? (lesson.getDuration() / 60) + " phút" : "0 phút");
 
-        if (lesson.getVideoThumbnailUrl() != null && !lesson.getVideoThumbnailUrl().isEmpty()) {
-            Glide.with(this)
-                    .load(lesson.getVideoThumbnailUrl())
-                    .centerCrop()
-                    .placeholder(R.drawable.ic_play_circle)
-                    .into(ivVideoThumbnail);
-        } else {
-            ivVideoThumbnail.setImageResource(R.drawable.ic_play_circle);
-        }
+        ivVideoThumbnail.setImageResource(R.drawable.ic_play_circle);
+        
+        courseService.getVideoByLessonId(lesson.getId()).enqueue(new Callback<ApiResponse<VideoLessonResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<VideoLessonResponse>> call, Response<ApiResponse<VideoLessonResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    VideoLessonResponse videoData = response.body().getData();
+                    currentVideoUrl = videoData.getVideoUrl();
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<VideoLessonResponse>> call, Throwable t) {}
+        });
     }
 
     private void toggleVideoPlayback() {
-        isVideoPlaying = !isVideoPlaying;
+        if (currentVideoUrl == null) {
+            ToastUtil.showCustomToast(this, "Video đang tải hoặc không có sẵn");
+            return;
+        }
+
         if (isVideoPlaying) {
-            ivPlayPauseIcon.setImageResource(R.drawable.ic_play); // swap to pause icon when available
+            pauseVideo();
         } else {
-            ivPlayPauseIcon.setImageResource(R.drawable.ic_play);
+            playVideo();
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // DOCUMENT
-    // ─────────────────────────────────────────────────────────────────────
+    private void playVideo() {
+        isVideoPlaying = true;
+        ivPlayPauseIcon.setImageResource(R.drawable.ic_pause);
+        ivVideoThumbnail.setVisibility(View.GONE);
+        videoView.setVisibility(View.VISIBLE);
+
+        if (!videoView.isPlaying()) {
+            if (currentVideoPositionSeconds == 0) {
+                videoView.setVideoPath(currentVideoUrl);
+                android.widget.MediaController mediaController = new android.widget.MediaController(this);
+                mediaController.setAnchorView(videoView);
+                videoView.setMediaController(mediaController);
+                videoView.setOnPreparedListener(mp -> {
+                    mp.start();
+                    videoProgressBar.setMax(mp.getDuration() / 1000);
+                });
+                videoView.setOnCompletionListener(mp -> {
+                    pauseVideo();
+                    completedLessonIds.add(currentLessonId);
+                    handlePrimaryAction();
+                });
+            } else {
+                videoView.start();
+            }
+        }
+        
+        if (trackingRunnable == null) {
+            trackingRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    currentVideoPositionSeconds += 10;
+                    if (videoView.isPlaying()) {
+                        videoProgressBar.setProgress(videoView.getCurrentPosition() / 1000);
+                        currentVideoPositionSeconds = videoView.getCurrentPosition() / 1000;
+                    }
+                    
+                    TrackingVideoLessonRequest req = new TrackingVideoLessonRequest();
+                    req.setVideoLessonId(currentLessonId); // Need video id really, fallback to lesson id
+                    req.setCurrentPosition(currentVideoPositionSeconds);
+                    
+                    learningService.trackVideoProgress(req).enqueue(new Callback<ApiResponse<Object>>() {
+                        @Override
+                        public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {}
+                        @Override
+                        public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {}
+                    });
+                    
+                    trackingHandler.postDelayed(this, 10000);
+                }
+            };
+        }
+        trackingHandler.postDelayed(trackingRunnable, 10000);
+    }
+    
+    private void pauseVideo() {
+        isVideoPlaying = false;
+        if (ivPlayPauseIcon != null) {
+            ivPlayPauseIcon.setImageResource(R.drawable.ic_play);
+        }
+        
+        if (videoView != null && videoView.isPlaying()) {
+            videoView.pause();
+        }
+        
+        if (trackingHandler != null && trackingRunnable != null) {
+            trackingHandler.removeCallbacks(trackingRunnable);
+            trackingRunnable = null;
+        }
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private void bindDocument(Lesson lesson) {
-        tvDocMeta.setText("Bài đọc • " + lesson.getDuration());
+    private void bindDocument(LessonResponse lesson) {
+        tvDocMeta.setText("Bài đọc • " + (lesson.getDuration() != null ? (lesson.getDuration()/60)+" phút" : ""));
         tvDocumentTitle.setText(lesson.getTitle());
 
         WebSettings settings = webViewDocument.getSettings();
@@ -323,12 +507,26 @@ public class LessonActivity extends AppCompatActivity {
 
         webViewDocument.setWebViewClient(new WebViewClient());
         webViewDocument.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
-
-        String html = buildStyledHtml(lesson.getDocumentHtml());
-        webViewDocument.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
+        
+        courseService.getArticleByLessonId(lesson.getId()).enqueue(new Callback<ApiResponse<ArticleLessonResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ArticleLessonResponse>> call, Response<ApiResponse<ArticleLessonResponse>> response) {
+                String content = "";
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    content = response.body().getData().getContent();
+                }
+                if (content == null) content = "<p>Nội dung trống</p>";
+                String html = buildStyledHtml(content);
+                webViewDocument.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<ArticleLessonResponse>> call, Throwable t) {
+                String html = buildStyledHtml("<p>Lỗi kết nối</p>");
+                webViewDocument.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
+            }
+        });
     }
 
-    /** Wraps raw HTML content with app-matching typography styles. */
     private String buildStyledHtml(String bodyContent) {
         return "<!DOCTYPE html><html><head>"
                 + "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
@@ -349,115 +547,128 @@ public class LessonActivity extends AppCompatActivity {
                 + "</body></html>";
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // QUIZ
-    // ─────────────────────────────────────────────────────────────────────
-
-    private void bindQuiz(Lesson lesson) {
+    private void bindQuiz(LessonResponse lesson) {
         currentQuestionIndex = 0;
-        selectedOptionIndex = -1;
-
-        List<QuizQuestion> questions = lesson.getQuestions();
-        if (questions == null || questions.isEmpty()) return;
-
+        selectedOption = null;
+        layoutQuizFeedback.setVisibility(View.GONE);
+        tvQuestionText.setText("Đang tải...");
+        rvQuizOptions.setAdapter(null);
+        btnPrimaryAction.setText("Câu tiếp theo");
+        btnPrimaryAction.setEnabled(false);
+        
+        learningService.createQuizSession(lesson.getId()).enqueue(new Callback<ApiResponse<QuizSessionResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<QuizSessionResponse>> call, Response<ApiResponse<QuizSessionResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    currentQuizSessionId = response.body().getData().getId();
+                    loadQuizQuestions();
+                } else {
+                    ToastUtil.showCustomToast(LessonActivity.this, "Lỗi tạo session quiz");
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<QuizSessionResponse>> call, Throwable t) {
+                ToastUtil.showCustomToast(LessonActivity.this, "Lỗi kết nối tạo session");
+            }
+        });
+        
         updateSheetProgress();
-        showQuestion(questions, currentQuestionIndex);
-        startQuizTimer(QUIZ_TIME_MILLIS);
-
-        // Bottom bar primary button becomes "Kiểm tra"
-        btnPrimaryAction.setText("Kiểm tra đáp án");
+    }
+    
+    private void loadQuizQuestions() {
+        learningService.getQuizSessionQuestions(currentQuizSessionId, null, 100).enqueue(new Callback<PaginatedApiResponseQuizSessionQuestionResponse>() {
+            @Override
+            public void onResponse(Call<PaginatedApiResponseQuizSessionQuestionResponse> call, Response<PaginatedApiResponseQuizSessionQuestionResponse> response) {
+                // Because QuizSessionQuestionResponse doesn't have the text of options / titles
+                // Let's call CourseService to get actual info
+                courseService.getQuizByLessonId(currentLessonId).enqueue(new Callback<ApiResponse<com.app.cinx.api.dto.QuizLessonResponse>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<com.app.cinx.api.dto.QuizLessonResponse>> call, Response<ApiResponse<com.app.cinx.api.dto.QuizLessonResponse>> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                            apiQuestions = response.body().getData().getQuestions();
+                            if (apiQuestions != null && !apiQuestions.isEmpty()) {
+                                showQuestion(0);
+                                btnPrimaryAction.setEnabled(true);
+                                startQuizTimer(QUIZ_TIME_MILLIS);
+                            }
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<ApiResponse<com.app.cinx.api.dto.QuizLessonResponse>> call, Throwable t) {}
+                });
+            }
+            @Override
+            public void onFailure(Call<PaginatedApiResponseQuizSessionQuestionResponse> call, Throwable t) {}
+        });
     }
 
-    private void showQuestion(List<QuizQuestion> questions, int index) {
-        QuizQuestion question = questions.get(index);
+    private void showQuestion(int index) {
+        if (apiQuestions == null || index >= apiQuestions.size()) return;
+        
+        QuizQuestionResponse question = apiQuestions.get(index);
 
-        // Counter
-        tvQuestionCounter.setText(
-                String.format(Locale.getDefault(), "CÂU HỎI %d/%d", index + 1, questions.size()));
+        tvQuestionCounter.setText(String.format(Locale.getDefault(), "CÂU HỎI %d/%d", index + 1, apiQuestions.size()));
 
-        // Progress bar
-        int pct = (int) ((index + 1) / (float) questions.size() * 100);
+        int pct = (int) ((index + 1) / (float) apiQuestions.size() * 100);
         quizProgressBar.setProgress(pct);
 
-        // Question text
-        tvQuestionText.setText(question.getQuestionText());
+        tvQuestionText.setText(question.getQuestionText() != null ? question.getQuestionText() : "");
 
-        // Options adapter
-        selectedOptionIndex = -1;
+        selectedOption = null;
         layoutQuizFeedback.setVisibility(View.GONE);
-        quizOptionAdapter = new QuizOptionAdapter(this, question.getOptions());
+        
+        List<QuizOptionResponse> opts = question.getOptions() != null ? question.getOptions() : new ArrayList<>();
+        quizOptionAdapter = new QuizOptionAdapter(this, opts);
         quizOptionAdapter.setOnOptionSelectedListener((pos, option) -> {
-            selectedOptionIndex = pos;
+            selectedOption = option;
             quizOptionAdapter.selectOption(pos);
+            btnPrimaryAction.setText(currentQuestionIndex == apiQuestions.size() - 1 ? "Nộp bài" : "Câu tiếp theo");
         });
         rvQuizOptions.setAdapter(quizOptionAdapter);
 
-        // Reset primary button label
-        btnPrimaryAction.setText("Kiểm tra đáp án");
+        btnPrimaryAction.setText(index == apiQuestions.size() - 1 ? "Nộp bài" : "Câu tiếp theo");
     }
 
-    /** Apply selected visual state to the tapped option (pending reveal). */
-    private void notifyOptionSelected(int selectedPos, int total) {
-        // Re-bind with SELECTED state for the picked item only
-        // QuizOptionAdapter handles state via revealAnswer; for "selected only" we
-        // need a lightweight refresh. We'll mark the state directly.
-        for (int i = 0; i < total; i++) {
-            // Nothing visible yet — handled on "check" button
-        }
-    }
-
-    private void checkQuizAnswer() {
-        if (selectedOptionIndex < 0) {
-            ToastUtil.showCustomToast(this, "Vui lòng chọn một đáp án!");
-            return;
-        }
-        quizOptionAdapter.revealAnswer(selectedOptionIndex);
-
-        // Show feedback
-        boolean isCorrect = lessons.get(currentIndex)
-                .getQuestions().get(currentQuestionIndex)
-                .getOptions().get(selectedOptionIndex).isCorrect();
-
-        layoutQuizFeedback.setVisibility(View.VISIBLE);
-        if (isCorrect) {
-            layoutQuizFeedback.setBackgroundResource(R.drawable.bg_quiz_option_correct);
-            ivFeedbackIcon.setImageResource(R.drawable.ic_check_circle);
-            ivFeedbackIcon.setColorFilter(getResources().getColor(android.R.color.holo_green_dark, null));
-            tvFeedbackTitle.setText("Chính xác! 🎉");
-            tvFeedbackTitle.setTextColor(getResources().getColor(android.R.color.holo_green_dark, null));
-        } else {
-            layoutQuizFeedback.setBackgroundResource(R.drawable.bg_quiz_option_wrong);
-            ivFeedbackIcon.setImageResource(R.drawable.ic_close);
-            ivFeedbackIcon.setColorFilter(getResources().getColor(R.color.error, null));
-            tvFeedbackTitle.setText("Chưa đúng!");
-            tvFeedbackTitle.setTextColor(getResources().getColor(R.color.error, null));
-            // Show the correct answer text
-            tvFeedbackDetail.setVisibility(View.VISIBLE);
-            List<com.app.cinx.model.QuizOption> opts =
-                    lessons.get(currentIndex).getQuestions().get(currentQuestionIndex).getOptions();
-            for (com.app.cinx.model.QuizOption o : opts) {
-                if (o.isCorrect()) {
-                    tvFeedbackDetail.setText("Đáp án đúng: " + o.getText());
-                    break;
-                }
-            }
-        }
-
-        // Switch button to "Câu tiếp theo"
-        List<QuizQuestion> qs = lessons.get(currentIndex).getQuestions();
-        boolean isLastQuestion = currentQuestionIndex >= qs.size() - 1;
-        btnPrimaryAction.setText(isLastQuestion ? "Hoàn thành Quiz ✓" : "Câu tiếp theo →");
-    }
-
-    private void advanceToNextQuestion() {
-        List<QuizQuestion> questions = lessons.get(currentIndex).getQuestions();
-        if (currentQuestionIndex < questions.size() - 1) {
-            currentQuestionIndex++;
-            showQuestion(questions, currentQuestionIndex);
-        } else {
-            // Quiz finished — mark lesson complete and go to next lesson
-            lessons.get(currentIndex).setCompleted(true);
+    private void handlePrimaryAction() {
+        LessonResponse lesson = lessons.get(currentIndex);
+        String t = lesson.getLessonType() != null ? lesson.getLessonType() : "";
+        if (t.equalsIgnoreCase("VIDEO") || t.equalsIgnoreCase("DOCUMENT") || t.equalsIgnoreCase("ARTICLE")) {
+            completedLessonIds.add(lesson.getId());
             navigateToNextLesson();
+        } else if (t.equalsIgnoreCase("QUIZ")) {
+            if (selectedOption != null) {
+                ChooseQuizAnswerRequest req = new ChooseQuizAnswerRequest();
+                req.setQuestionId(apiQuestions.get(currentQuestionIndex).getId());
+                req.setUserAnswer(selectedOption.getOptionText());
+                learningService.chooseQuizSessionQuestion(currentQuizSessionId, req).enqueue(new Callback<ApiResponse<Object>>() {
+                   @Override
+                   public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {}
+                   @Override
+                   public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {}
+                });
+            }
+            
+            if (currentQuestionIndex < apiQuestions.size() - 1) {
+                currentQuestionIndex++;
+                showQuestion(currentQuestionIndex);
+            } else {
+                SubmitQuizSessionRequest submitReq = new SubmitQuizSessionRequest();
+                learningService.submitQuizSession(currentQuizSessionId, submitReq).enqueue(new Callback<ApiResponse<QuizSessionResponse>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<QuizSessionResponse>> call, Response<ApiResponse<QuizSessionResponse>> response) {
+                        layoutQuizFeedback.setVisibility(View.VISIBLE);
+                        layoutQuizFeedback.setBackgroundResource(R.drawable.bg_quiz_option_correct);
+                        tvFeedbackTitle.setText("Hoàn thành! Đang chuyển bài...");
+                        
+                        btnPrimaryAction.setText("Bài tiếp theo");
+                        btnPrimaryAction.setOnClickListener(v -> navigateToNextLesson());
+                    }
+                    @Override
+                    public void onFailure(Call<ApiResponse<QuizSessionResponse>> call, Throwable t) {
+                        ToastUtil.showCustomToast(LessonActivity.this, "Lỗi nộp bài");
+                    }
+                });
+            }
         }
     }
 
@@ -471,6 +682,7 @@ public class LessonActivity extends AppCompatActivity {
             }
             @Override public void onFinish() {
                 tvQuizTimer.setText("00:00");
+                handlePrimaryAction(); 
             }
         }.start();
     }
@@ -482,43 +694,18 @@ public class LessonActivity extends AppCompatActivity {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // Bottom action bar
-    // ─────────────────────────────────────────────────────────────────────
-
     private void setupBottomBar() {
         btnPrevLesson.setOnClickListener(v -> navigateToPrevLesson());
         btnPrimaryAction.setOnClickListener(v -> handlePrimaryAction());
     }
 
-    private void handlePrimaryAction() {
-        Lesson lesson = lessons.get(currentIndex);
-        switch (lesson.getType()) {
-            case VIDEO:
-                lesson.setCompleted(true);
-                navigateToNextLesson();
-                break;
-            case DOCUMENT:
-                lesson.setCompleted(true);
-                navigateToNextLesson();
-                break;
-            case QUIZ:
-                if (quizOptionAdapter != null && quizOptionAdapter.isAnswered()) {
-                    advanceToNextQuestion();
-                } else {
-                    checkQuizAnswer();
-                }
-                break;
-        }
-    }
-
-    private void updateBottomBarState(Lesson lesson) {
+    private void updateBottomBarState(LessonResponse lesson) {
         boolean hasPrev = currentIndex > 0;
         btnPrevLesson.setEnabled(hasPrev);
         btnPrevLesson.setAlpha(hasPrev ? 1f : 0.4f);
 
-        // Button label for non-quiz types
-        if (lesson.getType() != LessonType.QUIZ) {
+        String t = lesson.getLessonType() != null ? lesson.getLessonType() : "";
+        if (!t.equalsIgnoreCase("QUIZ")) {
             btnPrimaryAction.setText("Hoàn thành & Tiếp tục");
         }
     }
@@ -529,18 +716,13 @@ public class LessonActivity extends AppCompatActivity {
 
     private void navigateToNextLesson() {
         int next = currentIndex + 1;
-        if (next < lessons.size() && !lessons.get(next).isLocked()) {
+        if (next < lessons.size() && !isAllLocked) {
             loadLesson(next);
         } else {
-            // End of course or next is locked
             ToastUtil.showCustomToast(this, "Bạn đã hoàn thành bài học! 🎉");
             finish();
         }
     }
-
-    // ─────────────────────────────────────────────────────────────────────
-    // Curriculum bottom sheet
-    // ─────────────────────────────────────────────────────────────────────
 
     private void setupBottomSheet() {
         View bottomSheet = findViewById(R.id.bottomSheet);
@@ -556,7 +738,6 @@ public class LessonActivity extends AppCompatActivity {
             @Override public void onSlide(@androidx.annotation.NonNull View view, float offset) {}
         });
 
-        // RecyclerView setup
         RecyclerView rvCurriculum = findViewById(R.id.rvCurriculum);
         sheetAdapter = new LessonSheetAdapter(this);
         sheetAdapter.setChapters(chapters);
@@ -572,16 +753,17 @@ public class LessonActivity extends AppCompatActivity {
     }
 
     private void refreshSheetAdapter() {
-        if (sheetAdapter == null) return;
-        int activeLessonId = lessons.get(currentIndex).getId();
+        if (sheetAdapter == null || currentIndex >= lessons.size()) return;
+        String activeLessonId = lessons.get(currentIndex).getId();
         sheetAdapter.setActiveLessonId(activeLessonId);
         updateSheetProgress();
     }
 
     private void updateSheetProgress() {
         int total = lessons.size();
+        if (total == 0) return;
         int completed = 0;
-        for (Lesson l : lessons) if (l.isCompleted()) completed++;
+        for (LessonResponse l : lessons) if (completedLessonIds.contains(l.getId())) completed++;
 
         if (tvSheetSubtitle != null) {
             tvSheetSubtitle.setText(total + " bài học • Hoàn thành "

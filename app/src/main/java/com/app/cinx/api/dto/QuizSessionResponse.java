@@ -23,6 +23,14 @@ public class QuizSessionResponse {
     public String getStatus() { return status; }
     public void setStatus(String val) { this.status = val; }
 
+    private Boolean isReviewAllowed;
+    public Boolean getIsReviewAllowed() { return isReviewAllowed; }
+    public void setIsReviewAllowed(Boolean val) { this.isReviewAllowed = val; }
+
+    private Boolean isShowAnswersOnReview;
+    public Boolean getIsShowAnswersOnReview() { return isShowAnswersOnReview; }
+    public void setIsShowAnswersOnReview(Boolean val) { this.isShowAnswersOnReview = val; }
+
     private QuizSessionSubmissionResponse quizSessionSubmission;
     public QuizSessionSubmissionResponse getQuizSessionSubmission() { return quizSessionSubmission; }
     public void setQuizSessionSubmission(QuizSessionSubmissionResponse val) { this.quizSessionSubmission = val; }

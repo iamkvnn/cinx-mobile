@@ -58,6 +58,22 @@ for file_path in glob.glob(f'{assets_dir}/*.json'):
                 lines.append(f"    public void set{c_name}({j_type} val) {{ this.{prop_name} = val; }}")
                 lines.append("")
 
+            # mock field preserved for ui consistency
+            if schema_name in ('CartItemResponse', 'PaymentMethodResponse', 'VoucherResponse'):
+                lines.append(f"    private Boolean isSelected = false;")
+                lines.append(f"    public Boolean isSelected() {{ return isSelected != null && isSelected; }}")
+                lines.append(f"    public void setSelected(Boolean val) {{ this.isSelected = val; }}")
+                lines.append("")
+
+            if schema_name == 'CartItemResponse':
+                lines.append(f"    public String getTitle() {{ return course != null ? course.getTitle() : \"\"; }}")
+                lines.append(f"    public String getInstructor() {{ return course != null && course.getInstructor() != null ? course.getInstructor().getName() : (course != null ? course.getDescription() : \"\"); }}")
+                lines.append(f"    public long getSalePrice() {{ return course != null && course.getDiscountedPrice() != null ? course.getDiscountedPrice() : (course != null && course.getPrice() != null ? course.getPrice() : 0L); }}")
+                lines.append(f"    public long getOriginalPrice() {{ return course != null && course.getPrice() != null ? course.getPrice() : 0L; }}")
+                lines.append(f"    public String getImageUrl() {{ return \"https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400\"; }}")
+                lines.append(f"    public String getCategory() {{ return course != null ? course.getCategory() : \"\"; }}")
+                lines.append("")
+
             lines.append("}")
 
             with open(os.path.join(dto_dir, f"{schema_name}.java"), 'w', encoding='utf-8') as f:
@@ -132,5 +148,3 @@ for file_path in glob.glob(f'{assets_dir}/*.json'):
             f.write("\n".join(lines))
 
 print("Code generated successfully.")
-
-

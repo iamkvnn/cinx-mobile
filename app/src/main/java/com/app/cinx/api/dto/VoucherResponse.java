@@ -47,4 +47,8 @@ public class VoucherResponse {
     public String getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(String val) { this.updatedAt = val; }
 
+    private Boolean isSelected = false;
+    public Boolean isSelected() { return isSelected != null && isSelected; }
+    public void setSelected(Boolean val) { this.isSelected = val; }
+
 }

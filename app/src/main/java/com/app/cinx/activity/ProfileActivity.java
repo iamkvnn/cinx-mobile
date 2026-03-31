@@ -10,20 +10,37 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.app.Activity;
 
 import com.app.cinx.R;
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.UserService;
+import com.app.cinx.api.dto.ApiResponse;
+import com.app.cinx.api.dto.UpdateProfileRequest;
+import com.app.cinx.api.dto.UserDto;
 import com.app.cinx.utils.NavHelper;
 import com.app.cinx.utils.ToastUtil;
 import com.app.cinx.utils.UserManager;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
+import com.google.gson.Gson;
 
-import com.app.cinx.api.RetrofitClient;
-import com.app.cinx.api.UserService;
-import com.app.cinx.api.dto.ApiResponse;
-import com.app.cinx.api.dto.UserDto;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -68,6 +85,23 @@ public class ProfileActivity extends AppCompatActivity {
     private static final int LEARN_HOURS  = 38;
 
     private UserDto currentUserDto;
+    
+    private Uri selectedAvatarUri = null;
+    private ImageView dialogAvatarView = null;
+
+    private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    selectedAvatarUri = result.getData().getData();
+                    if (dialogAvatarView != null) {
+                        Glide.with(this)
+                                .load(selectedAvatarUri)
+                                .circleCrop()
+                                .into(dialogAvatarView);
+                    }
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,23 +156,33 @@ public class ProfileActivity extends AppCompatActivity {
         UserManager user = UserManager.getInstance();
 
         // Avatar
+        String avatarUrl = user.getAvatarUrl();
+        if (avatarUrl == null || avatarUrl.isEmpty()) {
+            avatarUrl = "https://i.pravatar.cc/150?u=my_user";
+        }
         Glide.with(this)
-                .load("https://i.pravatar.cc/150?u=my_user")
+                .load(avatarUrl)
                 .circleCrop()
                 .placeholder(R.drawable.ic_profile_placeholder)
                 .into(ivAvatar);
 
-        // Name & email – fall back to demo values when not available
+        // Name & email
         String email = user.getUserEmail();
+        String name = user.getUserName();
+        
         if (email != null && !email.isEmpty()) {
             tvProfileEmail.setText(email);
-            // Derive a display name from the email prefix
+        }
+        
+        if (name != null && !name.isEmpty()) {
+            tvProfileName.setText(name);
+        } else if (email != null && !email.isEmpty()) {
             String namePart = email.contains("@") ? email.substring(0, email.indexOf('@')) : email;
             tvProfileName.setText(namePart);
         }
 
         // Membership badge
-        boolean isPro = true; // extend UserManager to hold tier when needed
+        boolean isPro = "PRO".equalsIgnoreCase(user.getUserRole()); // Assuming role string
         tvMembershipLabel.setText(isPro ? R.string.profile_badge_pro : R.string.profile_badge_basic);
 
         // Quick stats
@@ -156,6 +200,13 @@ public class ProfileActivity extends AppCompatActivity {
             public void onResponse(Call<ApiResponse<UserDto>> call, Response<ApiResponse<UserDto>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                     currentUserDto = response.body().getData();
+                    UserManager.getInstance().saveUserInfo(
+                            currentUserDto.getUserId(),
+                            currentUserDto.getEmail(),
+                            currentUserDto.getName(),
+                            currentUserDto.getAvatarUrl(),
+                            currentUserDto.getRole()
+                    );
                     runOnUiThread(() -> updateProfileUI(currentUserDto));
                 }
             }
@@ -195,10 +246,31 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showEditProfileDialog() {
+        selectedAvatarUri = null;
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.layout_profile_edit_bottom_sheet, null);
         dialog.setContentView(view);
         
+        dialogAvatarView = view.findViewById(R.id.editAvatar);
+        if (dialogAvatarView != null) {
+            String currentAvatar = UserManager.getInstance().getAvatarUrl();
+            if (currentAvatar != null && !currentAvatar.isEmpty()) {
+                Glide.with(this).load(currentAvatar).circleCrop().into(dialogAvatarView);
+            }
+            view.findViewById(R.id.editAvatar).setOnClickListener(v -> {
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                imagePickerLauncher.launch(intent);
+            });
+            // Try to find the inner LL that has both avatar and text
+            View avatarContainer = (View) dialogAvatarView.getParent();
+            if (avatarContainer != null && avatarContainer.getParent() instanceof View) {
+                ((View) avatarContainer.getParent()).setOnClickListener(v -> {
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    imagePickerLauncher.launch(intent);
+                });
+            }
+        }
+
         EditText inputName = view.findViewById(R.id.inputName);
         EditText inputEmail = view.findViewById(R.id.inputEmail);
         View btnSave = view.findViewById(R.id.btnSaveProfile);
@@ -210,16 +282,75 @@ public class ProfileActivity extends AppCompatActivity {
         btnClose.setOnClickListener(v -> dialog.dismiss());
         btnSave.setOnClickListener(v -> {
             String newName = inputName.getText().toString();
-            String newEmail = inputEmail.getText().toString();
-            if (!newName.isEmpty()) tvProfileName.setText(newName);
-            if (!newEmail.isEmpty()) tvProfileEmail.setText(newEmail);
-            UserManager.getInstance().setUserEmail(newEmail);
-            // In a real app, we would call an API here to update the user
-            ToastUtil.showCustomToast(this, "Đã cập nhật hồ sơ locally");
-            dialog.dismiss();
+            String newEmail = inputEmail.getText().toString(); // Maybe changing email needs auth change, we'll try API anyway
+            if (!newName.isEmpty()) {
+                
+                UserService userService = RetrofitClient.getInstance().getUserService();
+                if (userService != null && UserManager.getInstance().getUserId() != null) {
+                    UpdateProfileRequest updateReq = new UpdateProfileRequest();
+                    updateReq.setName(newName);
+                    
+                    String json = new Gson().toJson(updateReq);
+                    RequestBody userBody = RequestBody.create(MediaType.parse("application/json"), json);
+                    MultipartBody.Part avatarPart = prepareAvatarPart(selectedAvatarUri);
+                    
+                    userService.updateUser(UserManager.getInstance().getUserId(), userBody, avatarPart).enqueue(new Callback<ApiResponse<UserDto>>() {
+                        @Override
+                        public void onResponse(Call<ApiResponse<UserDto>> call, Response<ApiResponse<UserDto>> response) {
+                            if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                                currentUserDto = response.body().getData();
+                                UserManager.getInstance().setUserName(currentUserDto.getName());
+                                runOnUiThread(() -> {
+                                    updateProfileUI(currentUserDto);
+                                    ToastUtil.showCustomToast(ProfileActivity.this, "Cập nhật hồ sơ thành công");
+                                    dialog.dismiss();
+                                });
+                            } else {
+                                ToastUtil.showCustomToast(ProfileActivity.this, "Cập nhật thất bại");
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ApiResponse<UserDto>> call, Throwable t) {
+                            Log.e("ProfileActivity", "Failed to update profile", t);
+                            ToastUtil.showCustomToast(ProfileActivity.this, "Lỗi kết nối");
+                        }
+                    });
+                } else {
+                    tvProfileName.setText(newName);
+                    UserManager.getInstance().setUserName(newName);
+                    dialog.dismiss();
+                }
+            } else {
+                ToastUtil.showCustomToast(this, "Tên không được để trống");
+            }
         });
         
         dialog.show();
+    }
+    
+    private MultipartBody.Part prepareAvatarPart(Uri uri) {
+        if (uri == null) return null;
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            if (inputStream != null) {
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                int nRead;
+                byte[] data = new byte[16384];
+                while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+                buffer.flush();
+                byte[] bytes = buffer.toByteArray();
+                String mimeType = getContentResolver().getType(uri);
+                if (mimeType == null) mimeType = "image/jpeg";
+                RequestBody requestFile = RequestBody.create(MediaType.parse(mimeType), bytes);
+                return MultipartBody.Part.createFormData("avatar", "avatar.jpg", requestFile);
+            }
+        } catch (IOException e) {
+            Log.e("ProfileActivity", "Error preparing avatar part", e);
+        }
+        return null;
     }
 
     private void setupMenuListeners() {

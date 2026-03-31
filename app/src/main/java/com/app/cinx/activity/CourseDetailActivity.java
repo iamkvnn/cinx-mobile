@@ -16,13 +16,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
+import com.app.cinx.api.dto.LessonResponse;
+import com.app.cinx.api.dto.SectionResponse;
 import com.app.cinx.utils.UserManager;
 import android.widget.Toast;
 import com.app.cinx.adapter.CourseCurriculumAdapter;
-import com.app.cinx.data.SampleCourseData;
 import com.app.cinx.data.CartRepository;
-import com.app.cinx.model.Chapter;
-import com.app.cinx.model.Lesson;
 import com.app.cinx.utils.ToastUtil;
 import com.google.android.material.tabs.TabLayout;
 
@@ -31,13 +30,18 @@ import com.app.cinx.api.RetrofitClient;
 import com.app.cinx.api.dto.ApiResponse;
 import com.app.cinx.api.dto.CourseDetailResponse;
 import com.app.cinx.api.dto.AddToCartRequest;
+import com.app.cinx.api.dto.LearningItemProgressResponse;
+import com.app.cinx.api.dto.CheckEnrollmentStatus;
 import com.app.cinx.utils.PriceUtil;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 public class CourseDetailActivity extends AppCompatActivity {
 
@@ -69,42 +73,34 @@ public class CourseDetailActivity extends AppCompatActivity {
     // ── Continue/Start button ─────────────────────────────────────────────
     private AppCompatButton btnStartLearning;
 
-    // ── Data ──────────────────────────────────────────────────────────────
-    private List<Chapter> chapters;
-    private List<Lesson> lessons;
+    // ── Data ────────────────────────────────────────────────────────────────────────
+    private List<SectionResponse> chapters = new ArrayList<>();
+    private List<LessonResponse> lessons = new ArrayList<>();
+    private String courseIdStr;
+    private Set<String> completedLessonIds = new HashSet<>();
+    private boolean isAllLocked = true;
 
-    // ─────────────────────────────────────────────────────────────────────
+    // ──────────────────────────────────────────────────────────────────────────────
     // Lifecycle
-    // ─────────────────────────────────────────────────────────────────────
+    // ──────────────────────────────────────────────────────────────────────────────
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_detail);
 
-        loadData();
         initViews();
         setupNavButtons();
         setupTabs();
         setupDescriptionExpand();
-        setupCurriculum();
         setupStartButton();
 
         updatePurchaseState(isPurchased);
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // Data
-    // ─────────────────────────────────────────────────────────────────────
-
-    private void loadData() {
-        chapters = SampleCourseData.getChapters();
-        lessons  = SampleCourseData.getLessons();
-    }
-
-    // ─────────────────────────────────────────────────────────────────────
+    // ──────────────────────────────────────────────────────────────────────────────
     // View initialisation
-    // ─────────────────────────────────────────────────────────────────────
+    // ──────────────────────────────────────────────────────────────────────────────
 
     private void initViews() {
         layoutActionUnpurchased = findViewById(R.id.layoutActionUnpurchased);
@@ -131,7 +127,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         TextView tvOriginalPrice = findViewById(R.id.tvOriginalPrice);
         TextView tvCurrentPrice = findViewById(R.id.tvCurrentPrice);
         
-        String courseIdStr = getIntent().getStringExtra("COURSE_ID");
+        courseIdStr = getIntent().getStringExtra("COURSE_ID");
 
         long originalPriceVal = getIntent().getLongExtra("COURSE_PRICE", 1200000L);
         long currentPriceVal = getIntent().getLongExtra("COURSE_DISCOUNTED_PRICE", 599000L);
@@ -164,7 +160,9 @@ public class CourseDetailActivity extends AppCompatActivity {
                 startActivity(loginIntent);
             } else {
                 if (courseIdStr != null) {
-                    RetrofitClient.getInstance().getCartService().addToCart(new AddToCartRequest(courseIdStr)).enqueue(new Callback<ApiResponse<Void>>() {
+                    AddToCartRequest req = new AddToCartRequest();
+                    req.setCourseId(courseIdStr);
+                    RetrofitClient.getInstance().getCartService().addToCart(req).enqueue(new Callback<ApiResponse<Void>>() {
                         @Override
                         public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
                             if (response.isSuccessful()) {
@@ -234,11 +232,95 @@ public class CourseDetailActivity extends AppCompatActivity {
             tvOriginalPrice.setVisibility(View.GONE);
         }
 
-        // Set real purchase state if available from API
+        // Set initial purchase state (will be refined by checkEnrollment)
         if (detail.getIsInSubscription() != null && detail.getIsInSubscription()) {
             isPurchased = true;
             updatePurchaseState(isPurchased);
         }
+        
+        // Update curriculum
+        if (detail.getSections() != null) {
+            chapters = detail.getSections();
+            lessons.clear();
+            for (SectionResponse sec : chapters) {
+                if (sec.getLessons() != null) {
+                    lessons.addAll(sec.getLessons());
+                }
+            }
+            
+            checkEnrollmentAndLoadProgress();
+        }
+    }
+
+    private void checkEnrollmentAndLoadProgress() {
+        if (!UserManager.getInstance().isLoggedIn() || courseIdStr == null) {
+            isAllLocked = true;
+            isPurchased = false;
+            updatePurchaseState(isPurchased);
+            setupCurriculum();
+            return;
+        }
+
+        List<String> ids = new ArrayList<>();
+        ids.add(courseIdStr);
+
+        RetrofitClient.getInstance().getEnrollmentService().checkEnrollmentStatus(ids).enqueue(new Callback<ApiResponse<List<CheckEnrollmentStatus>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<CheckEnrollmentStatus>>> call, Response<ApiResponse<List<CheckEnrollmentStatus>>> response) {
+                boolean enrolled = false;
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    List<CheckEnrollmentStatus> statusList = response.body().getData();
+                    if (!statusList.isEmpty()) {
+                        Boolean st = statusList.get(0).getIsEnrolled();
+                        enrolled = (st != null && st);
+                    }
+                }
+                
+                isPurchased = enrolled;
+                isAllLocked = !enrolled;
+                updatePurchaseState(isPurchased);
+                
+                if (!isAllLocked) {
+                    fetchLearningProgress(courseIdStr);
+                } else {
+                    setupCurriculum();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<CheckEnrollmentStatus>>> call, Throwable t) {
+                Log.e("CourseDetail", "Check enroll failed", t);
+                isAllLocked = true;
+                isPurchased = false;
+                updatePurchaseState(isPurchased);
+                setupCurriculum();
+            }
+        });
+    }
+
+    private void fetchLearningProgress(String courseId) {
+        RetrofitClient.getInstance().getLearningService().getLearningItemProgressByCourseId(courseId)
+                .enqueue(new Callback<ApiResponse<List<LearningItemProgressResponse>>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<List<LearningItemProgressResponse>>> call, Response<ApiResponse<List<LearningItemProgressResponse>>> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                            List<LearningItemProgressResponse> list = response.body().getData();
+                            completedLessonIds.clear();
+                            for (LearningItemProgressResponse item : list) {
+                                if (item.getIsCompleted() != null && item.getIsCompleted()) {
+                                    completedLessonIds.add(item.getItemId());
+                                }
+                            }
+                        }
+                        setupCurriculum();
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<List<LearningItemProgressResponse>>> call, Throwable t) {
+                        Log.e("CourseDetail", "Failed to fetch learning progress", t);
+                        setupCurriculum();
+                    }
+                });
     }
 
     private void setupNavButtons() {
@@ -288,15 +370,16 @@ public class CourseDetailActivity extends AppCompatActivity {
         });
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────
     // Curriculum tab
-    // ─────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────
 
     private void setupCurriculum() {
+        if (chapters == null || chapters.isEmpty()) return;
+        
         // Summary counts
         int totalLessons = lessons.size();
-        int completedLessons = 0;
-        for (Lesson l : lessons) if (l.isCompleted()) completedLessons++;
+        int completedLessons = completedLessonIds.size();
 
         if (tvCurriculumSummary != null) {
             tvCurriculumSummary.setText(
@@ -308,21 +391,23 @@ public class CourseDetailActivity extends AppCompatActivity {
 
         // Build adapter
         curriculumAdapter = new CourseCurriculumAdapter(this, chapters);
+        curriculumAdapter.setLockState(isAllLocked);
+        curriculumAdapter.setCompletedLessons(completedLessonIds);
 
         // Highlight the first active (or first unlocked incomplete) lesson
-        int activeLessonId = -1;
-        for (Lesson l : lessons) {
-            if (l.isActive()) { activeLessonId = l.getId(); break; }
-        }
-        if (activeLessonId < 0) {
-            for (Lesson l : lessons) {
-                if (!l.isLocked() && !l.isCompleted()) {
-                    activeLessonId = l.getId();
-                    break;
-                }
+        String activeLessonId = null;
+        for (LessonResponse l : lessons) {
+            if (!isAllLocked && !completedLessonIds.contains(l.getId())) {
+                activeLessonId = l.getId();
+                break;
             }
         }
-        curriculumAdapter.setActiveLessonId(activeLessonId);
+        if (activeLessonId != null) {
+            curriculumAdapter.setActiveLessonId(activeLessonId);
+        } else if (!lessons.isEmpty() && !isAllLocked) {
+             activeLessonId = lessons.get(0).getId();
+             curriculumAdapter.setActiveLessonId(activeLessonId);
+        }
         curriculumAdapter.setOnLessonClickListener(lesson -> openLesson(lesson.getId()));
 
         rvCourseCurriculum.setLayoutManager(new LinearLayoutManager(this));
@@ -330,19 +415,24 @@ public class CourseDetailActivity extends AppCompatActivity {
         rvCourseCurriculum.setNestedScrollingEnabled(false);
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────
     // Start / Continue button
-    // ─────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────
 
     private void setupStartButton() {
         if (btnStartLearning == null) return;
         btnStartLearning.setOnClickListener(v -> {
-            // Resume at first active lesson, else first incomplete unlocked lesson
-            for (Lesson l : lessons) {
-                if (l.isActive() && !l.isLocked()) { openLesson(l.getId()); return; }
+            if (isAllLocked) {
+                ToastUtil.showCustomToast(this, "Vui lòng đăng nhập để học");
+                return;
             }
-            for (Lesson l : lessons) {
-                if (!l.isLocked() && !l.isCompleted()) { openLesson(l.getId()); return; }
+            
+            // Resume at first incomplete unlocked lesson
+            for (LessonResponse l : lessons) {
+                if (!completedLessonIds.contains(l.getId())) { 
+                    openLesson(l.getId()); 
+                    return; 
+                }
             }
             // All done or all locked — restart from lesson 1
             if (!lessons.isEmpty()) openLesson(lessons.get(0).getId());
@@ -350,21 +440,20 @@ public class CourseDetailActivity extends AppCompatActivity {
     }
 
     /** Launches LessonActivity for the given lesson ID (only if unlocked). */
-    private void openLesson(int lessonId) {
-        for (Lesson l : lessons) {
-            if (l.getId() == lessonId) {
-                if (l.isLocked()) {
-                    ToastUtil.showCustomToast(this, "Bài học chưa mở khoá!");
+    private void openLesson(String lessonId) {
+        for (LessonResponse l : lessons) {
+            if (l.getId().equals(lessonId)) {
+                if (isAllLocked) {
+                    ToastUtil.showCustomToast(this, "Bài học chưa mở khóa!");
                     return;
                 }
-                startActivity(LessonActivity.newIntent(this, lessonId));
+                startActivity(LessonActivity.newIntent(this, courseIdStr, lessonId));
                 return;
             }
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────    // Cart badge refresh
-    // ───────────────────────────────────────────────────────────────────
+    // ── Cart badge refresh ───────────────────────────────────────────────────────────
 
     @Override
     protected void onResume() {

@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
-import com.app.cinx.model.QuizOption;
+import com.app.cinx.api.dto.QuizOptionResponse;
 
 import java.util.List;
 
@@ -34,24 +34,24 @@ public class QuizOptionAdapter extends RecyclerView.Adapter<QuizOptionAdapter.Op
 
     /** Callback fired when user taps an option (only if quiz is not yet answered). */
     public interface OnOptionSelectedListener {
-        void onOptionSelected(int position, QuizOption option);
+        void onOptionSelected(int position, QuizOptionResponse option);
     }
 
-    // ── Fields ────────────────────────────────────────────────────────────
+    // ── Fields ──────────────────────────────────────────────────────────────────────
     private final Context context;
-    private final List<QuizOption> options;
+    private final List<QuizOptionResponse> options;
     private final OptionState[] states;
     private boolean answered = false;
     private OnOptionSelectedListener listener;
 
-    public QuizOptionAdapter(Context context, List<QuizOption> options) {
+    public QuizOptionAdapter(Context context, List<QuizOptionResponse> options) {
         this.context = context;
         this.options = options;
         this.states = new OptionState[options.size()];
         for (int i = 0; i < states.length; i++) states[i] = OptionState.DEFAULT;
     }
 
-    // ── Public API ────────────────────────────────────────────────────────
+    // ── Public API ──────────────────────────────────────────────────────────────────
 
     public void setOnOptionSelectedListener(OnOptionSelectedListener listener) {
         this.listener = listener;
@@ -76,7 +76,7 @@ public class QuizOptionAdapter extends RecyclerView.Adapter<QuizOptionAdapter.Op
     public void revealAnswer(int selectedIndex) {
         answered = true;
         for (int i = 0; i < options.size(); i++) {
-            if (options.get(i).isCorrect()) {
+            if (options.get(i).getIsCorrect() != null && options.get(i).getIsCorrect()) {
                 states[i] = OptionState.CORRECT;
             } else if (i == selectedIndex) {
                 states[i] = OptionState.WRONG;
@@ -107,7 +107,7 @@ public class QuizOptionAdapter extends RecyclerView.Adapter<QuizOptionAdapter.Op
 
     @Override
     public void onBindViewHolder(@NonNull OptionViewHolder holder, int position) {
-        QuizOption option = options.get(position);
+        QuizOptionResponse option = options.get(position);
         holder.bind(option, states[position], position);
     }
 
@@ -136,8 +136,8 @@ public class QuizOptionAdapter extends RecyclerView.Adapter<QuizOptionAdapter.Op
             tvOptionLabel   = itemView.findViewById(R.id.tvOptionLabel);
         }
 
-        void bind(QuizOption option, OptionState state, int position) {
-            tvOptionText.setText(option.getText());
+        void bind(QuizOptionResponse option, OptionState state, int position) {
+            tvOptionText.setText(option.getOptionText() != null ? option.getOptionText() : "");
 
             switch (state) {
                 case DEFAULT:

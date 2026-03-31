@@ -104,7 +104,7 @@ public class MyLearningActivity extends AppCompatActivity
     
     private void fetchEnrolledCourses() {
         EnrollmentService enrollmentService = RetrofitClient.getInstance().getEnrollmentService();
-        enrollmentService.getEnrolledCourses(0, 100).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
+        enrollmentService.getEnrolledCourses(1, 100).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
             @Override
             public void onResponse(Call<PaginatedApiResponseCourseResponse> call, Response<PaginatedApiResponseCourseResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {

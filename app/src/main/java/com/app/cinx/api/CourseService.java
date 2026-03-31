@@ -75,6 +75,9 @@ public interface CourseService {
     @POST("api/v1/courses")
     Call<ApiResponse<CourseResponse>> createCourse(@Body CreateCourseRequest body);
 
+    @POST("api/v1/courses/{id}/update-rating")
+    Call<ApiResponse<Void>> updateCourseRating(@Path("id") String id, @Query("rating") Double rating);
+
     @POST("api/v1/courses/{courseId}/images")
     Call<ApiResponse<Object>> uploadCourseImages(@Path("courseId") String courseId, @Body CreateCourseImageRequest body);
 

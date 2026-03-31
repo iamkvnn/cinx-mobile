@@ -15,7 +15,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
 import com.app.cinx.R;
+import com.app.cinx.api.AuthService;
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.dto.ApiResponse;
+import com.app.cinx.api.dto.AuthRequestDto;
+import com.app.cinx.api.dto.TokenResponseDto;
+import com.app.cinx.api.dto.UserDto;
+import com.app.cinx.utils.TokenManager;
 import com.app.cinx.utils.UserManager;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import android.util.Log;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -100,17 +112,52 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         if (isValid) {
-            // Mock Login Success
-            Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-            
-            // Save user to memory
-            UserManager.getInstance().login(email); // Mock name
+            AppCompatButton btnLogin = findViewById(R.id.btn_login);
+            btnLogin.setEnabled(false);
+            btnLogin.setText("Đang đăng nhập...");
 
-            // Navigate to Main Activity
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
+            AuthService authService = RetrofitClient.getInstance().getAuthService();
+            if (authService == null) {
+                btnLogin.setEnabled(true);
+                btnLogin.setText("Đăng nhập");
+                return;
+            }
+
+            AuthRequestDto req = new AuthRequestDto();
+            req.setEmail(email);
+            req.setPassword(password);
+
+            authService.login(req).enqueue(new Callback<ApiResponse<TokenResponseDto>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<TokenResponseDto>> call, Response<ApiResponse<TokenResponseDto>> response) {
+                    btnLogin.setEnabled(true);
+                    btnLogin.setText("Đăng nhập");
+                    
+                    if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                        TokenResponseDto tokens = response.body().getData();
+                        TokenManager.getInstance().saveTokens(
+                                tokens.getAccessToken(),
+                                tokens.getRefreshToken()
+                        );
+                        
+                        // Fetch current user profile before going to MainActivity
+                        fetchUserProfileAndNavigate(email);
+
+                    } else {
+                        btnLogin.setEnabled(true);
+                        btnLogin.setText("Đăng nhập");
+                        Toast.makeText(LoginActivity.this, "Đăng nhập thất bại: Sai email hoặc mật khẩu", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<TokenResponseDto>> call, Throwable t) {
+                    btnLogin.setEnabled(true);
+                    btnLogin.setText("Đăng nhập");
+                    Log.e("LoginActivity", "Login error", t);
+                    Toast.makeText(LoginActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
@@ -119,5 +166,46 @@ public class LoginActivity extends AppCompatActivity {
         shake.setInterpolator(new android.view.animation.CycleInterpolator(5));
         shake.setDuration(300);
         view.startAnimation(shake);
+    }
+
+    private void fetchUserProfileAndNavigate(String fallbackEmail) {
+        com.app.cinx.api.UserService userService = RetrofitClient.getInstance().getUserService();
+        if (userService != null) {
+            userService.getCurrentUser().enqueue(new Callback<ApiResponse<UserDto>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<UserDto>> call, Response<ApiResponse<UserDto>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                        UserDto userDto = response.body().getData();
+                        UserManager.getInstance().saveUserInfo(
+                                userDto.getUserId(),
+                                userDto.getEmail(),
+                                userDto.getName(),
+                                userDto.getAvatarUrl(),
+                                userDto.getRole()
+                        );
+                    } else {
+                        UserManager.getInstance().login(fallbackEmail);
+                    }
+                    navigateToMain();
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<UserDto>> call, Throwable t) {
+                    UserManager.getInstance().login(fallbackEmail);
+                    navigateToMain();
+                }
+            });
+        } else {
+            UserManager.getInstance().login(fallbackEmail);
+            navigateToMain();
+        }
+    }
+
+    private void navigateToMain() {
+        Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }

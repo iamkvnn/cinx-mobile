@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -33,7 +34,6 @@ android {
     }
 }
 
-apply(from = "../generate.gradle")
 
 dependencies {
     implementation(libs.stompprotocolandroid)
@@ -58,4 +58,6 @@ dependencies {
     implementation(libs.retrofit.gson)
     implementation(libs.okhttp.logging)
     implementation(libs.gson)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 }

@@ -23,6 +23,14 @@ public class CreateQuizLessonRequest {
     public Integer getDuration() { return duration; }
     public void setDuration(Integer val) { this.duration = val; }
 
+    private Boolean isReviewAllowed;
+    public Boolean getIsReviewAllowed() { return isReviewAllowed; }
+    public void setIsReviewAllowed(Boolean val) { this.isReviewAllowed = val; }
+
+    private Boolean isShowAnswersOnReview;
+    public Boolean getIsShowAnswersOnReview() { return isShowAnswersOnReview; }
+    public void setIsShowAnswersOnReview(Boolean val) { this.isShowAnswersOnReview = val; }
+
     private List<CreateQuizQuestionRequest> questions;
     public List<CreateQuizQuestionRequest> getQuestions() { return questions; }
     public void setQuestions(List<CreateQuizQuestionRequest> val) { this.questions = val; }

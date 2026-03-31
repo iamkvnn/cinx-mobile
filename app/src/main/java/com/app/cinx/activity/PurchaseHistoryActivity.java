@@ -260,16 +260,19 @@ public class PurchaseHistoryActivity extends AppCompatActivity
         switch (order.getStatus()) {
             case COMPLETED:
                 msg = getString(R.string.order_review_toast, order.getOrderId());
+                ToastUtil.showCustomToast(this, msg);
                 break;
             case PENDING:
                 msg = getString(R.string.order_cancel_toast, order.getOrderId());
+                ToastUtil.showCustomToast(this, msg);
                 break;
             case CANCELLED:
             default:
-                msg = getString(R.string.order_detail_toast, order.getOrderId());
+                Intent intent = new Intent(this, OrderDetailActivity.class);
+                intent.putExtra(OrderDetailActivity.EXTRA_ORDER_ID, order.getOrderId());
+                startActivity(intent);
                 break;
         }
-        ToastUtil.showCustomToast(this, msg);
     }
 
     @Override
@@ -284,13 +287,15 @@ public class PurchaseHistoryActivity extends AppCompatActivity
                 return;
 
             case PENDING:
-                msg = getString(R.string.order_pay_toast, order.getOrderId());
+                Intent pendingIntent = new Intent(this, OrderDetailActivity.class);
+                pendingIntent.putExtra(OrderDetailActivity.EXTRA_ORDER_ID, order.getOrderId());
+                startActivity(pendingIntent);
                 break;
             case CANCELLED:
             default:
                 msg = getString(R.string.order_repurchase_toast);
+                ToastUtil.showCustomToast(this, msg);
                 break;
         }
-        ToastUtil.showCustomToast(this, msg);
     }
 }

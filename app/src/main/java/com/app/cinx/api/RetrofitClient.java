@@ -30,6 +30,8 @@ public class RetrofitClient {
     private OrderService        orderService;
     private EnrollmentService   enrollmentService;
     private PaymentService      paymentService;
+    private LearningService     learningService;
+    private NotificationService  notificationService;
     private RecommendationService recommendationService;
     private SocialService      socialService;
 
@@ -95,6 +97,16 @@ public class RetrofitClient {
     public PaymentService getPaymentService() {
         if (paymentService == null) paymentService = retrofitMain.create(PaymentService.class);
         return paymentService;
+    }
+
+    public LearningService getLearningService() {
+        if (learningService == null) learningService = retrofitMain.create(LearningService.class);
+        return learningService;
+    }
+
+    public NotificationService getNotificationService() {
+        if (notificationService == null) notificationService = retrofitMain.create(NotificationService.class);
+        return notificationService;
     }
 
     public RecommendationService getRecommendationService() {

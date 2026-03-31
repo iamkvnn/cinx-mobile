@@ -3,6 +3,14 @@ import com.app.cinx.api.dto.ApiResponse;
 import com.app.cinx.api.dto.RefreshTokenRequest;
 import com.app.cinx.api.dto.TokenResponseDto;
 import com.app.cinx.utils.TokenManager;
+import com.app.cinx.utils.UserManager;
+import com.app.cinx.CinxApp;
+import com.app.cinx.activity.LoginActivity;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.Toast;
+
 import java.io.IOException;
 import okhttp3.Authenticator;
 import okhttp3.Request;
@@ -21,7 +29,7 @@ public class TokenAuthenticator implements Authenticator {
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
             OkHttpClient client = new OkHttpClient.Builder().addInterceptor(logging).build();
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:9090/")
+                    .baseUrl("http://api.shinyjewelry.shop/")
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
@@ -47,8 +55,18 @@ public class TokenAuthenticator implements Authenticator {
                     .header("Authorization", tokenManager.getBearerToken())
                     .build();
         } else {
-            tokenManager.clear();
+            handleLogout();
             return null;
         }
+    }
+
+    private void handleLogout() {
+        UserManager.getInstance().logout();
+        new Handler(Looper.getMainLooper()).post(() -> {
+            Toast.makeText(CinxApp.getInstance(), "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(CinxApp.getInstance(), LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            CinxApp.getInstance().startActivity(intent);
+        });
     }
 }

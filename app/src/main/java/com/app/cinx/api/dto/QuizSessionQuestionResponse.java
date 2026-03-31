@@ -27,4 +27,16 @@ public class QuizSessionQuestionResponse {
     public String getUserAnswer() { return userAnswer; }
     public void setUserAnswer(String val) { this.userAnswer = val; }
 
+    private String correctAnswer;
+    public String getCorrectAnswer() { return correctAnswer; }
+    public void setCorrectAnswer(String val) { this.correctAnswer = val; }
+
+    private Boolean isCorrect;
+    public Boolean getIsCorrect() { return isCorrect; }
+    public void setIsCorrect(Boolean val) { this.isCorrect = val; }
+
+    private Integer score;
+    public Integer getScore() { return score; }
+    public void setScore(Integer val) { this.score = val; }
+
 }

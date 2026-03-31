@@ -29,7 +29,7 @@ import com.app.cinx.R;
 import com.app.cinx.adapter.CartAdapter;
 import com.app.cinx.adapter.VoucherAdapter;
 import com.app.cinx.data.CartRepository;
-import com.app.cinx.model.CartItem;
+import com.app.cinx.api.dto.CartItemResponse;
 import com.app.cinx.model.Voucher;
 import com.app.cinx.utils.Convert;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -39,6 +39,9 @@ import com.app.cinx.api.RetrofitClient;
 import com.app.cinx.api.dto.ApiResponse;
 import com.app.cinx.api.dto.CartItemResponse;
 import com.app.cinx.api.dto.CourseResponse;
+import com.app.cinx.api.EnrollmentService;
+import com.app.cinx.api.dto.PaginatedApiResponseVoucherResponse;
+import com.app.cinx.api.dto.VoucherResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -86,7 +89,7 @@ public class CartActivity extends AppCompatActivity
     // Data
     // ─────────────────────────────────────────────────────────────────────
 
-    private final List<CartItem> cartItems = new ArrayList<>();
+    private final List<CartItemResponse> cartItems = new ArrayList<>();
     private final List<Voucher>  vouchers  = new ArrayList<>();
     private       Voucher        appliedVoucher = null;
     private       CartAdapter    cartAdapter;
@@ -100,15 +103,44 @@ public class CartActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
 
-        initSampleData();
         bindViews();
         setupRecyclerView();
         setupSwipeToDelete();
         setupClickListeners();
         
         fetchCartItems();
+        fetchVouchers();
     }
     
+    private void fetchVouchers() {
+        EnrollmentService enrollmentService = RetrofitClient.getInstance().getEnrollmentService();
+        if (enrollmentService == null) return;
+        
+        enrollmentService.getVouchers(null).enqueue(new Callback<PaginatedApiResponseVoucherResponse>() {
+            @Override
+            public void onResponse(Call<PaginatedApiResponseVoucherResponse> call, Response<PaginatedApiResponseVoucherResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    vouchers.clear();
+                    for (VoucherResponse vr : response.body().getData()) {
+                        int discount = vr.getDiscountAmount() != null ? vr.getDiscountAmount().intValue() : 0;
+                        vouchers.add(new Voucher(
+                                vr.getId(),
+                                vr.getCode(),
+                                vr.getDescription() != null ? vr.getDescription() : "",
+                                vr.getCode(),
+                                discount
+                        ));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PaginatedApiResponseVoucherResponse> call, Throwable t) {
+                Log.e("CartActivity", "Failed to fetch vouchers", t);
+            }
+        });
+    }
+
     private void fetchCartItems() {
         CartService cartService = RetrofitClient.getInstance().getCartService();
         if (cartService == null) return;
@@ -125,18 +157,9 @@ public class CartActivity extends AppCompatActivity
                         CourseResponse cr = r.getCourse();
                         if (cr == null) continue;
                         
-                        String id = r.getId() != null ? r.getId() : cr.getId();
-                        String title = cr.getTitle();
-                        String instructor = cr.getDescription(); // fallback
-                        long price = cr.getPrice() != null ? cr.getPrice() : 0L;
-                        long discountedPrice = cr.getDiscountedPrice() != null ? cr.getDiscountedPrice() : price;
-                        String thumbnail = "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80";
-                        String category = cr.getCategory();
-                        
-                        CartItem ci = new CartItem(id, title, instructor, price, discountedPrice, thumbnail, category);
-                        ci.setSelected(true); // default selected
-                        cartItems.add(ci);
-                        CartRepository.getInstance().addItem(ci);
+                        r.setSelected(true); // default selected
+                        cartItems.add(r);
+                        CartRepository.getInstance().addItem(r);
                     }
                     runOnUiThread(() -> {
                         cartAdapter.notifyDataSetChanged();
@@ -151,22 +174,6 @@ public class CartActivity extends AppCompatActivity
                 Log.e("CartActivity", "Failed to fetch cart", t);
             }
         });
-    }
-
-    // ─────────────────────────────────────────────────────────────────────
-    // Sample data — replace with Repository in production
-    // ─────────────────────────────────────────────────────────────────────
-
-    private void initSampleData() {
-        // Vouchers mock
-        vouchers.addAll(Arrays.asList(
-                new Voucher("v1", "Giảm 20% cho thành viên mới",
-                        "Áp dụng cho mọi khóa học", "EDUFUTURE", 20),
-                new Voucher("v2", "Giảm 10% Lập trình",
-                        "Dành riêng cho khóa Code",  "PRODEV",    10),
-                new Voucher("v3", "Giảm 5% Thiết kế",
-                        "Dành riêng cho khóa Design","DESIGN50",  5)
-        ));
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -232,7 +239,7 @@ public class CartActivity extends AppCompatActivity
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int pos = viewHolder.getAdapterPosition();
-                CartItem item = cartItems.get(pos);
+                CartItemResponse item = cartItems.get(pos);
                 
                 // Call API to remove
                 CartService cartService = RetrofitClient.getInstance().getCartService();
@@ -356,7 +363,7 @@ public class CartActivity extends AppCompatActivity
         refreshSummary();
         // Sync cart repository so CheckoutActivity receives up-to-date selection state
         CartRepository.getInstance().clear();
-        for (CartItem item: cartItems) {
+        for (CartItemResponse item: cartItems) {
             CartRepository.getInstance().addItem(item);
         }
 
@@ -370,7 +377,7 @@ public class CartActivity extends AppCompatActivity
     @Override
     public void onDeleteItem(int position) {
         if (position >= 0 && position < cartItems.size()) {
-            CartItem item = cartItems.get(position);
+            CartItemResponse item = cartItems.get(position);
             CartService cartService = RetrofitClient.getInstance().getCartService();
             if (cartService != null) {
                 cartService.removeFromCart(item.getId()).enqueue(new Callback<ApiResponse<Void>>() {
@@ -392,7 +399,7 @@ public class CartActivity extends AppCompatActivity
 
     private long calculateSubtotal() {
         long subtotal = 0;
-        for (CartItem item : cartItems) {
+        for (CartItemResponse item : cartItems) {
             if (item.isSelected()) subtotal += item.getSalePrice();
         }
         return subtotal;
@@ -411,7 +418,7 @@ public class CartActivity extends AppCompatActivity
         long discount   = subtotal - total;
 
         int count = 0;
-        for (CartItem item : cartItems) if (item.isSelected()) count++;
+        for (CartItemResponse item : cartItems) if (item.isSelected()) count++;
 
         // Only show voucher row & payment summary if at least 1 item is selected
         if (count > 0) {
@@ -543,7 +550,37 @@ public class CartActivity extends AppCompatActivity
                 dialog.dismiss();
                 Toast.makeText(this, getString(R.string.cart_promo_applied, matched.getDiscountPercent()), Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, getString(R.string.cart_promo_invalid), Toast.LENGTH_SHORT).show();
+                EnrollmentService enrollmentService = RetrofitClient.getInstance().getEnrollmentService();
+                if (enrollmentService != null) {
+                    enrollmentService.getVoucherByCode(code).enqueue(new Callback<ApiResponse<VoucherResponse>>() {
+                        @Override
+                        public void onResponse(Call<ApiResponse<VoucherResponse>> call, Response<ApiResponse<VoucherResponse>> response) {
+                            if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                                VoucherResponse vr = response.body().getData();
+                                int discount = vr.getDiscountAmount() != null ? vr.getDiscountAmount().intValue() : 0;
+                                appliedVoucher = new Voucher(
+                                        vr.getId(),
+                                        vr.getCode(),
+                                        vr.getDescription() != null ? vr.getDescription() : "",
+                                        vr.getCode(),
+                                        discount
+                                );
+                                refreshSummary();
+                                dialog.dismiss();
+                                Toast.makeText(CartActivity.this, getString(R.string.cart_promo_applied, appliedVoucher.getDiscountPercent()), Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(CartActivity.this, getString(R.string.cart_promo_invalid), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ApiResponse<VoucherResponse>> call, Throwable t) {
+                            Toast.makeText(CartActivity.this, getString(R.string.cart_promo_invalid), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(this, getString(R.string.cart_promo_invalid), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
-import com.app.cinx.model.CartItem;
+import com.app.cinx.api.dto.CartItemResponse;
 import com.app.cinx.utils.Convert;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
@@ -49,14 +49,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     // Fields
     // ─────────────────────────────────────────────────────────────────────
 
-    private final List<CartItem>             items;
+    private final List<CartItemResponse>             items;
     private final OnCartInteractionListener  listener;
 
     // ─────────────────────────────────────────────────────────────────────
     // Constructor
     // ─────────────────────────────────────────────────────────────────────
 
-    public CartAdapter(List<CartItem> items, OnCartInteractionListener listener) {
+    public CartAdapter(List<CartItemResponse> items, OnCartInteractionListener listener) {
         this.items    = items;
         this.listener = listener;
     }
@@ -100,7 +100,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
     /** Selects/deselects all items. */
     public void setAllSelected(boolean selected) {
-        for (CartItem item : items) {
+        for (CartItemResponse item : items) {
             item.setSelected(selected);
         }
         notifyItemRangeChanged(0, items.size());
@@ -110,14 +110,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     /** Returns true when every item is selected (or the list is empty). */
     public boolean areAllSelected() {
         if (items.isEmpty()) return false;
-        for (CartItem item : items) {
+        for (CartItemResponse item : items) {
             if (!item.isSelected()) return false;
         }
         return true;
     }
 
     /** Returns the live data list (used for calculating totals). */
-    public List<CartItem> getItems() {
+    public List<CartItemResponse> getItems() {
         return items;
     }
 
@@ -146,7 +146,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             btnDelete    = itemView.findViewById(R.id.btnDeleteItem);
         }
 
-        void bind(CartItem item) {
+        void bind(CartItemResponse item) {
             // Checkbox
             cbSelect.setOnCheckedChangeListener(null); // clear old listener before setting value
             cbSelect.setChecked(item.isSelected());

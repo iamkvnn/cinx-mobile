@@ -59,6 +59,14 @@ public class CourseDetailResponse {
     public Long getDuration() { return duration; }
     public void setDuration(Long val) { this.duration = val; }
 
+    private Boolean hasCertificate;
+    public Boolean getHasCertificate() { return hasCertificate; }
+    public void setHasCertificate(Boolean val) { this.hasCertificate = val; }
+
+    private String certificateTitle;
+    public String getCertificateTitle() { return certificateTitle; }
+    public void setCertificateTitle(String val) { this.certificateTitle = val; }
+
     private String createdAt;
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String val) { this.createdAt = val; }

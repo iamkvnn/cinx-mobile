@@ -18,9 +18,23 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
 import com.app.cinx.adapter.CheckoutCourseAdapter;
+import com.app.cinx.api.dto.CartItemResponse;
+import com.app.cinx.api.dto.CourseResponse;
+import com.app.cinx.api.dto.InstructorResponse;
+import com.app.cinx.api.EnrollmentService;
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.dto.ApiResponse;
+import com.app.cinx.api.dto.OrderDetailResponse;
+import com.app.cinx.api.dto.OrderItemResponse;
+import com.app.cinx.utils.Convert;
 import com.app.cinx.utils.ToastUtil;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class OrderDetailActivity extends AppCompatActivity {
 
@@ -45,8 +59,8 @@ public class OrderDetailActivity extends AppCompatActivity {
     private View btnLearnNow;
     
     // Default mock data, replace with repository lookup
-    private String orderId = "EDUF-8A9B2C";
-    private int status = 1; // 0=Unpaid, 1=Success, 2=Cancelled
+    private String orderId = "";
+    private OrderDetailResponse orderDetail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,14 +74,36 @@ public class OrderDetailActivity extends AppCompatActivity {
         bindViews();
         setupListeners();
         
-        // Mock data logic
         Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_ORDER_ID)) {
             orderId = intent.getStringExtra(EXTRA_ORDER_ID);
+            fetchOrderDetail();
+        } else {
+            ToastUtil.showCustomToast(this, "Order ID missing");
+            finish();
         }
-        
-        // Populate UI
-        updateUI();
+    }
+
+    private void fetchOrderDetail() {
+        EnrollmentService service = RetrofitClient.getInstance().getEnrollmentService();
+        if (service == null) return;
+
+        service.getOrderById(orderId).enqueue(new Callback<ApiResponse<OrderDetailResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<OrderDetailResponse>> call, Response<ApiResponse<OrderDetailResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    orderDetail = response.body().getData();
+                    updateUI();
+                } else {
+                    ToastUtil.showCustomToast(OrderDetailActivity.this, "Không thể tải chi tiết đơn hàng");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<OrderDetailResponse>> call, Throwable t) {
+                ToastUtil.showCustomToast(OrderDetailActivity.this, "Lỗi kết nối");
+            }
+        });
     }
 
     private void bindViews() {
@@ -116,17 +152,24 @@ public class OrderDetailActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
+        if (orderDetail == null) return;
+        
         tvOrderId.setText(orderId);
-        tvOrderDate.setText("24/05/2026 14:28");
+        tvOrderDate.setText(orderDetail.getOrderDate() != null ? orderDetail.getOrderDate() : "");
+
+        String paymentStatus = "";
+        if (orderDetail.getPayment() != null && orderDetail.getPayment().getStatus() != null) {
+            paymentStatus = orderDetail.getPayment().getStatus().toUpperCase();
+        }
         
         // Apply status differences
-        if (status == 1) { // Success
+        if ("SUCCESS".equals(paymentStatus) || "COMPLETED".equals(paymentStatus)) { // Success
             statusBanner.setBackgroundResource(R.drawable.bg_btn_primary); // Assuming gradient for success
             ivStatusIcon.setImageResource(R.drawable.ic_check_circle);
             tvStatusTitle.setText("Giao dịch thành công");
             tvStatusSubtitle.setText("Cảm ơn bạn đã mua khóa học.");
             bottomAction.setVisibility(View.VISIBLE);
-        } else if (status == 0) { // Unpaid
+        } else if ("PENDING".equals(paymentStatus) || "".equals(paymentStatus)) { // Unpaid
             statusBanner.setBackgroundColor(Color.parseColor("#FBBF24")); // Amber
             ivStatusIcon.setImageResource(R.drawable.ic_clock); // Use appropriate icon
             tvStatusTitle.setText("Chờ thanh toán");
@@ -135,15 +178,54 @@ public class OrderDetailActivity extends AppCompatActivity {
         } else { // Cancelled
             statusBanner.setBackgroundColor(Color.parseColor("#EF4444")); // Red
             ivStatusIcon.setImageResource(R.drawable.ic_close);
-            tvStatusTitle.setText("Đã hủy");
-            tvStatusSubtitle.setText("Giao dịch này đã bị hủy.");
+            tvStatusTitle.setText("Đã hủy hoặc thất bại");
+            tvStatusSubtitle.setText("Giao dịch này không thành công.");
             bottomAction.setVisibility(View.GONE);
         }
         
-        // Mock payment details
-        tvSubtotal.setText("1.498.000đ");
-        tvDiscount.setText("-299.600đ");
-        tvTotal.setText("1.198.400đ");
-        tvPaymentMethod.setText("Ví MoMo");
+        List<CartItemResponse> displayItems = new ArrayList<>();
+        if (orderDetail.getItems() != null) {
+            for (OrderItemResponse item : orderDetail.getItems()) {
+                CartItemResponse c = new CartItemResponse();
+                c.setId(item.getCourseId());
+                
+                CourseResponse cr = new CourseResponse();
+                cr.setId(item.getCourseId());
+                cr.setTitle(item.getTitle());
+                cr.setPrice(item.getPrice());
+                cr.setDiscountedPrice(item.getDiscountedPrice());
+                
+                InstructorResponse ir = new InstructorResponse();
+                ir.setName("Instructor");
+                cr.setInstructor(ir);
+                
+                c.setCourse(cr);
+                displayItems.add(c);
+            }
+        }
+        
+        // Re-create the adapter because setCourses isn't available
+        adapter = new CheckoutCourseAdapter(displayItems);
+        rvOrderItems.setAdapter(adapter);
+
+        long subtotal = 0;
+        if (orderDetail.getItems() != null) {
+             for (OrderItemResponse item : orderDetail.getItems()) {
+                 subtotal += item.getPrice() != null ? item.getPrice() : 0;
+             }
+        }
+
+        long discount = orderDetail.getDiscounted() != null ? orderDetail.getDiscounted() : 0;
+        long total = orderDetail.getTotalPrice() != null ? orderDetail.getTotalPrice() : (subtotal - discount);
+
+        tvSubtotal.setText(Convert.formatVnd(subtotal));
+        tvDiscount.setText("-" + Convert.formatVnd(discount));
+        tvTotal.setText(Convert.formatVnd(total));
+        
+        if (orderDetail.getPayment() != null && orderDetail.getPayment().getPaymentInfo() != null) {
+            tvPaymentMethod.setText(orderDetail.getPayment().getPaymentInfo());
+        } else {
+            tvPaymentMethod.setText("N/A");
+        }
     }
 }

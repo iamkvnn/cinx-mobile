@@ -15,6 +15,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
 import com.app.cinx.R;
+import com.app.cinx.api.AuthService;
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.dto.ApiResponse;
+import com.app.cinx.api.dto.RegisterRequest;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import android.util.Log;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -91,8 +100,8 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void handleRegister() {
-        String name = inputName.getText().toString();
-        String email = inputEmail.getText().toString();
+        String name = inputName.getText().toString().trim();
+        String email = inputEmail.getText().toString().trim();
         String pass = inputPassword.getText().toString();
         String repass = inputRepassword.getText().toString();
         boolean isValid = true;
@@ -108,11 +117,45 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         if (isValid) {
-            Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-            // Redirect to Login
+            AppCompatButton btnRegister = findViewById(R.id.btn_register);
+            btnRegister.setEnabled(false);
+            btnRegister.setText("Đang đăng ký...");
 
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
+            AuthService authService = RetrofitClient.getInstance().getAuthService();
+            if (authService == null) {
+                btnRegister.setEnabled(true);
+                btnRegister.setText("Đăng ký");
+                return;
+            }
+
+            RegisterRequest req = new RegisterRequest();
+            req.setName(name);
+            req.setEmail(email);
+            req.setPassword(pass);
+            // Default role is USER or handled by backend
+
+            authService.register(req).enqueue(new Callback<ApiResponse<Object>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
+                    btnRegister.setEnabled(true);
+                    btnRegister.setText("Đăng ký");
+                    if (response.isSuccessful()) {
+                        Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                        finish();
+                    } else {
+                        Toast.makeText(RegisterActivity.this, "Đăng ký thất bại", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
+                    btnRegister.setEnabled(true);
+                    btnRegister.setText("Đăng ký");
+                    Log.e("RegisterActivity", "Register error", t);
+                    Toast.makeText(RegisterActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 

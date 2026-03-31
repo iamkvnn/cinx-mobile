@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
-import com.app.cinx.model.CartItem;
+import com.app.cinx.api.dto.CartItemResponse;
 import com.app.cinx.utils.Convert;
 import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -23,9 +23,9 @@ import java.util.List;
 public class CheckoutCourseAdapter
         extends RecyclerView.Adapter<CheckoutCourseAdapter.ViewHolder> {
 
-    private final List<CartItem> items;
+    private final List<CartItemResponse> items;
 
-    public CheckoutCourseAdapter(@NonNull List<CartItem> items) {
+    public CheckoutCourseAdapter(@NonNull List<CartItemResponse> items) {
         this.items = items;
     }
 
@@ -39,7 +39,7 @@ public class CheckoutCourseAdapter
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        CartItem item = items.get(position);
+        CartItemResponse item = items.get(position);
 
         holder.tvTitle.setText(item.getTitle());
         holder.tvInstructor.setText(

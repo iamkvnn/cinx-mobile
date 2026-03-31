@@ -16,7 +16,7 @@ import com.app.cinx.R;
 import com.app.cinx.adapter.CheckoutCourseAdapter;
 import com.app.cinx.adapter.PaymentMethodAdapter;
 import com.app.cinx.data.CartRepository;
-import com.app.cinx.model.CartItem;
+import com.app.cinx.api.dto.CartItemResponse;
 import com.app.cinx.model.PaymentMethod;
 import com.app.cinx.utils.Convert;
 import com.app.cinx.utils.UserManager;
@@ -71,7 +71,7 @@ public class CheckoutActivity extends AppCompatActivity {
     private AppCompatButton btnPlaceOrder;
 
     // ── Data ──────────────────────────────────────────────────────────────
-    private List<CartItem> checkoutItems;  // items carried from cart
+    private List<CartItemResponse> checkoutItems;  // items carried from cart
 
     /** Voucher applied in CartActivity (may be null). */
     private int    voucherPercent = 0;
@@ -113,8 +113,8 @@ public class CheckoutActivity extends AppCompatActivity {
      */
     private void collectCheckoutItems() {
         checkoutItems = new ArrayList<>();
-        List<CartItem> all = CartRepository.getInstance().getItems();
-        for (CartItem item : all) {
+        List<CartItemResponse> all = CartRepository.getInstance().getItems();
+        for (CartItemResponse item : all) {
             if (item.isSelected()) checkoutItems.add(item);
         }
         if (checkoutItems.isEmpty()) {
@@ -205,7 +205,7 @@ public class CheckoutActivity extends AppCompatActivity {
 
     private long calcSubtotal() {
         long sum = 0;
-        for (CartItem item : checkoutItems) sum += item.getSalePrice();
+        for (CartItemResponse item : checkoutItems) sum += item.getSalePrice();
         return sum;
     }
 
@@ -277,7 +277,7 @@ public class CheckoutActivity extends AppCompatActivity {
 
         CreateOrderRequest request = new CreateOrderRequest();
         List<CartItemDto> cartItemDtos = new ArrayList<>();
-        for (CartItem ci : checkoutItems) {
+        for (CartItemResponse ci : checkoutItems) {
             CartItemDto dto = new CartItemDto();
             dto.setId(ci.getId());
             cartItemDtos.add(dto);
@@ -327,7 +327,7 @@ public class CheckoutActivity extends AppCompatActivity {
         UserManager user = UserManager.getInstance();
         String email = (user.isLoggedIn() && user.getUserEmail() != null)
                 ? user.getUserEmail()
-                : "minh.nguyen@example.com";
+                : "khoa.vu@example.com";
 
         Intent intent = new Intent(this, PaymentSuccessActivity.class);
         intent.putExtra(PaymentSuccessActivity.EXTRA_ORDER_CODE, orderCode);

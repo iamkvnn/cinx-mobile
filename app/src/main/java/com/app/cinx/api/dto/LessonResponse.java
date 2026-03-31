@@ -11,13 +11,13 @@ public class LessonResponse {
     public String getTitle() { return title; }
     public void setTitle(String val) { this.title = val; }
 
-    private String description;
-    public String getDescription() { return description; }
-    public void setDescription(String val) { this.description = val; }
-
     private Long duration;
     public Long getDuration() { return duration; }
     public void setDuration(Long val) { this.duration = val; }
+
+    private String lessonType;
+    public String getLessonType() { return lessonType; }
+    public void setLessonType(String val) { this.lessonType = val; }
 
     private Integer orderIndex;
     public Integer getOrderIndex() { return orderIndex; }

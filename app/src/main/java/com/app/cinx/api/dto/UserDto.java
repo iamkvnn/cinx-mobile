@@ -27,4 +27,8 @@ public class UserDto {
     public String getAvatarUrl() { return avatarUrl; }
     public void setAvatarUrl(String val) { this.avatarUrl = val; }
 
+    private Integer xp;
+    public Integer getXp() { return xp; }
+    public void setXp(Integer val) { this.xp = val; }
+
 }

@@ -1,6 +1,7 @@
 package com.app.cinx.data;
 
-import com.app.cinx.model.CartItem;
+import com.app.cinx.api.dto.CartItemResponse;
+import com.app.cinx.api.dto.CourseResponse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,14 +37,14 @@ public class CartRepository {
     // State
     // ─────────────────────────────────────────────────────────────────────
 
-    private final List<CartItem> items = new ArrayList<>();
+    private final List<CartItemResponse> items = new ArrayList<>();
 
     // ─────────────────────────────────────────────────────────────────────
     // Public API
     // ─────────────────────────────────────────────────────────────────────
 
     /** Live list — may be mutated by callers directly or via helpers below. */
-    public List<CartItem> getItems() {
+    public List<CartItemResponse> getItems() {
         return items;
     }
 
@@ -52,20 +53,25 @@ public class CartRepository {
     }
 
     public boolean containsCourse(String courseId) {
-        for (CartItem item : items) {
-            if (item.getId().equals(courseId)) return true;
+        for (CartItemResponse item : items) {
+            String itemId = item.getCourse() != null ? item.getCourse().getId() : item.getId();
+            if (itemId != null && itemId.equals(courseId)) return true;
         }
         return false;
     }
 
-    public void addItem(CartItem item) {
-        if (!containsCourse(item.getId())) {
+    public void addItem(CartItemResponse item) {
+        String itemId = item.getCourse() != null ? item.getCourse().getId() : item.getId();
+        if (itemId != null && !containsCourse(itemId)) {
             items.add(item);
         }
     }
 
     public void removeItem(String courseId) {
-        items.removeIf(item -> item.getId().equals(courseId));
+        items.removeIf(item -> {
+            String itemId = item.getCourse() != null ? item.getCourse().getId() : item.getId();
+            return itemId != null && itemId.equals(courseId);
+        });
     }
 
     public void clear() {
@@ -77,19 +83,6 @@ public class CartRepository {
     // ─────────────────────────────────────────────────────────────────────
 
     private void seedSampleData() {
-        items.addAll(Arrays.asList(
-                new CartItem("1",
-                        "UI/UX Design Masterclass: Từ Cơ Bản Đến Nâng Cao",
-                        "Hà Linh",
-                        1_200_000L, 599_000L,
-                        "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400",
-                        "Design"),
-                new CartItem("2",
-                        "Fullstack React & Node.js cho người mới",
-                        "Minh Tuấn",
-                        1_500_000L, 899_000L,
-                        "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=400",
-                        "Code")
-        ));
+        // No sample data seeded initially
     }
 }

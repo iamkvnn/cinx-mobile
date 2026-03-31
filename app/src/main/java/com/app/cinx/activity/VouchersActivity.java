@@ -19,6 +19,16 @@ import com.app.cinx.adapter.VoucherProfileAdapter;
 import com.app.cinx.model.ProfileVoucher;
 import com.app.cinx.utils.ToastUtil;
 
+import com.app.cinx.api.EnrollmentService;
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.dto.ApiResponse;
+import com.app.cinx.api.dto.PaginatedApiResponseVoucherResponse;
+import com.app.cinx.api.dto.VoucherResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -63,7 +73,7 @@ public class VouchersActivity extends AppCompatActivity
     // ─────────────────────────────────────────────────────────────────
 
     private VoucherProfileAdapter adapter;
-    private final List<ProfileVoucher> allVouchers = buildSampleVouchers();
+    private final List<ProfileVoucher> allVouchers = new ArrayList<>();
     private boolean showingAvailable = true;
 
     // ─────────────────────────────────────────────────────────────────
@@ -80,7 +90,48 @@ public class VouchersActivity extends AppCompatActivity
         setupTabs();
         setupAddCode();
         setupSheet();
-        loadTab(true);
+        
+        fetchVouchers();
+    }
+
+    private void fetchVouchers() {
+        EnrollmentService service = RetrofitClient.getInstance().getEnrollmentService();
+        if (service == null) return;
+        
+        service.getVouchers(null).enqueue(new Callback<PaginatedApiResponseVoucherResponse>() {
+            @Override
+            public void onResponse(Call<PaginatedApiResponseVoucherResponse> call, Response<PaginatedApiResponseVoucherResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    allVouchers.clear();
+                    for (VoucherResponse vr : response.body().getData()) {
+                        int discount = vr.getDiscountAmount() != null ? vr.getDiscountAmount().intValue() : 0;
+                        ProfileVoucher.Status status = ProfileVoucher.Status.AVAILABLE;
+                        // Determine status if possible, default to available
+                        // Since there's no status in VoucherResponse, we'll assumeAVAILABLE
+                        
+                        allVouchers.add(new ProfileVoucher(
+                                vr.getId(),
+                                vr.getCode(), // using code as title
+                                vr.getDescription() != null ? vr.getDescription() : "",
+                                vr.getCode(),
+                                ProfileVoucher.DiscountType.PERCENT, // Assuming % discount
+                                discount,
+                                vr.getValidTo() != null ? vr.getValidTo() : "Không giới hạn",
+                                status,
+                                vr.getQuantity() != null ? vr.getQuantity().intValue() : 1,
+                                R.drawable.bg_voucher_left_purple // Default icon
+                        ));
+                    }
+                    runOnUiThread(() -> loadTab(showingAvailable));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PaginatedApiResponseVoucherResponse> call, Throwable t) {
+                Log.e("VouchersActivity", "Failed to fetch vouchers", t);
+                ToastUtil.showCustomToast(VouchersActivity.this, "Không thể tải danh sách Voucher");
+            }
+        });
     }
 
     // ─────────────────────────────────────────────────────────────────
@@ -182,9 +233,27 @@ public class VouchersActivity extends AppCompatActivity
                 ToastUtil.showCustomToast(this, getString(R.string.voucher_enter_code));
                 return;
             }
-            // TODO: validate code against backend; for now show feedback
-            ToastUtil.showCustomToast(this, getString(R.string.voucher_code_saved, code));
-            etVoucherCode.setText("");
+            
+            EnrollmentService service = RetrofitClient.getInstance().getEnrollmentService();
+            if (service != null) {
+                service.getVoucherByCode(code).enqueue(new Callback<ApiResponse<VoucherResponse>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<VoucherResponse>> call, Response<ApiResponse<VoucherResponse>> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                            ToastUtil.showCustomToast(VouchersActivity.this, getString(R.string.voucher_code_saved, code));
+                            etVoucherCode.setText("");
+                            fetchVouchers(); // Reload list
+                        } else {
+                            ToastUtil.showCustomToast(VouchersActivity.this, "Mã voucher không hợp lệ");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<VoucherResponse>> call, Throwable t) {
+                        ToastUtil.showCustomToast(VouchersActivity.this, "Lỗi kết nối");
+                    }
+                });
+            }
         });
     }
 
@@ -292,47 +361,6 @@ public class VouchersActivity extends AppCompatActivity
                 "Mỗi tài khoản chỉ được sử dụng voucher 1 lần duy nhất.",
                 "Không áp dụng đồng thời cùng các mã giảm giá khác.",
                 "Voucher không có giá trị quy đổi thành tiền mặt dưới mọi hình thức."
-        );
-    }
-
-    private List<ProfileVoucher> buildSampleVouchers() {
-        return Arrays.asList(
-                new ProfileVoucher(
-                        "v001",
-                        "Ưu đãi thành viên mới",
-                        "Áp dụng cho mọi khóa học trên hệ thống. Giảm 20% tổng đơn.",
-                        "VOUCHER20",
-                        ProfileVoucher.DiscountType.PERCENT,
-                        20,
-                        "30/06/2026",
-                        ProfileVoucher.Status.AVAILABLE,
-                        1,
-                        R.drawable.bg_voucher_left_purple
-                ),
-                new ProfileVoucher(
-                        "v002",
-                        "Giảm trực tiếp 100K",
-                        "Áp dụng cho danh mục Design & Code. Đơn tối thiểu 500K.",
-                        "SAVE100",
-                        ProfileVoucher.DiscountType.FIXED,
-                        100,
-                        "15/07/2026",
-                        ProfileVoucher.Status.AVAILABLE,
-                        0,
-                        R.drawable.bg_voucher_left_teal
-                ),
-                new ProfileVoucher(
-                        "v003",
-                        "Flash Sale 30%",
-                        "Voucher chương trình Flash Sale tháng 3/2026.",
-                        "FLASH30",
-                        ProfileVoucher.DiscountType.PERCENT,
-                        30,
-                        "31/03/2026",
-                        ProfileVoucher.Status.EXPIRED,
-                        0,
-                        R.drawable.bg_voucher_left_gray
-                )
         );
     }
 }

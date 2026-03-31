@@ -9,6 +9,9 @@ public interface NotificationService {
     @POST("api/v1/notifications/{notificationId}/toggle-read")
     Call<ApiResponse<Void>> toggleRead(@Path("notificationId") String notificationId);
 
+    @POST("api/v1/notifications/test-push")
+    Call<ApiResponse<Void>> testPushNotification(@Query("title") String title, @Query("body") String body);
+
     @GET("api/v1/notifications")
     Call<PaginatedApiResponseUserNotificationResponse> getNotifications(@Query("page") Integer page, @Query("size") Integer size);
 
