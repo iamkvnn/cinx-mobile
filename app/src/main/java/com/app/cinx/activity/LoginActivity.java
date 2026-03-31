@@ -146,6 +146,32 @@ public class LoginActivity extends AppCompatActivity {
                     } else {
                         btnLogin.setEnabled(true);
                         btnLogin.setText("Đăng nhập");
+
+                        try {
+                            if (response.errorBody() != null) {
+                                String errorBodyStr = response.errorBody().string();
+                                if (errorBodyStr.contains("User email is not verified")) {
+                                    AuthService as = RetrofitClient.getInstance().getAuthService();
+                                    if(as != null) {
+                                        com.app.cinx.api.dto.SendOtpRequest sreq = new com.app.cinx.api.dto.SendOtpRequest();
+                                        sreq.setEmail(email);
+                                        as.resendOtp(sreq).enqueue(new Callback<ApiResponse<Object>>() {
+                                            @Override
+                                            public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> res) {}
+                                            @Override
+                                            public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {}
+                                        });
+                                    }
+                                    Intent intent = new Intent(LoginActivity.this, VerifyOtpActivity.class);
+                                    intent.putExtra("EMAIL", email);
+                                    startActivity(intent);
+                                    return;
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
                         Toast.makeText(LoginActivity.this, "Đăng nhập thất bại: Sai email hoặc mật khẩu", Toast.LENGTH_SHORT).show();
                     }
                 }

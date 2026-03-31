@@ -1,9 +1,6 @@
 package com.app.cinx.activity;
-
 import android.content.Intent;
-import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.Looper;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -15,157 +12,93 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.os.Bundle;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
-
 import com.app.cinx.R;
 import com.app.cinx.api.AuthService;
 import com.app.cinx.api.RetrofitClient;
 import com.app.cinx.api.dto.ApiResponse;
 import com.app.cinx.api.dto.ResetPasswordRequest;
 import com.app.cinx.api.dto.SendOtpRequest;
-import com.app.cinx.api.dto.VerifyEmailRequest;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import android.util.Log;
-
 public class ForgotPasswordActivity extends AppCompatActivity {
-
-    // Views (steps)
-    private LinearLayout viewForgot, viewOtp, viewReset, viewSuccess;
-
-    // Step 1
+    private LinearLayout viewForm, viewSuccess;
     private EditText inputEmail;
-
-    // Step 2
+    private AppCompatButton btnSendOtp;
     private EditText otp1, otp2, otp3, otp4, otp5, otp6;
-    private TextView tvOtpEmail, btnResendOtp;
-    private CountDownTimer resendTimer;
-    private int resendSeconds = 30;
-    
-    private String verifiedOtp = "";
-
-    // Step 3
     private EditText inputNewPassword, inputConfirmPassword;
     private ImageView iconEyeNew;
-    private View strengthBar1, strengthBar2, strengthBar3, strengthBar4;
+    private AppCompatButton btnUpdatePassword;
     private boolean isNewPasswordVisible = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
-
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
-
         bindViews();
-        setupBackButton();
-        setupStep1();
-        setupStep2();
-        setupStep3();
-        setupStep4();
+        setupActions();
     }
-
     private void bindViews() {
-        viewForgot = findViewById(R.id.view_forgot);
-        viewOtp    = findViewById(R.id.view_otp);
-        viewReset  = findViewById(R.id.view_reset);
+        viewForm = findViewById(R.id.view_form);
         viewSuccess = findViewById(R.id.view_success);
-
         inputEmail = findViewById(R.id.input_email);
-
+        btnSendOtp = findViewById(R.id.btn_send_otp);
         otp1 = findViewById(R.id.otp_1);
         otp2 = findViewById(R.id.otp_2);
         otp3 = findViewById(R.id.otp_3);
         otp4 = findViewById(R.id.otp_4);
         otp5 = findViewById(R.id.otp_5);
         otp6 = findViewById(R.id.otp_6);
-        tvOtpEmail  = findViewById(R.id.tv_otp_email);
-        btnResendOtp = findViewById(R.id.btn_resend_otp);
-
-        inputNewPassword     = findViewById(R.id.input_new_password);
+        inputNewPassword = findViewById(R.id.input_new_password);
         inputConfirmPassword = findViewById(R.id.input_confirm_password);
-        iconEyeNew   = findViewById(R.id.icon_eye_new);
-        strengthBar1 = findViewById(R.id.strength_bar_1);
-        strengthBar2 = findViewById(R.id.strength_bar_2);
-        strengthBar3 = findViewById(R.id.strength_bar_3);
-        strengthBar4 = findViewById(R.id.strength_bar_4);
-    }
-
-    private void setupBackButton() {
+        iconEyeNew = findViewById(R.id.icon_eye_new);
+        btnUpdatePassword = findViewById(R.id.btn_update_password);
         ImageView btnBack = findViewById(R.id.btn_back);
-        btnBack.setOnClickListener(v -> {
-            if (viewOtp.getVisibility() == View.VISIBLE) {
-                showView(viewForgot);
-            } else if (viewReset.getVisibility() == View.VISIBLE) {
-                showView(viewOtp);
-            } else {
+        if(btnBack != null) btnBack.setOnClickListener(v -> finish());
+        AppCompatButton btnGoLogin = findViewById(R.id.btn_go_login);
+        if(btnGoLogin != null) {
+            btnGoLogin.setOnClickListener(v -> {
+                Intent intent = new Intent(ForgotPasswordActivity.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
                 finish();
-            }
-        });
+            });
+        }
     }
-
-    // ─── STEP 1: EMAIL INPUT ────────────────────────────────────────────────
-    private void setupStep1() {
-        AppCompatButton btnSendOtp = findViewById(R.id.btn_send_otp);
+    private void setupActions() {
         btnSendOtp.setOnClickListener(v -> {
             String email = inputEmail.getText().toString().trim();
-            if (email.isEmpty()) {
-                inputEmail.setError("Vui lòng nhập email");
-                shakeView(inputEmail);
-                return;
-            }
-            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                inputEmail.setError("Email không hợp lệ");
-                shakeView(inputEmail);
-                return;
-            }
-            
+            if (email.isEmpty()) { inputEmail.setError("Vui lòng nhập email"); shakeView(inputEmail); return; }
             btnSendOtp.setEnabled(false);
             btnSendOtp.setText("Đang gửi...");
-
             AuthService authService = RetrofitClient.getInstance().getAuthService();
             if (authService == null) return;
-            
             SendOtpRequest req = new SendOtpRequest();
             req.setEmail(email);
-
             authService.sendChangePasswordOtp(req).enqueue(new Callback<ApiResponse<Object>>() {
                 @Override
                 public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
                     btnSendOtp.setEnabled(true);
-                    btnSendOtp.setText("Gửi mã OTP");
+                    btnSendOtp.setText("Gửi lại mã OTP");
                     if (response.isSuccessful()) {
-                        // Display masked email and move to OTP view
-                        tvOtpEmail.setText(maskEmail(email));
-                        showView(viewOtp);
-                        startResendTimer();
-                        otp1.requestFocus();
                         Toast.makeText(ForgotPasswordActivity.this, "Đã gửi mã OTP", Toast.LENGTH_SHORT).show();
+                        otp1.requestFocus();
                     } else {
                         Toast.makeText(ForgotPasswordActivity.this, "Không thể gửi OTP", Toast.LENGTH_SHORT).show();
                     }
                 }
-
                 @Override
                 public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
                     btnSendOtp.setEnabled(true);
                     btnSendOtp.setText("Gửi mã OTP");
-                    Log.e("ForgotPwd", "Error sending OTP", t);
                     Toast.makeText(ForgotPasswordActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
                 }
             });
         });
-    }
-
-    // ─── STEP 2: OTP VERIFICATION ───────────────────────────────────────────
-    private void setupStep2() {
         EditText[] otpFields = {otp1, otp2, otp3, otp4, otp5, otp6};
         for (int i = 0; i < otpFields.length; i++) {
             final int index = i;
@@ -180,10 +113,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 }
             });
             otpFields[i].setOnKeyListener((v, keyCode, event) -> {
-                if (keyCode == android.view.KeyEvent.KEYCODE_DEL
-                        && event.getAction() == android.view.KeyEvent.ACTION_DOWN
-                        && otpFields[index].getText().toString().isEmpty()
-                        && index > 0) {
+                if (keyCode == android.view.KeyEvent.KEYCODE_DEL && event.getAction() == android.view.KeyEvent.ACTION_DOWN && otpFields[index].getText().toString().isEmpty() && index > 0) {
                     otpFields[index - 1].requestFocus();
                     otpFields[index - 1].setText("");
                     return true;
@@ -191,246 +121,61 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 return false;
             });
         }
-
-        AppCompatButton btnVerifyOtp = findViewById(R.id.btn_verify_otp);
-        btnVerifyOtp.setOnClickListener(v -> {
-            String code = otp1.getText().toString()
-                    + otp2.getText().toString()
-                    + otp3.getText().toString()
-                    + otp4.getText().toString()
-                    + otp5.getText().toString()
-                    + otp6.getText().toString();
-            if (code.length() < 6) {
-                shakeView(findViewById(R.id.otp_container));
-                return;
+        iconEyeNew.setOnClickListener(v -> {
+            if (isNewPasswordVisible) {
+                inputNewPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                iconEyeNew.setImageResource(R.drawable.ic_eye);
+                iconEyeNew.setColorFilter(getColor(R.color.text_secondary));
+            } else {
+                inputNewPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                iconEyeNew.setImageResource(R.drawable.ic_eye_off);
+                iconEyeNew.setColorFilter(getColor(R.color.primary));
             }
-            
-            btnVerifyOtp.setEnabled(false);
-            btnVerifyOtp.setText("Đang xác thực...");
-
-            AuthService authService = RetrofitClient.getInstance().getAuthService();
-            if (authService == null) return;
-            
-            VerifyEmailRequest req = new VerifyEmailRequest();
-            req.setEmail(inputEmail.getText().toString().trim());
-            req.setOtp(code);
-            
-            authService.verifyOtp(req).enqueue(new Callback<ApiResponse<Object>>() {
-                @Override
-                public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
-                    btnVerifyOtp.setEnabled(true);
-                    btnVerifyOtp.setText("Xác nhận");
-                    if (response.isSuccessful()) {
-                        verifiedOtp = code;
-                        cancelResendTimer();
-                        showView(viewReset);
-                        inputNewPassword.requestFocus();
-                    } else {
-                        Toast.makeText(ForgotPasswordActivity.this, "Mã OTP không chính xác", Toast.LENGTH_SHORT).show();
-                        shakeView(findViewById(R.id.otp_container));
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
-                    btnVerifyOtp.setEnabled(true);
-                    btnVerifyOtp.setText("Xác nhận");
-                    Log.e("ForgotPwd", "Error verifying OTP", t);
-                    Toast.makeText(ForgotPasswordActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
-                }
-            });
+            inputNewPassword.setSelection(inputNewPassword.getText().length());
+            isNewPasswordVisible = !isNewPasswordVisible;
         });
-
-        btnResendOtp.setOnClickListener(v -> {
-            if (btnResendOtp.isEnabled()) {
-                String email = inputEmail.getText().toString().trim();
-                AuthService authService = RetrofitClient.getInstance().getAuthService();
-                if (authService != null) {
-                    SendOtpRequest req = new SendOtpRequest();
-                    req.setEmail(email);
-                    authService.sendChangePasswordOtp(req).enqueue(new Callback<ApiResponse<Object>>() {
-                        @Override
-                        public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
-                            if (response.isSuccessful()) {
-                                Toast.makeText(ForgotPasswordActivity.this, "Đã gửi lại mã OTP", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {}
-                    });
-                }
-                
-                // Clear OTP fields
-                for (EditText f : otpFields) f.setText("");
-                otp1.requestFocus();
-                startResendTimer();
-            }
-        });
-    }
-
-    // ─── STEP 3: RESET PASSWORD ─────────────────────────────────────────────
-    private void setupStep3() {
-        iconEyeNew.setOnClickListener(v -> togglePasswordVisibility());
-
-        inputNewPassword.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                updateStrengthBars(s.toString());
-            }
-            @Override public void afterTextChanged(Editable s) {}
-        });
-
-        AppCompatButton btnUpdate = findViewById(R.id.btn_update_password);
-        btnUpdate.setOnClickListener(v -> {
+        btnUpdatePassword.setOnClickListener(v -> {
+            String email = inputEmail.getText().toString().trim();
+            String code = otp1.getText().toString() + otp2.getText().toString() + otp3.getText().toString() + otp4.getText().toString() + otp5.getText().toString() + otp6.getText().toString();
             String password = inputNewPassword.getText().toString();
             String confirm  = inputConfirmPassword.getText().toString();
-
-            if (password.isEmpty()) {
-                inputNewPassword.setError("Vui lòng nhập mật khẩu");
-                shakeView(inputNewPassword);
-                return;
-            }
-            if (password.length() < 6) {
-                inputNewPassword.setError("Mật khẩu tối thiểu 6 ký tự");
-                shakeView(inputNewPassword);
-                return;
-            }
-            if (!password.equals(confirm)) {
-                inputConfirmPassword.setError("Mật khẩu không khớp");
-                shakeView(inputConfirmPassword);
-                return;
-            }
-            
-            btnUpdate.setEnabled(false);
-            btnUpdate.setText("Đang cập nhật...");
-
+            if (email.isEmpty()) { inputEmail.setError("Email rỗng"); return; }
+            if (code.length() < 6) { shakeView(findViewById(R.id.otp_container)); return; }
+            if (password.isEmpty()) { inputNewPassword.setError("Mật khẩu rỗng"); return; }
+            if (!password.equals(confirm)) { inputConfirmPassword.setError("Không khớp"); return; }
+            btnUpdatePassword.setEnabled(false);
+            btnUpdatePassword.setText("Đang cập nhật...");
             AuthService authService = RetrofitClient.getInstance().getAuthService();
             if (authService == null) return;
-            
             ResetPasswordRequest req = new ResetPasswordRequest();
-            req.setEmail(inputEmail.getText().toString().trim());
-            req.setOtp(verifiedOtp);
+            req.setEmail(email);
+            req.setOtp(code);
             req.setNewPassword(password);
-            
             authService.resetPassword(req).enqueue(new Callback<ApiResponse<Object>>() {
                 @Override
                 public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
-                    btnUpdate.setEnabled(true);
-                    btnUpdate.setText("Cập nhật mật khẩu");
+                    btnUpdatePassword.setEnabled(true);
+                    btnUpdatePassword.setText("Cập nhật mật khẩu");
                     if (response.isSuccessful()) {
-                        showView(viewSuccess);
+                        viewForm.setVisibility(View.GONE);
+                        viewSuccess.setVisibility(View.VISIBLE);
                     } else {
-                        Toast.makeText(ForgotPasswordActivity.this, "Đổi mật khẩu thất bại", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ForgotPasswordActivity.this, "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
                     }
                 }
-
                 @Override
                 public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
-                    btnUpdate.setEnabled(true);
-                    btnUpdate.setText("Cập nhật mật khẩu");
-                    Log.e("ForgotPwd", "Error resetting password", t);
+                    btnUpdatePassword.setEnabled(true);
+                    btnUpdatePassword.setText("Cập nhật mật khẩu");
                     Toast.makeText(ForgotPasswordActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
                 }
             });
         });
     }
-
-    // ─── STEP 4: SUCCESS ────────────────────────────────────────────────────
-    private void setupStep4() {
-        AppCompatButton btnGoLogin = findViewById(R.id.btn_go_login);
-        btnGoLogin.setOnClickListener(v -> {
-            Intent intent = new Intent(ForgotPasswordActivity.this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-            finish();
-        });
-    }
-
-    // ─── HELPERS ────────────────────────────────────────────────────────────
-
-    private void showView(LinearLayout target) {
-        viewForgot.setVisibility(View.GONE);
-        viewOtp.setVisibility(View.GONE);
-        viewReset.setVisibility(View.GONE);
-        viewSuccess.setVisibility(View.GONE);
-        target.setVisibility(View.VISIBLE);
-    }
-
-    private void togglePasswordVisibility() {
-        if (isNewPasswordVisible) {
-            inputNewPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            iconEyeNew.setImageResource(R.drawable.ic_eye);
-            iconEyeNew.setColorFilter(getColor(R.color.text_secondary));
-        } else {
-            inputNewPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-            iconEyeNew.setImageResource(R.drawable.ic_eye_off);
-            iconEyeNew.setColorFilter(getColor(R.color.primary));
-        }
-        inputNewPassword.setSelection(inputNewPassword.getText().length());
-        isNewPasswordVisible = !isNewPasswordVisible;
-    }
-
-    private void updateStrengthBars(String password) {
-        int strength = 0;
-        if (password.length() >= 6)                               strength++;
-        if (password.length() >= 10)                              strength++;
-        if (password.matches(".*[A-Z].*") || password.matches(".*[0-9].*")) strength++;
-        if (password.matches(".*[^a-zA-Z0-9].*"))                strength++;
-
-        int[] colors = {0xFFEF4444, 0xFFF97316, 0xFF22C55E, 0xFF10B981};
-        int activeColor = strength > 0 ? colors[Math.min(strength - 1, 3)] : 0xFFE2E8F0;
-        int inactiveColor = 0xFFE2E8F0;
-
-        strengthBar1.setBackgroundColor(strength >= 1 ? activeColor : inactiveColor);
-        strengthBar2.setBackgroundColor(strength >= 2 ? activeColor : inactiveColor);
-        strengthBar3.setBackgroundColor(strength >= 3 ? activeColor : inactiveColor);
-        strengthBar4.setBackgroundColor(strength >= 4 ? activeColor : inactiveColor);
-    }
-
-    private String maskEmail(String email) {
-        int at = email.indexOf('@');
-        if (at <= 2) return email;
-        return email.substring(0, 3) + "***" + email.substring(at);
-    }
-
-    private void startResendTimer() {
-        btnResendOtp.setEnabled(false);
-        btnResendOtp.setTextColor(getColor(R.color.text_placeholder));
-        resendSeconds = 30;
-        if (resendTimer != null) resendTimer.cancel();
-        resendTimer = new CountDownTimer(30_000, 1_000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                resendSeconds = (int) (millisUntilFinished / 1000);
-                btnResendOtp.setText("Gửi lại (" + resendSeconds + "s)");
-            }
-            @Override
-            public void onFinish() {
-                btnResendOtp.setText("Gửi lại");
-                btnResendOtp.setEnabled(true);
-                btnResendOtp.setTextColor(getColor(R.color.primary));
-            }
-        }.start();
-    }
-
-    private void cancelResendTimer() {
-        if (resendTimer != null) {
-            resendTimer.cancel();
-            resendTimer = null;
-        }
-    }
-
     private void shakeView(View view) {
         Animation shake = new TranslateAnimation(0, 10, 0, 0);
         shake.setInterpolator(new android.view.animation.CycleInterpolator(5));
         shake.setDuration(300);
         view.startAnimation(shake);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        cancelResendTimer();
     }
 }
