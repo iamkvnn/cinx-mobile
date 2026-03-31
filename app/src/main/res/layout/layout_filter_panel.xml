@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="300dp"
+    android:layout_width="320dp"
     android:layout_height="match_parent"
     android:background="#F8FAFC"
     android:clickable="true"
@@ -44,11 +44,13 @@
                 android:textStyle="bold" />
 
             <RadioGroup
+                android:id="@+id/rgSort"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp">
 
                 <RadioButton
+                    android:id="@+id/rbSortPopular"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:checked="true"
@@ -57,6 +59,7 @@
                     android:textSize="15sp" />
 
                 <RadioButton
+                    android:id="@+id/rbSortNewest"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Mới nhất"
@@ -64,13 +67,15 @@
                     android:textSize="15sp" />
 
                 <RadioButton
+                    android:id="@+id/rbSortPriceAsc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Giá thấp đến cao"
                     android:paddingStart="8dp"
                     android:textSize="15sp" />
-                    
+
                  <RadioButton
+                    android:id="@+id/rbSortPriceDesc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Giá cao đến thấp"
@@ -78,37 +83,7 @@
                     android:textSize="15sp" />
             </RadioGroup>
 
-            <!-- Price Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:text="Mức giá"
-                android:textColor="#64748B"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-                
-            <CheckBox
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Miễn phí"
-                android:textSize="15sp"/>
-                
-            <CheckBox
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Trả phí"
-                android:textSize="15sp"/>
-                
-            <CheckBox
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Đang khuyến mãi"
-                android:textSize="15sp"/>
-
-             <View android:layout_width="match_parent" android:layout_height="24dp"/>
-
-             <!-- Category Section -->
+            <!-- Category Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -117,26 +92,16 @@
                 android:textColor="#64748B"
                 android:textSize="14sp"
                 android:textStyle="bold" />
-            
+
              <com.google.android.material.chip.ChipGroup
+                android:id="@+id/cgCategories"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <com.google.android.material.chip.Chip
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/Widget.MaterialComponents.Chip.Filter"
-                    android:text="Lập trình"/>
-                <com.google.android.material.chip.Chip
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/Widget.MaterialComponents.Chip.Filter"
-                    android:text="Thiết kế"/>
-                <com.google.android.material.chip.Chip
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/Widget.MaterialComponents.Chip.Filter"
-                    android:text="Business"/>
+                android:layout_height="wrap_content"
+                app:singleSelection="true"
+                app:selectionRequired="false">
              </com.google.android.material.chip.ChipGroup>
+
+             <View android:layout_width="match_parent" android:layout_height="24dp"/>
 
         </LinearLayout>
     </ScrollView>
@@ -167,7 +132,7 @@
             android:layout_height="56dp"
             android:layout_weight="1"
             android:backgroundTint="@color/primary"
-            android:text="Xem (45)"
+            android:text="Cập nhật"
             app:cornerRadius="16dp" />
 
     </LinearLayout>

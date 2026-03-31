@@ -108,7 +108,13 @@
             android:screenOrientation="portrait" />
 
         <activity android:name=".activity.OrderDetailActivity" android:exported="false" android:screenOrientation="portrait" />
-            <activity android:name=".activity.VerifyOtpActivity" android:exported="false"/>
-    </application>
+        <activity android:name=".activity.VerifyOtpActivity" android:exported="false"/>
+
+        <activity android:name=".activity.CourseListActivity" android:exported="false" android:screenOrientation="portrait" />
+
+        <activity android:name=".activity.InstructorDashboardActivity" android:exported="false" android:screenOrientation="portrait" />
+
+    <activity android:name=".activity.CourseOutlineActivity" android:exported="false" android:screenOrientation="portrait" />    <activity android:name=".activity.LessonEditorActivity" android:exported="false" android:screenOrientation="portrait" />
+</application>
 
 </manifest>

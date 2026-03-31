@@ -70,7 +70,7 @@ public interface CourseService {
     Call<ApiResponse<Object>> deleteArticleLesson(@Query("lessonId") String lessonId);
 
     @GET("api/v1/courses")
-    Call<PaginatedApiResponseCourseResponse> getAllCourses(@Query("apiQuery") PaginatedApiQuery apiQuery, @Query("categoryId") String categoryId);
+    Call<PaginatedApiResponseCourseResponse> getAllCourses(@Query("apiQuery") PaginatedApiQuery apiQuery, @Query("categoryId") String categoryId, @Query("instructorId") String instructorId);
 
     @POST("api/v1/courses")
     Call<ApiResponse<CourseResponse>> createCourse(@Body CreateCourseRequest body);

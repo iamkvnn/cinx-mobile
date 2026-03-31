@@ -27,8 +27,6 @@ public class EnrolledCourse {
     // ── PROGRESS-specific ────────────────────────────────────────────────────
 
     private int    progress;      // 0–100
-    private String nextLesson;
-    private String lastAccessed;
 
     // ── COMPLETED-specific ───────────────────────────────────────────────────
 
@@ -56,13 +54,10 @@ public class EnrolledCourse {
 
     public static EnrolledCourse progress(int id, String title, String instructor,
                                           String imageUrl, String category,
-                                          int progress, String nextLesson,
-                                          String lastAccessed) {
+                                          int progress) {
         EnrolledCourse c = new EnrolledCourse(id, title, instructor,
                 imageUrl, category, Status.PROGRESS);
         c.progress     = progress;
-        c.nextLesson   = nextLesson;
-        c.lastAccessed = lastAccessed;
         return c;
     }
 
@@ -95,8 +90,6 @@ public class EnrolledCourse {
     public String getCategory()       { return category; }
     public Status getStatus()         { return status; }
     public int    getProgress()       { return progress; }
-    public String getNextLesson()     { return nextLesson; }
-    public String getLastAccessed()   { return lastAccessed; }
     public String getCompletionDate() { return completionDate; }
     public String getGrade()          { return grade; }
     public String getOriginalPrice()  { return originalPrice; }

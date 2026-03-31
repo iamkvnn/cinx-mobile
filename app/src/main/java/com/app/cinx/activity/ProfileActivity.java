@@ -119,7 +119,21 @@ public class ProfileActivity extends AppCompatActivity {
         setupEditProfileListener();
         setupToggles();
 
-        NavHelper.setupNavigation(this, R.id.navProfile);
+        boolean isInstructorView = getIntent().getBooleanExtra("IS_INSTRUCTOR_VIEW", false);
+        View navStudent = findViewById(R.id.navStudent);
+        View navInstructor = findViewById(R.id.navInstructor);
+        
+        if (isInstructorView || "INSTRUCTOR".equalsIgnoreCase(UserManager.getInstance().getUserRole())) {
+            if (navStudent != null) navStudent.setVisibility(View.GONE);
+            if (navInstructor != null) navInstructor.setVisibility(View.VISIBLE);
+            
+            NavHelper.setupInstructorNavigation(this, R.id.navInstProfile);
+        } else {
+            if (navStudent != null) navStudent.setVisibility(View.VISIBLE);
+            if (navInstructor != null) navInstructor.setVisibility(View.GONE);
+            
+            NavHelper.setupNavigation(this, R.id.navProfile);
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────
@@ -207,6 +221,7 @@ public class ProfileActivity extends AppCompatActivity {
                             currentUserDto.getAvatarUrl(),
                             currentUserDto.getRole()
                     );
+                    UserManager.getInstance().setUserXp(currentUserDto.getXp() != null ? currentUserDto.getXp() : 0);
                     runOnUiThread(() -> updateProfileUI(currentUserDto));
                 }
             }
@@ -300,6 +315,7 @@ public class ProfileActivity extends AppCompatActivity {
                             if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                                 currentUserDto = response.body().getData();
                                 UserManager.getInstance().setUserName(currentUserDto.getName());
+                                UserManager.getInstance().setUserXp(currentUserDto.getXp() != null ? currentUserDto.getXp() : 0);
                                 runOnUiThread(() -> {
                                     updateProfileUI(currentUserDto);
                                     ToastUtil.showCustomToast(ProfileActivity.this, "Cập nhật hồ sơ thành công");

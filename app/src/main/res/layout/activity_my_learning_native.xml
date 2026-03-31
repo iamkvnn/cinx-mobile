@@ -334,31 +334,57 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="MỤC TIÊU HÔM NAY"
+                            android:text="MỤC TIÊU XP TRONG NGÀY"
                             android:textSize="12sp"
                             android:textStyle="bold"
+                            android:textAllCaps="true"
                             android:textColor="@color/text_secondary" />
-
-                        <TextView
-                            android:id="@+id/tvGoalsProgress"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="2/3 Done"
-                            android:textSize="10sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/primary"
-                            android:background="@drawable/border_panel"
-                            android:backgroundTint="#E6FFFFFF"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="2dp" />
                     </LinearLayout>
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/goalsRecyclerView"
+                                
+                    <LinearLayout
+                        android:id="@+id/layoutGoalContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false"
-                        android:overScrollMode="never" />
+                        android:background="@drawable/glass_card_bg"
+                        android:padding="16dp"
+                        android:orientation="vertical">
+                        
+                        <TextView
+                            android:id="@+id/tvDailyGoalText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Chưa có mục tiêu cho ngày này"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_primary"
+                            android:layout_marginBottom="12dp" />
+
+                        <ProgressBar
+                            android:id="@+id/pbDailyGoal"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:progressDrawable="@drawable/bg_progress_bar_ml"
+                            android:max="100" />
+                            
+                        <TextView
+                            android:id="@+id/tvDailyGoalXp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="0 / 0 XP"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_secondary"
+                            android:gravity="end"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+                    
+                    <Button
+                        android:id="@+id/btnManageGoal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Thiết lập Mục tiêu"
+                        android:layout_marginTop="12dp"
+                        style="@style/Widget.MaterialComponents.Button" />
                 </LinearLayout>
 
                 <!-- Spacing -->

@@ -39,15 +39,21 @@ import com.app.cinx.api.dto.CategoryResponse;
 import com.app.cinx.api.dto.CourseResponse;
 import com.app.cinx.api.dto.PaginatedApiQuery;
 import com.app.cinx.api.dto.PaginatedApiResponseCourseResponse;
+import com.app.cinx.adapter.CourseAdapter;
+import android.widget.EditText;
+import android.view.inputmethod.EditorInfo;
 
 public class DiscoveryActivity extends AppCompatActivity {
 
-    private DrawerLayout drawerLayout;
     private ImageView    btnFilter;
     private FrameLayout  btnCartBadge;
     private TextView     tvCartBadge;
     private RecyclerView coursesRecyclerView;
     private RecyclerView categoriesRecyclerView;
+    private RecyclerView bestSellersRecyclerView;
+    private EditText     etSearch;
+
+    private String currentCategoryId = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,12 +66,13 @@ public class DiscoveryActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        drawerLayout         = findViewById(R.id.drawerLayout);
         btnFilter            = findViewById(R.id.btnFilter);
         btnCartBadge         = findViewById(R.id.btnCartBadgeDiscovery);
         tvCartBadge          = findViewById(R.id.tvCartBadgeDiscovery);
         coursesRecyclerView  = findViewById(R.id.coursesRecyclerView);
         categoriesRecyclerView = findViewById(R.id.categoriesRecyclerView);
+        bestSellersRecyclerView = findViewById(R.id.bestSellersRecyclerView);
+        etSearch             = findViewById(R.id.etSearch);
 
         // Cart button
         if (btnCartBadge != null) {
@@ -73,30 +80,24 @@ public class DiscoveryActivity extends AppCompatActivity {
                     startActivity(new Intent(this, CartActivity.class)));
         }
 
-        // Filter button
+        // Filter button goes directly to CourseListActivity and opens drawer? No, just opens it.
         btnFilter.setOnClickListener(v -> {
-            if (drawerLayout != null) {
-                drawerLayout.openDrawer(GravityCompat.END);
-            }
+            Intent intent = new Intent(DiscoveryActivity.this, CourseListActivity.class);
+            if (currentCategoryId != null) intent.putExtra("CATEGORY_ID", currentCategoryId);
+            startActivity(intent);
         });
 
-        // Setup Drawer Buttons (Clear, Apply)
-        findViewById(R.id.btnClear).setOnClickListener(v -> {
-             // Logic to clear filters
-             if (drawerLayout != null) drawerLayout.closeDrawer(GravityCompat.END);
+        // Setup Search
+        etSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                Intent intent = new Intent(DiscoveryActivity.this, CourseListActivity.class);
+                intent.putExtra("SEARCH_QUERY", etSearch.getText().toString());
+                if (currentCategoryId != null) intent.putExtra("CATEGORY_ID", currentCategoryId);
+                startActivity(intent);
+                return true;
+            }
+            return false;
         });
-        
-        findViewById(R.id.btnApply).setOnClickListener(v -> {
-             // Logic to apply filters
-             if (drawerLayout != null) drawerLayout.closeDrawer(GravityCompat.END);
-        });
-        
-        // Setup Featured Image
-        ImageView featuredImage = findViewById(R.id.featuredImage);
-        Glide.with(this)
-             .load("https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=600&auto=format&fit=crop")
-             .centerCrop()
-             .into(featuredImage);
     }
 
     private void setupNavigation() {
@@ -145,9 +146,54 @@ public class DiscoveryActivity extends AppCompatActivity {
             }
         });
 
+        // Setup Best Sellers
+        bestSellersRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        PaginatedApiQuery bestSellerQuery = new PaginatedApiQuery();
+        bestSellerQuery.setPage(1);
+        bestSellerQuery.setSize(5);
+        bestSellerQuery.setSort("{\"enrollmentCount\":\"desc\"}");
+        
+        courseService.getAllCourses(bestSellerQuery, null, null).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
+            @Override
+            public void onResponse(Call<PaginatedApiResponseCourseResponse> call, Response<PaginatedApiResponseCourseResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    List<CourseResponse> courseResponses = response.body().getData();
+                    CourseAdapter adapter = new CourseAdapter(courseResponses, new CourseAdapter.OnCourseClickListener() {
+                        @Override
+                        public void onCourseClick(CourseResponse course) {
+                            Intent intent = new Intent(DiscoveryActivity.this, CourseDetailActivity.class);
+                            intent.putExtra("COURSE_ID", course.getId());
+                            startActivity(intent);
+                        }
+                        
+                        @Override
+                        public void onFavoriteClick(CourseResponse course) {
+                            // handle favorite
+                        }
+                    });
+                    bestSellersRecyclerView.setAdapter(adapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PaginatedApiResponseCourseResponse> call, Throwable t) {
+                // handle error
+            }
+        });
+
         // Setup Courses
         coursesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        courseService.getAllCourses(null, null).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
+        loadCourses(null, null);
+    }
+
+    private void loadCourses(String queryStr, String categoryId) {
+        CourseService courseService = RetrofitClient.getInstance().getCourseService();
+        PaginatedApiQuery query = null;
+        if (queryStr != null && !queryStr.trim().isEmpty()) {
+            query = new PaginatedApiQuery();
+            query.setQuery(queryStr.trim());
+        }
+        courseService.getAllCourses(query, categoryId, null).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
             @Override
             public void onResponse(Call<PaginatedApiResponseCourseResponse> call, Response<PaginatedApiResponseCourseResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
@@ -206,6 +252,10 @@ public class DiscoveryActivity extends AppCompatActivity {
                 selectedPosition = pos;
                 notifyItemChanged(old);
                 notifyItemChanged(selectedPosition);
+                
+                currentCategoryId = categories.get(pos).getId();
+                String queryStr = etSearch.getText().toString();
+                loadCourses(queryStr, currentCategoryId);
             });
         }
 

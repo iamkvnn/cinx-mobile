@@ -16,6 +16,7 @@ public class UserManager {
     private static final String KEY_USER_NAME = "user_name";
     private static final String KEY_USER_AVATAR = "user_avatar";
     private static final String KEY_USER_ROLE = "user_role";
+    private static final String KEY_USER_XP = "user_xp";
 
     private UserManager() {
         prefs = CinxApp.getInstance().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -82,5 +83,13 @@ public class UserManager {
     
     public void setUserName(String name) {
         prefs.edit().putString(KEY_USER_NAME, name).apply();
+    }
+
+    public int getUserXp() {
+        return prefs.getInt(KEY_USER_XP, 0);
+    }
+
+    public void setUserXp(int xp) {
+        prefs.edit().putInt(KEY_USER_XP, xp).apply();
     }
 }

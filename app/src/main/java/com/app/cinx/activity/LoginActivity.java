@@ -209,6 +209,7 @@ public class LoginActivity extends AppCompatActivity {
                                 userDto.getAvatarUrl(),
                                 userDto.getRole()
                         );
+                        UserManager.getInstance().setUserXp(userDto.getXp() != null ? userDto.getXp() : 0);
                     } else {
                         UserManager.getInstance().login(fallbackEmail);
                     }
@@ -229,7 +230,15 @@ public class LoginActivity extends AppCompatActivity {
 
     private void navigateToMain() {
         Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        
+        Intent intent;
+        String role = UserManager.getInstance().getUserRole();
+        if ("INSTRUCTOR".equalsIgnoreCase(role)) {
+            intent = new Intent(LoginActivity.this, InstructorDashboardActivity.class);
+        } else {
+            intent = new Intent(LoginActivity.this, MainActivity.class);
+        }
+        
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

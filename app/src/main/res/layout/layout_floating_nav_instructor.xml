@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/floatingNav"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="32dp"
+    android:background="@drawable/glass_nav_bg"
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="10dp"
+    android:elevation="24dp"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:animateLayoutChanges="true">
+
+    <!-- Courses Tab -->
+    <LinearLayout
+        android:id="@+id/navInstCourses"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="6dp"
+        android:minHeight="48dp"
+        android:background="@android:color/transparent">
+
+        <ImageView
+            android:id="@+id/navInstCoursesIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_book"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/navInstCoursesText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Khóa học"
+            android:textColor="@color/primary"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Certificate Requests Tab -->
+    <LinearLayout
+        android:id="@+id/navInstCert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="6dp"
+        android:minHeight="48dp"
+        android:background="@android:color/transparent">
+
+        <ImageView
+            android:id="@+id/navInstCertIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_certificate"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/navInstCertText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chứng chỉ"
+            android:textColor="@color/primary"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Stats Tab -->
+    <LinearLayout
+        android:id="@+id/navInstStats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="6dp"
+        android:minHeight="48dp"
+        android:background="@android:color/transparent">
+
+        <ImageView
+            android:id="@+id/navInstStatsIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_bar_chart"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/navInstStatsText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thống kê"
+            android:textColor="@color/primary"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Profile Tab -->
+    <LinearLayout
+        android:id="@+id/navInstProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="6dp"
+        android:minHeight="48dp"
+        android:background="@android:color/transparent">
+
+        <ImageView
+            android:id="@+id/navInstProfileIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_person"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/navInstProfileText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tôi"
+            android:textColor="@color/primary"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -60,6 +60,64 @@ public class NavHelper {
         });
     }
 
+    public static void setupInstructorNavigation(Activity activity, int activeTabId) {
+        View coursesBtn = activity.findViewById(R.id.navInstCourses);
+        View certBtn = activity.findViewById(R.id.navInstCert);
+        View statsBtn = activity.findViewById(R.id.navInstStats);
+        View profileBtn = activity.findViewById(R.id.navInstProfile);
+
+        // Set active state visually
+        setActiveState(coursesBtn, activeTabId == R.id.navInstCourses);
+        setActiveState(certBtn, activeTabId == R.id.navInstCert);
+        setActiveState(statsBtn, activeTabId == R.id.navInstStats);
+        setActiveState(profileBtn, activeTabId == R.id.navInstProfile);
+
+        // Actions
+        if (coursesBtn != null) {
+            coursesBtn.setOnClickListener(v -> {
+                if (activeTabId != R.id.navInstCourses) {
+                    Intent intent = new Intent(activity, com.app.cinx.activity.InstructorDashboardActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    activity.startActivity(intent);
+                }
+            });
+        }
+
+        if (certBtn != null) {
+            certBtn.setOnClickListener(v -> {
+                if (activeTabId != R.id.navInstCert) {
+                    // Intent intent = new Intent(activity, InstructorCertificatesActivity.class);
+                    // intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    // activity.startActivity(intent);
+                    android.widget.Toast.makeText(activity, "Chức năng duyệt Chứng chỉ đang xây dựng", android.widget.Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        if (statsBtn != null) {
+            statsBtn.setOnClickListener(v -> {
+                if (activeTabId != R.id.navInstStats) {
+                    // Intent intent = new Intent(activity, InstructorStatsActivity.class);
+                    // intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    // activity.startActivity(intent);
+                    android.widget.Toast.makeText(activity, "Chức năng Thống kê đang xây dựng", android.widget.Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        if (profileBtn != null) {
+            profileBtn.setOnClickListener(v -> {
+                if (activeTabId != R.id.navInstProfile) {
+                    Intent intent = new Intent(activity, ProfileActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    // Pass a flag to indicate it's an instructor profile so the bottom nav renders correctly
+                    intent.putExtra("IS_INSTRUCTOR_VIEW", true);
+                    activity.startActivity(intent);
+                }
+            });
+        }
+    }
+
     private static void setActiveState(View view, boolean isActive) {
         if (view instanceof ViewGroup) {
             ViewGroup container = (ViewGroup) view;

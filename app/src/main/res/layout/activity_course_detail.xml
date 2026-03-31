@@ -201,6 +201,7 @@
                     android:background="@drawable/bg_white_card"
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="5dp"
+                    android:id="@+id/tvCourseCategory"
                     android:text="DESIGN"
                     android:textColor="@color/primary"
                     android:textSize="10sp"
@@ -263,6 +264,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
                         <TextView
+                            android:id="@+id/tvCourseRating"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="4.9"
@@ -270,6 +272,7 @@
                             android:textSize="18sp"
                             android:textStyle="bold" />
                         <TextView
+                            android:id="@+id/tvCourseReviewCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="(12.5k đánh giá)"
@@ -307,6 +310,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
                         <TextView
+                            android:id="@+id/tvCourseStudents"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="34k+"
@@ -340,6 +344,7 @@
                     android:background="@drawable/bg_avatar_orange"
                     android:layout_marginEnd="14dp">
                     <TextView
+                        android:id="@+id/tvInstructorInitials"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -361,6 +366,7 @@
                         android:textColor="@color/text_secondary"
                         android:textSize="11sp" />
                     <TextView
+                        android:id="@+id/tvInstructorName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Hà Linh (Senior UI/UX)"
@@ -441,9 +447,9 @@
                                 android:layout_marginEnd="10dp" android:layout_marginTop="1dp"
                                 android:src="@drawable/ic_check_circle"
                                 app:tint="#22C55E" />
-                            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                            <TextView android:id="@+id/tvCourseBenefit1" android:layout_width="0dp" android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Sử dụng thành thạo Figma từ cơ bản đến Auto Layout, Components."
+                                android:text="Sử dụng thành thạo kĩ năng cơ bản."
                                 android:textColor="@color/text_secondary" android:textSize="14sp"
                                 android:lineSpacingExtra="2dp" />
                         </LinearLayout>
@@ -454,9 +460,9 @@
                                 android:layout_marginEnd="10dp" android:layout_marginTop="1dp"
                                 android:src="@drawable/ic_check_circle"
                                 app:tint="#22C55E" />
-                            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                            <TextView android:id="@+id/tvCourseBenefit2" android:layout_width="0dp" android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Quy trình thiết kế chuẩn UX Research, Wireframe, UI Design, Prototyping."
+                                android:text="Quy trình thiết kế chuẩn chuyên nghiệp."
                                 android:textColor="@color/text_secondary" android:textSize="14sp"
                                 android:lineSpacingExtra="2dp" />
                         </LinearLayout>
@@ -467,9 +473,9 @@
                                 android:layout_marginEnd="10dp" android:layout_marginTop="1dp"
                                 android:src="@drawable/ic_check_circle"
                                 app:tint="#22C55E" />
-                            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                            <TextView android:id="@+id/tvCourseBenefit3" android:layout_width="0dp" android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Xây dựng Portfolio ấn tượng để ứng tuyển các công ty công nghệ."
+                                android:text="Xây dựng Portfolio ấn tượng."
                                 android:textColor="@color/text_secondary" android:textSize="14sp"
                                 android:lineSpacingExtra="2dp" />
                         </LinearLayout>
@@ -491,7 +497,7 @@
                                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                                     android:text="Thời lượng" android:textColor="@color/text_secondary"
                                     android:textSize="11sp" android:layout_marginBottom="2dp" />
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                <TextView android:id="@+id/tvCourseDuration" android:layout_width="wrap_content" android:layout_height="wrap_content"
                                     android:text="24 Giờ" android:textColor="@color/text_primary"
                                     android:textSize="15sp" android:textStyle="bold" />
                             </LinearLayout>
@@ -505,7 +511,7 @@
                                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                                     android:text="Chứng chỉ" android:textColor="@color/text_secondary"
                                     android:textSize="11sp" android:layout_marginBottom="2dp" />
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                <TextView android:id="@+id/tvCourseCertificate" android:layout_width="wrap_content" android:layout_height="wrap_content"
                                     android:text="Cấp sau khóa học" android:textColor="@color/text_primary"
                                     android:textSize="13sp" android:textStyle="bold" android:gravity="center" />
                             </LinearLayout>
@@ -629,7 +635,7 @@
 
                         <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
                             android:orientation="vertical" android:gravity="center" android:layout_marginEnd="20dp">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            <TextView android:id="@+id/tvCourseTabRating" android:layout_width="wrap_content" android:layout_height="wrap_content"
                                 android:text="4.9" android:textColor="@color/text_primary"
                                 android:textSize="40sp" android:textStyle="bold" />
                             <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -646,8 +652,8 @@
 
                                 <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_star"  app:tint="@color/star_color" />
                             </LinearLayout>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="12,500 đánh giá" android:textColor="@color/text_secondary"
+                            <TextView android:id="@+id/tvCourseTabReviewCount" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="" android:textColor="@color/text_secondary"
                                 android:textSize="11sp" />
                         </LinearLayout>
 
@@ -700,10 +706,10 @@
                                 android:layout_marginEnd="12dp"/>
                             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                                 android:layout_weight="1" android:orientation="vertical">
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                    android:text="Minh Tuấn" android:textColor="@color/text_primary"
+                                <TextView android:id="@+id/tvReview1Name" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Người dùng" android:textColor="@color/text_primary"
                                     android:textSize="14sp" android:textStyle="bold" />
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                <TextView android:id="@+id/tvReview1Date" android:layout_width="wrap_content" android:layout_height="wrap_content"
                                     android:text="2 ngày trước" android:textColor="@color/text_secondary"
                                     android:textSize="12sp" />
                             </LinearLayout>
@@ -722,8 +728,8 @@
                                 <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_star"  app:tint="@color/star_color" />
                             </LinearLayout>
                         </LinearLayout>
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:text="Khóa học rất chi tiết và dễ hiểu. Nhờ thực hành theo project cuối khóa mà mình đã pass phỏng vấn Fresher UI/UX. Cảm ơn mentor Hà Linh!"
+                        <TextView android:id="@+id/tvReview1Content" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="Khóa học rất chi tiết và dễ hiểu. Rất hữu ích!"
                             android:textColor="@color/text_secondary" android:textSize="14sp" android:lineSpacingExtra="3dp" />
                     </LinearLayout>
 
@@ -738,10 +744,10 @@
                                 android:layout_marginEnd="12dp"/>
                             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                                 android:layout_weight="1" android:orientation="vertical">
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                    android:text="Thảo My" android:textColor="@color/text_primary"
+                                <TextView android:id="@+id/tvReview2Name" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Học viên" android:textColor="@color/text_primary"
                                     android:textSize="14sp" android:textStyle="bold" />
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                <TextView android:id="@+id/tvReview2Date" android:layout_width="wrap_content" android:layout_height="wrap_content"
                                     android:text="1 tuần trước" android:textColor="@color/text_secondary"
                                     android:textSize="12sp" />
                             </LinearLayout>
@@ -760,8 +766,8 @@
                                 <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_star"  app:tint="#E2E8F0" />
                             </LinearLayout>
                         </LinearLayout>
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:text="Nội dung Auto Layout duoc giai thich rat ky, tuy nhien phan Prototyping hoi luot nhanh. Nhin chung van rat dang tien."
+                        <TextView android:id="@+id/tvReview2Content" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="Nội dung truyền đạt rất tốt, tuy nhiên ở phần sau hơi lướt nhanh."
                             android:textColor="@color/text_secondary" android:textSize="14sp" android:lineSpacingExtra="3dp" />
                     </LinearLayout>
                 </LinearLayout>

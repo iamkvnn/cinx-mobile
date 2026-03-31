@@ -20,7 +20,24 @@
         app:layout_constraintBottom_toBottomOf="parent"
         tools:src="@tools:sample/backgrounds/scenic" />
 
-    <!-- Content (Right) -->
+    <!-- Discount Badge (Top-Right corner of card) -->
+    <TextView
+        android:id="@+id/discountRate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_ml_badge"
+        android:paddingHorizontal="6dp"
+        android:paddingVertical="3dp"
+        android:textColor="#EC4899"
+        android:textSize="9sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="-30%"
+        tools:visibility="visible" />
+
+    <!-- Content (Right of image) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -30,7 +47,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Top Row: Category + Price -->
         <TextView
             android:id="@+id/courseCategory"
             android:layout_width="wrap_content"
@@ -46,55 +62,6 @@
             android:textAllCaps="true"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <LinearLayout
-            android:id="@+id/priceContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="end"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-                
-                <TextView
-                    android:id="@+id/discountRate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_ml_badge"
-                    android:paddingHorizontal="4dp"
-                    android:paddingVertical="2dp"
-                    android:layout_marginEnd="4dp"
-                    android:textColor="#EC4899"
-                    android:textSize="9sp"
-                    android:textStyle="bold"
-                    android:visibility="gone"
-                    tools:text="-30%" />
-                    
-                <TextView
-                    android:id="@+id/originalPrice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="10sp"
-                    android:textColor="@color/text_secondary"
-                    android:visibility="gone"
-                    tools:text="800.000" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/coursePrice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@color/primary"
-                tools:text="599.000" />
-        </LinearLayout>
 
         <!-- Title -->
         <TextView
@@ -112,7 +79,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/courseCategory" />
 
-        <!-- Description (Instructor/Subtitle) -->
+        <!-- Description -->
         <TextView
             android:id="@+id/courseDesc"
             android:layout_width="0dp"
@@ -127,15 +94,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/courseTitle" />
 
-        <!-- Bottom Row: Duration + Rating -->
+        <!-- Bottom Row: Duration + Rating (left) -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/metaContainer"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="6dp"
             android:gravity="center_vertical"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/courseDesc">
+            app:layout_constraintEnd_toStartOf="@id/priceContainer"
+            app:layout_constraintTop_toBottomOf="@id/courseDesc"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <!-- Duration -->
             <ImageView
@@ -143,8 +113,8 @@
                 android:layout_height="12dp"
                 android:src="@drawable/ic_play"
                 app:tint="#94A3B8"
-                android:layout_marginEnd="4dp"/>
-            
+                android:layout_marginEnd="4dp" />
+
             <TextView
                 android:id="@+id/courseDuration"
                 android:layout_width="wrap_content"
@@ -153,7 +123,7 @@
                 android:textSize="10sp"
                 android:textColor="#94A3B8"
                 android:textStyle="bold"
-                android:layout_marginEnd="12dp"/>
+                android:layout_marginEnd="12dp" />
 
             <!-- Rating -->
             <ImageView
@@ -161,7 +131,7 @@
                 android:layout_height="12dp"
                 android:src="@drawable/ic_star"
                 app:tint="#FBBF24"
-                android:layout_marginEnd="4dp"/>
+                android:layout_marginEnd="4dp" />
 
             <TextView
                 android:id="@+id/courseRating"
@@ -170,7 +140,38 @@
                 android:text="4.8"
                 android:textSize="10sp"
                 android:textColor="#94A3B8"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Price (bottom-right): original price strikethrough + final price -->
+        <LinearLayout
+            android:id="@+id/priceContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="end"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/courseDesc"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:id="@+id/originalPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="@color/text_secondary"
+                android:visibility="gone"
+                tools:text="800.000" />
+
+            <TextView
+                android:id="@+id/coursePrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                tools:text="599.000đ" />
 
         </LinearLayout>
 

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface LearningService {
     @GET("api/v1/daily-goals")
-    Call<ApiResponse<DailyGoalResponse>> getDailyGoal();
+    Call<ApiResponse<DailyGoalResponse>> getDailyGoal(@Query("date") String date);
 
     @PUT("api/v1/daily-goals")
     Call<ApiResponse<DailyGoalResponse>> editDailyGoal(@Body SetDailyGoalRequest body);
@@ -16,7 +16,7 @@ public interface LearningService {
     Call<ApiResponse<DailyGoalResponse>> setDailyGoal(@Body SetDailyGoalRequest body);
 
     @DELETE("api/v1/daily-goals")
-    Call<ApiResponse<Void>> deleteDailyGoal();
+    Call<ApiResponse<Void>> deleteDailyGoal(@Query("date") String date);
 
     @PUT("api/v1/certificates/requests/{requestId}/reject")
     Call<ApiResponse<CertificateRequestResponse>> rejectCertificate(@Path("requestId") String requestId);
@@ -60,6 +60,9 @@ public interface LearningService {
     @POST("api/v1/learning-paths")
     Call<ApiResponse<LearningPathResponse>> createLearningPath(@Body LearningPathRequest body);
 
+    @POST("api/v1/instructor/assignments/submissions/{submissionId}/grade")
+    Call<ApiResponse<Void>> scoreAssignmentSubmission_1(@Path("submissionId") String submissionId, @Query("score") Double score);
+
     @POST("api/v1/certificates/apply/{courseId}")
     Call<ApiResponse<CertificateRequestResponse>> applyForCertificate(@Path("courseId") String courseId);
 
@@ -98,6 +101,21 @@ public interface LearningService {
 
     @DELETE("api/v1/learning-paths/active")
     Call<ApiResponse<Void>> dropActiveLearningPath();
+
+    @GET("api/v1/instructor/quizzes/{quizId}/analytics")
+    Call<ApiResponse<List<QuizQuestionAnalyticsResponse>>> getQuizAnalytics(@Path("quizId") String quizId);
+
+    @GET("api/v1/instructor/courses/{courseId}/students/{studentId}/progress")
+    Call<ApiResponse<List<LearningItemProgressResponse>>> getStudentProgress(@Path("courseId") String courseId, @Path("studentId") String studentId);
+
+    @GET("api/v1/instructor/courses/{courseId}/progress")
+    Call<ApiResponse<List<CourseProgressResponse>>> getCourseProgress_1(@Path("courseId") String courseId);
+
+    @GET("api/v1/instructor/assignments/{assignmentId}/submissions")
+    Call<PaginatedApiResponseAssignmentSubmissionResponse> getAssignmentSubmissions_1(@Path("assignmentId") String assignmentId, @Query("page") Integer page, @Query("size") Integer size);
+
+    @GET("api/v1/daily-goals/month")
+    Call<ApiResponse<List<DailyGoalResponse>>> getDailyGoalsInMonth(@Query("year") Integer year, @Query("month") Integer month);
 
     @GET("api/v1/certificates/requests/{courseId}")
     Call<PaginatedApiResponseCertificateRequestResponse> getRequestsByCourse(@Path("courseId") String courseId, @Query("status") String status, @Query("page") Integer page, @Query("size") Integer size);

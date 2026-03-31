@@ -132,8 +132,8 @@ public class MyLearningAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         void bind(EnrolledCourse c, OnCourseActionListener l) {
             tvTitle.setText(c.getTitle());
             tvInstructor.setText("Bởi " + c.getInstructor() + "  •  " + c.getCategory());
-            tvLastAccessed.setText(c.getLastAccessed());
-            tvNextLesson.setText(c.getNextLesson());
+            tvLastAccessed.setVisibility(View.GONE);
+            tvNextLesson.setVisibility(View.GONE);
             tvProgress.setText(c.getProgress() + "%");
             progressBar.setProgress(c.getProgress());
 

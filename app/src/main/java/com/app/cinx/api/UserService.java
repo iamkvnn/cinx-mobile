@@ -1,18 +1,17 @@
 package com.app.cinx.api;
 
 import com.app.cinx.api.dto.*;
-import retrofit2.Call;
-import retrofit2.http.*;
-import java.util.List;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.http.*;
+import java.util.List;
 
 public interface UserService {
     @GET("api/v1/users/{id}")
     Call<ApiResponse<UserDto>> getUserById(@Path("id") String id);
 
-    @Multipart
     @PUT("api/v1/users/{id}")
     Call<ApiResponse<UserDto>> updateUser(
             @Path("id") String id,

@@ -123,7 +123,7 @@ public class RecommendedAdapter extends RecyclerView.Adapter<RecommendedAdapter.
             }
 
             Glide.with(itemView.getContext())
-                    .load("https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=800&q=80")
+                    .load("https://img.lovepik.com/photo/40015/9423.jpg_wh860.jpg")
                     .apply(new RequestOptions().transform(new RoundedCorners(24)))
                     .into(courseImage);
 

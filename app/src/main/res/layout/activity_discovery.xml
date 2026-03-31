@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawerLayout"
+    android:id="@+id/mainContentInfo"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     tools:context=".activity.DiscoveryActivity">
-
-    <!-- Main Content -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/mainContentInfo"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/background">
 
         <!-- Background Blobs -->
         <View
@@ -145,6 +139,7 @@
                     android:background="#00FFFFFF">
 
                     <EditText
+                        android:id="@+id/etSearch"
                         android:layout_width="0dp"
                         android:layout_height="56dp"
                         android:layout_weight="1"
@@ -157,7 +152,9 @@
                         android:textColor="@color/text_primary"
                         android:textColorHint="#94A3B8"
                         android:textSize="14sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold"
+                        android:imeOptions="actionSearch"
+                        android:inputType="text"/>
 
                     <ImageView
                         android:id="@+id/btnFilter"
@@ -180,12 +177,11 @@
                     android:paddingHorizontal="24dp"
                     android:layout_marginBottom="16dp"/>
 
-                <!-- Featured Course -->
+                <!-- Featured Course / Best Sellers -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingHorizontal="24dp"
                     android:layout_marginBottom="24dp">
 
                     <TextView
@@ -197,77 +193,16 @@
                         android:textColor="#94A3B8"
                         android:textAllCaps="true"
                         android:letterSpacing="0.05"
-                        android:layout_marginBottom="12dp"/>
-                    
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_marginBottom="12dp"
+                        android:paddingHorizontal="24dp"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/bestSellersRecyclerView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/glass_card_bg"
-                        android:padding="10dp">
-                        
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/featuredImage"
-                            android:layout_width="match_parent"
-                            android:layout_height="180dp"
-                            android:scaleType="centerCrop"
-                            app:shapeAppearanceOverlay="@style/RoundedImageView"
-                            tools:src="@tools:sample/backgrounds/scenic"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"/>
-
-                        <!-- Badges on image -->
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Best Seller"
-                            android:textSize="10sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/white"
-                            android:background="@drawable/glass_card_bg"
-                            android:backgroundTint="#99000000"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="4dp"
-                            app:layout_constraintTop_toTopOf="@id/featuredImage"
-                            app:layout_constraintStart_toStartOf="@id/featuredImage"
-                            android:layout_margin="12dp"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="$89.00"
-                            android:textSize="12sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/black"
-                            android:background="@drawable/glass_nav_bg"
-                            android:paddingHorizontal="10dp"
-                            android:paddingVertical="6dp"
-                            app:layout_constraintBottom_toBottomOf="@id/featuredImage"
-                            app:layout_constraintEnd_toEndOf="@id/featuredImage"
-                            android:layout_margin="12dp"/>
-                            
-                        <TextView
-                            android:id="@+id/featuredTitle"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Mastering UI Motion"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/text_primary"
-                            android:layout_marginTop="12dp"
-                            app:layout_constraintTop_toBottomOf="@id/featuredImage"/>
-
-                        <TextView
-                            android:id="@+id/featuredDesc"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Học cách tạo ra các chuyển động mượt mà, animation phức tạp với After Effects và Figma."
-                            android:textSize="12sp"
-                            android:textColor="@color/text_secondary"
-                            android:layout_marginTop="4dp"
-                            app:layout_constraintTop_toBottomOf="@id/featuredTitle"/>
-                            
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                        android:orientation="horizontal"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="24dp" />
 
                 </LinearLayout>
 
@@ -333,13 +268,5 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Filter Side Panel -->
-    <include 
-        layout="@layout/layout_filter_panel"
-        android:layout_width="320dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="end" />
-
-</androidx.drawerlayout.widget.DrawerLayout>

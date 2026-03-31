@@ -18,10 +18,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
-import com.app.cinx.adapter.GoalAdapter;
 import com.app.cinx.adapter.MyLearningAdapter;
 import com.app.cinx.model.EnrolledCourse;
-import com.app.cinx.model.Goal;
 import com.app.cinx.utils.NavHelper;
 import com.bumptech.glide.Glide;
 
@@ -49,20 +47,25 @@ public class LearningScheduleActivity extends AppCompatActivity {
     private TextView previouslySelectedDayView = null;
 
     // Streak data (day ranges)
-    private final int[][] streakRanges = {{10, 14}, {20, 22}};
-    private final Set<Integer> eventDays = new HashSet<>(Arrays.asList(5, 10, 11, 12, 13, 14, 20, 21, 22, 24));
+    private final Set<Integer> eventDays = new HashSet<>();
+    private Integer streakStartDay = null;
+    private Integer streakEndDay = null;
 
     // Views
     private LinearLayout calendarGrid;
     private TextView tvMonthYear;
     private TextView tvGoalsTitle;
-    private TextView tvGoalsProgress;
-    private RecyclerView goalsRecyclerView;
+    private TextView tvDailyGoalText;
+    private android.widget.ProgressBar pbDailyGoal;
+    private TextView tvDailyGoalXp;
+    private android.widget.Button btnManageGoal;
     private RecyclerView coursesRecyclerView;
     private ImageView imgAvatar;
+    private TextView tvStreakDays;
+    private TextView tvXP;
 
-    // Adapters
-    private GoalAdapter goalAdapter;
+    // Daily Goal state
+    private com.app.cinx.api.dto.DailyGoalResponse currentDailyGoal;
     private List<EnrolledCourse> inProgressCourses;
 
     @Override
@@ -75,48 +78,115 @@ public class LearningScheduleActivity extends AppCompatActivity {
         currentMonth = cal.get(Calendar.MONTH) + 1; // 1-based
         currentYear = cal.get(Calendar.YEAR);
 
-        initMockData();
+        fetchInProgressCourses();
         bindViews();
-        setupGoals();
-        setupCalendar();
+        fetchMyStreak();
+        setupCalendarAndGoals();
         setupAvatar();
         setupCourses();
         setupNavigation();
     }
 
-    private void initMockData() {
+    private void fetchInProgressCourses() {
         inProgressCourses = new ArrayList<>();
-        inProgressCourses.add(EnrolledCourse.progress(1,
-                "UI/UX Design Masterclass: Từ Cơ Bản Đến Nâng Cao", "Hà Linh",
-                "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80",
-                "Design", 65, "Bài 4.2: Component & Auto Layout", "2 giờ trước"));
-        inProgressCourses.add(EnrolledCourse.progress(2,
-                "Fullstack React & Node.js cho người mới", "Minh Tuấn",
-                "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=300&q=80",
-                "Coding", 15, "Bài 2.1: Cài đặt môi trường Node.js", "Hôm qua"));
-        inProgressCourses.add(EnrolledCourse.progress(3,
-                "Mobile App Design với Figma", "Hà Linh",
-                "https://images.unsplash.com/photo-1555099962-4199c345e5dd?w=300&q=80",
-                "Design", 2, "Bài 1.1: Giới thiệu khóa học", "Tuần trước"));
+        com.app.cinx.api.EnrollmentService enrollmentService = com.app.cinx.api.RetrofitClient.getInstance().getEnrollmentService();
+        com.app.cinx.api.LearningService learningService = com.app.cinx.api.RetrofitClient.getInstance().getLearningService();
+        
+        enrollmentService.getEnrolledCourses(1, 100).enqueue(new retrofit2.Callback<com.app.cinx.api.dto.PaginatedApiResponseCourseResponse>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.app.cinx.api.dto.PaginatedApiResponseCourseResponse> call, retrofit2.Response<com.app.cinx.api.dto.PaginatedApiResponseCourseResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    List<com.app.cinx.api.dto.CourseResponse> enrollments = response.body().getData();
+                    if (enrollments.isEmpty()) return;
+                    
+                    List<String> courseIds = new ArrayList<>();
+                    for (com.app.cinx.api.dto.CourseResponse cr : enrollments) {
+                        if (cr != null && cr.getId() != null) courseIds.add(cr.getId());
+                    }
+                    if (courseIds.isEmpty()) return;
+
+                    learningService.getCourseProgressByCourseIds(courseIds).enqueue(new retrofit2.Callback<com.app.cinx.api.dto.ApiResponse<List<com.app.cinx.api.dto.CourseProgressResponse>>>() {
+                        @Override
+                        public void onResponse(retrofit2.Call<com.app.cinx.api.dto.ApiResponse<List<com.app.cinx.api.dto.CourseProgressResponse>>> pCall, retrofit2.Response<com.app.cinx.api.dto.ApiResponse<List<com.app.cinx.api.dto.CourseProgressResponse>>> pResp) {
+                            if (pResp.isSuccessful() && pResp.body() != null && pResp.body().getData() != null) {
+                                List<com.app.cinx.api.dto.CourseProgressResponse> progresses = pResp.body().getData();
+                                
+                                int count = 0;
+                                for (com.app.cinx.api.dto.CourseResponse cr : enrollments) {
+                                    if (count >= 3) break; // max 3 items
+                                    if (cr == null || cr.getId() == null) continue;
+                                    
+                                    com.app.cinx.api.dto.CourseProgressResponse match = null;
+                                    for (com.app.cinx.api.dto.CourseProgressResponse p : progresses) {
+                                        if (cr.getId().equals(p.getCourseId())) {
+                                            match = p;
+                                            break;
+                                        }
+                                    }
+                                    
+                                    boolean isCompleted = match != null && Boolean.TRUE.equals(match.getIsCompleted());
+                                    if (!isCompleted) {
+                                        int id = cr.getId().hashCode();
+                                        String title = cr.getTitle();
+                                        String instructor = (cr.getInstructor() != null && cr.getInstructor().getName() != null) ? cr.getInstructor().getName() : "Unknown";
+                                        String thumbnail = (cr.getImages() != null && !cr.getImages().isEmpty()) ? cr.getImages().get(0).getImageUrl() : "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80";
+                                        String category = cr.getCategory();
+                                        
+                                        int progressPercent = 0;
+                                        if (match != null && match.getTotalItems() != null && match.getTotalItems() > 0 && match.getCompletedItems() != null) {
+                                            progressPercent = (int) (((double) match.getCompletedItems() / match.getTotalItems()) * 100);
+                                        }
+                                        inProgressCourses.add(EnrolledCourse.progress(id, title, instructor, thumbnail, category, progressPercent));
+                                        count++;
+                                    }
+                                }
+                                runOnUiThread(() -> {
+                                    if (coursesRecyclerView.getAdapter() != null) {
+                                        coursesRecyclerView.getAdapter().notifyDataSetChanged();
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(retrofit2.Call<com.app.cinx.api.dto.ApiResponse<List<com.app.cinx.api.dto.CourseProgressResponse>>> pCall, Throwable t) {
+                            android.util.Log.e("LearningSchedule", "Failed to fetch course progress", t);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<com.app.cinx.api.dto.PaginatedApiResponseCourseResponse> call, Throwable t) {
+                android.util.Log.e("LearningSchedule", "Failed to fetch enrollments", t);
+            }
+        });
     }
 
     private void bindViews() {
         tvMonthYear         = findViewById(R.id.tvMonthYear);
         calendarGrid        = findViewById(R.id.calendarGrid);
-        goalsRecyclerView   = findViewById(R.id.goalsRecyclerView);
+        tvDailyGoalText     = findViewById(R.id.tvDailyGoalText);
+        pbDailyGoal         = findViewById(R.id.pbDailyGoal);
+        tvDailyGoalXp       = findViewById(R.id.tvDailyGoalXp);
+        btnManageGoal       = findViewById(R.id.btnManageGoal);
         coursesRecyclerView = findViewById(R.id.coursesRecyclerView);
-        tvGoalsProgress     = findViewById(R.id.tvGoalsProgress);
+        tvStreakDays        = findViewById(R.id.tvStreakDays);
+        tvXP                = findViewById(R.id.tvXP);
+        if (tvXP != null) {
+            tvXP.setText(String.format("%,d", com.app.cinx.utils.UserManager.getInstance().getUserXp()));
+        }
         calendarGrid = findViewById(R.id.calendarGrid);
         tvMonthYear = findViewById(R.id.tvMonthYear);
         tvGoalsTitle = findViewById(R.id.tvGoalsTitle);
-        tvGoalsProgress = findViewById(R.id.tvGoalsProgress);
-        goalsRecyclerView = findViewById(R.id.goalsRecyclerView);
         coursesRecyclerView = findViewById(R.id.coursesRecyclerView);
         imgAvatar = findViewById(R.id.imgAvatar);
 
         // Month navigation
         findViewById(R.id.btnPrevMonth).setOnClickListener(v -> navigateMonth(-1));
         findViewById(R.id.btnNextMonth).setOnClickListener(v -> navigateMonth(1));
+        
+        btnManageGoal.setOnClickListener(v -> showManageGoalDialog());
 
         TextView btnViewAll = findViewById(R.id.btnViewAllCourses);
         btnViewAll.setOnClickListener(v ->
@@ -130,6 +200,74 @@ public class LearningScheduleActivity extends AppCompatActivity {
                 .into(imgAvatar);
     }
 
+    private void fetchMyStreak() {
+        com.app.cinx.api.LearningService ls = com.app.cinx.api.RetrofitClient.getInstance().getLearningService();
+        ls.getMyStreak().enqueue(new retrofit2.Callback<com.app.cinx.api.dto.ApiResponse<com.app.cinx.api.dto.UserStreakResponse>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.app.cinx.api.dto.ApiResponse<com.app.cinx.api.dto.UserStreakResponse>> call, retrofit2.Response<com.app.cinx.api.dto.ApiResponse<com.app.cinx.api.dto.UserStreakResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    com.app.cinx.api.dto.UserStreakResponse streak = response.body().getData();
+                    runOnUiThread(() -> {
+                        int currentStreak = streak.getCurrentStreak() != null ? streak.getCurrentStreak() : 0;
+                        tvStreakDays.setText(currentStreak + " Ngày");
+                        
+                        // Set streak ranges on Calendar
+                        if (currentStreak > 0) {
+                            Calendar today = Calendar.getInstance();
+                            if (currentMonth == today.get(Calendar.MONTH) + 1 && currentYear == today.get(Calendar.YEAR)) {
+                                streakEndDay = today.get(Calendar.DAY_OF_MONTH);
+                                streakStartDay = Math.max(1, streakEndDay - currentStreak + 1);
+                            } else {
+                                streakStartDay = null;
+                                streakEndDay = null;
+                            }
+                        } else {
+                            streakStartDay = null;
+                            streakEndDay = null;
+                        }
+                        
+                        // We will update Calendar streak lines next time it renders or right now
+                        renderCalendar();
+                    });
+                }
+            }
+            @Override
+            public void onFailure(retrofit2.Call<com.app.cinx.api.dto.ApiResponse<com.app.cinx.api.dto.UserStreakResponse>> call, Throwable t) {
+                android.util.Log.e("LearningSchedule", "fetchMyStreak failed", t);
+            }
+        });
+    }
+
+    private void fetchGoalsForMonth(int year, int month) {
+        com.app.cinx.api.LearningService ls = com.app.cinx.api.RetrofitClient.getInstance().getLearningService();
+        ls.getDailyGoalsInMonth(year, month).enqueue(new retrofit2.Callback<com.app.cinx.api.dto.ApiResponse<List<com.app.cinx.api.dto.DailyGoalResponse>>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.app.cinx.api.dto.ApiResponse<List<com.app.cinx.api.dto.DailyGoalResponse>>> call, retrofit2.Response<com.app.cinx.api.dto.ApiResponse<List<com.app.cinx.api.dto.DailyGoalResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    eventDays.clear();
+                    for (com.app.cinx.api.dto.DailyGoalResponse goal : response.body().getData()) {
+                        String date = goal.getGoalDate(); // assuming "YYYY-MM-DD"
+                        if (date != null && date.length() >= 10) {
+                            try {
+                                int dYear = Integer.parseInt(date.substring(0, 4));
+                                int dMonth = Integer.parseInt(date.substring(5, 7));
+                                int dDay = Integer.parseInt(date.substring(8, 10));
+                                if (dYear == year && dMonth == month) {
+                                    eventDays.add(dDay);
+                                }
+                            } catch (Exception e) {}
+                        }
+                    }
+                    runOnUiThread(() -> renderCalendar());
+                }
+            }
+            @Override
+            public void onFailure(retrofit2.Call<com.app.cinx.api.dto.ApiResponse<List<com.app.cinx.api.dto.DailyGoalResponse>>> call, Throwable t) {
+                android.util.Log.e("LearningSchedule", "fetchGoalsForMonth failed", t);
+            }
+        });
+    }
+
     private void navigateMonth(int delta) {
         currentMonth += delta;
         if (currentMonth > 12) {
@@ -141,8 +279,10 @@ public class LearningScheduleActivity extends AppCompatActivity {
         }
         selectedDay = -1;
         previouslySelectedDayView = null;
-        setupCalendar();
-        // Reset goals to default
+        
+        fetchMyStreak();
+        fetchGoalsForMonth(currentYear, currentMonth);
+        renderCalendar();
         loadGoals(-1);
     }
 
@@ -199,14 +339,6 @@ public class LearningScheduleActivity extends AppCompatActivity {
                     if (eventDays.contains(day)) {
                         addEventDot(cell, day == selectedDay);
                     }
-
-                    // Auto-select today or day 24 on first load
-                    Calendar today = Calendar.getInstance();
-                    if (selectedDay == -1 && currentMonth == today.get(Calendar.MONTH) + 1
-                            && currentYear == today.get(Calendar.YEAR)
-                            && day == today.get(Calendar.DAY_OF_MONTH)) {
-                        selectDay(day, dayView);
-                    }
                 }
 
                 rowLayout.addView(cell);
@@ -215,11 +347,7 @@ public class LearningScheduleActivity extends AppCompatActivity {
             calendarGrid.addView(rowLayout);
         }
 
-        // If no day was selected (not current month), select day 1
-        if (selectedDay == -1) {
-            // Find first day view and select it
-            selectFirstDay();
-        }
+        // Wait for user to select a day. No default selection.
     }
 
     private void selectFirstDay() {
@@ -346,11 +474,11 @@ public class LearningScheduleActivity extends AppCompatActivity {
     }
 
     private String getStreakStatus(int day) {
-        for (int[] range : streakRanges) {
-            if (day >= range[0] && day <= range[1]) {
-                if (range[0] == range[1]) return "single";
-                if (day == range[0]) return "start";
-                if (day == range[1]) return "end";
+        if (streakStartDay != null && streakEndDay != null) {
+            if (day >= streakStartDay && day <= streakEndDay) {
+                if (streakStartDay.equals(streakEndDay)) return "single";
+                if (day == streakStartDay) return "start";
+                if (day == streakEndDay) return "end";
                 return "middle";
             }
         }
@@ -358,42 +486,141 @@ public class LearningScheduleActivity extends AppCompatActivity {
     }
 
     // ── Goals ────────────────────────────────────────────────────────────────
-
-    private void setupGoals() {
-        goalsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        goalAdapter = new GoalAdapter(getDefaultGoals());
-        goalsRecyclerView.setAdapter(goalAdapter);
+    
+    private void setupCalendarAndGoals() {
+        fetchGoalsForMonth(currentYear, currentMonth);
+        renderCalendar();
     }
 
     private void loadGoals(int day) {
-        List<Goal> goals;
-        Calendar today = Calendar.getInstance();
-        if (day == today.get(Calendar.DAY_OF_MONTH) && currentMonth == today.get(Calendar.MONTH) + 1
-                && currentYear == today.get(Calendar.YEAR)) {
-            goals = new ArrayList<>();
-            goals.add(new Goal(1, "Hoàn thành Quiz Module 3", true, "30m", "quiz"));
-            goals.add(new Goal(2, "Xem video 'React Hooks'", true, "45m", "video"));
-            goals.add(new Goal(3, "Bài tập thực hành UI", false, "60m", "code"));
-
-            tvGoalsTitle.setText("MỤC TIÊU NGÀY " + day + "/" + currentMonth);
-            tvGoalsProgress.setText("2/3 Done");
-        } else {
-            goals = getDefaultGoals();
-            if (day > 0) {
-                tvGoalsTitle.setText("MỤC TIÊU NGÀY " + day + "/" + currentMonth);
+        if (day <= 0) {
+            Calendar today = Calendar.getInstance();
+            if (currentMonth == today.get(Calendar.MONTH) + 1 && currentYear == today.get(Calendar.YEAR)) {
+                day = today.get(Calendar.DAY_OF_MONTH);
             } else {
-                tvGoalsTitle.setText("MỤC TIÊU HÔM NAY");
+                day = 1;
             }
-            tvGoalsProgress.setText("0/2 Done");
         }
-        goalAdapter.updateGoals(goals);
+        tvGoalsTitle.setText(String.format("MỤC TIÊU NGÀY %02d/%02d/%d", day, currentMonth, currentYear));
+        
+        String dateStr = String.format("%04d-%02d-%02d", currentYear, currentMonth, day);
+        fetchDailyGoal(dateStr);
+    }
+    
+    private void fetchDailyGoal(String dateStr) {
+        com.app.cinx.api.LearningService ls = com.app.cinx.api.RetrofitClient.getInstance().getLearningService();
+        ls.getDailyGoal(dateStr).enqueue(new retrofit2.Callback<com.app.cinx.api.dto.ApiResponse<com.app.cinx.api.dto.DailyGoalResponse>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.app.cinx.api.dto.ApiResponse<com.app.cinx.api.dto.DailyGoalResponse>> call, retrofit2.Response<com.app.cinx.api.dto.ApiResponse<com.app.cinx.api.dto.DailyGoalResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    currentDailyGoal = response.body().getData();
+                    updateDailyGoalUI(currentDailyGoal);
+                } else {
+                    currentDailyGoal = null;
+                    updateDailyGoalUI(null);
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<com.app.cinx.api.dto.ApiResponse<com.app.cinx.api.dto.DailyGoalResponse>> call, Throwable t) {
+                currentDailyGoal = null;
+                updateDailyGoalUI(null);
+            }
+        });
     }
 
-    private List<Goal> getDefaultGoals() {
-        List<Goal> goals = new ArrayList<>();
-        goals.add(new Goal(1, "Nghỉ ngơi hoặc ôn tập nhẹ", false, "--", "rest"));
-        goals.add(new Goal(2, "Thêm mục tiêu mới?", false, "+", "add"));
-        return goals;
+    private void updateDailyGoalUI(com.app.cinx.api.dto.DailyGoalResponse goal) {
+        if (goal == null) {
+            tvDailyGoalText.setText("Bạn chưa thiết lập mục tiêu XP cho ngày này.");
+            pbDailyGoal.setProgress(0);
+            tvDailyGoalXp.setText("0 / 0 XP");
+            btnManageGoal.setText("Thiết lập Mục tiêu");
+        } else {
+            int current = goal.getCurrentXp() != null ? goal.getCurrentXp() : 0;
+            int target = goal.getTargetXp() != null ? goal.getTargetXp() : 0;
+            tvDailyGoalText.setText(current >= target ? "Chúc mừng! Bạn đã hoàn thành mục tiêu ngày." : "Hãy tiếp tục học để đạt mục tiêu!");
+            
+            pbDailyGoal.setMax(target > 0 ? target : 100);
+            pbDailyGoal.setProgress(current);
+            tvDailyGoalXp.setText(current + " / " + target + " XP");
+            btnManageGoal.setText("Chỉnh sửa Mục tiêu");
+        }
+    }
+    
+    private void showManageGoalDialog() {
+        if (selectedDay < 1) return;
+        String dateStr = String.format("%04d-%02d-%02d", currentYear, currentMonth, selectedDay);
+        
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle("Mục tiêu XP");
+        
+        final android.widget.EditText input = new android.widget.EditText(this);
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        if (currentDailyGoal != null && currentDailyGoal.getTargetXp() != null) {
+            input.setText(String.valueOf(currentDailyGoal.getTargetXp()));
+        } else {
+            input.setText("100");
+        }
+        builder.setView(input);
+        
+        builder.setPositiveButton("Lưu", (dialog, which) -> {
+            String val = input.getText().toString();
+            if(!val.isEmpty()) {
+                saveDailyGoal(dateStr, Integer.parseInt(val));
+            }
+        });
+        
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+        
+        if (currentDailyGoal != null) {
+            builder.setNeutralButton("Xóa", (dialog, which) -> deleteDailyGoal(dateStr));
+        }
+        
+        builder.show();
+    }
+    
+    private void saveDailyGoal(String dateStr, int targetXp) {
+        com.app.cinx.api.dto.SetDailyGoalRequest req = new com.app.cinx.api.dto.SetDailyGoalRequest();
+        req.setTargetXp(targetXp);
+        req.setGoalDate(dateStr);
+        
+        com.app.cinx.api.LearningService ls = com.app.cinx.api.RetrofitClient.getInstance().getLearningService();
+        retrofit2.Call<com.app.cinx.api.dto.ApiResponse<com.app.cinx.api.dto.DailyGoalResponse>> call;
+        
+        if (currentDailyGoal == null) {
+            call = ls.setDailyGoal(req);
+        } else {
+            call = ls.editDailyGoal(req);
+        }
+        
+        call.enqueue(new retrofit2.Callback<com.app.cinx.api.dto.ApiResponse<com.app.cinx.api.dto.DailyGoalResponse>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.app.cinx.api.dto.ApiResponse<com.app.cinx.api.dto.DailyGoalResponse>> call, retrofit2.Response<com.app.cinx.api.dto.ApiResponse<com.app.cinx.api.dto.DailyGoalResponse>> response) {
+                fetchDailyGoal(dateStr);
+                renderCalendar(); // Refresh calendar dots
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<com.app.cinx.api.dto.ApiResponse<com.app.cinx.api.dto.DailyGoalResponse>> call, Throwable t) {
+                com.app.cinx.utils.ToastUtil.showCustomToast(LearningScheduleActivity.this, "Lỗi lưu mục tiêu");
+            }
+        });
+    }
+    
+    private void deleteDailyGoal(String dateStr) {
+        com.app.cinx.api.LearningService ls = com.app.cinx.api.RetrofitClient.getInstance().getLearningService();
+        ls.deleteDailyGoal(dateStr).enqueue(new retrofit2.Callback<com.app.cinx.api.dto.ApiResponse<Void>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.app.cinx.api.dto.ApiResponse<Void>> call, retrofit2.Response<com.app.cinx.api.dto.ApiResponse<Void>> response) {
+                fetchDailyGoal(dateStr);
+                renderCalendar();
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<com.app.cinx.api.dto.ApiResponse<Void>> call, Throwable t) {
+                com.app.cinx.utils.ToastUtil.showCustomToast(LearningScheduleActivity.this, "Lỗi xóa mục tiêu");
+            }
+        });
     }
 
     // ── In-progress courses preview ──────────────────────────────────────────

@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.cinx.R;
 import com.app.cinx.adapter.MyLearningAdapter;
+import com.app.cinx.api.LearningService;
 import com.app.cinx.model.EnrolledCourse;
 import com.app.cinx.utils.ToastUtil;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -104,32 +105,76 @@ public class MyLearningActivity extends AppCompatActivity
     
     private void fetchEnrolledCourses() {
         EnrollmentService enrollmentService = RetrofitClient.getInstance().getEnrollmentService();
+        LearningService learningService = RetrofitClient.getInstance().getLearningService();
         enrollmentService.getEnrolledCourses(1, 100).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
             @Override
             public void onResponse(Call<PaginatedApiResponseCourseResponse> call, Response<PaginatedApiResponseCourseResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                     List<CourseResponse> enrollments = response.body().getData();
+                    if (enrollments.isEmpty()) {
+                        runOnUiThread(() -> {
+                            setupTabs();
+                            renderCourses();
+                        });
+                        return;
+                    }
+                    
+                    List<String> courseIds = new ArrayList<>();
                     for (CourseResponse cr : enrollments) {
-                        if (cr == null) continue;
-                        
-                        String idStr = cr.getId();
-                        int id = (idStr != null) ? idStr.hashCode() : 0;
-                        String title = cr.getTitle();
-                        String instructor = cr.getDescription(); // fallback
-                        String thumbnail = "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80";
-                        String category = cr.getCategory();
-                        
-                        // Fake progress since its not in CourseResponse 
-                        boolean isCompleted = false;
-                        if (isCompleted) {
-                            allCourses.add(EnrolledCourse.completed(id, title, instructor, thumbnail, category, "N/A", "N/A"));
-                        } else {
-                            allCourses.add(EnrolledCourse.progress(id, title, instructor, thumbnail, category, 0, "N/A", "N/A"));
+                        if (cr != null && cr.getId() != null) {
+                            courseIds.add(cr.getId());
                         }
                     }
-                    runOnUiThread(() -> {
-                        setupTabs();
-                        renderCourses();
+                    
+                    if (courseIds.isEmpty()) return;
+
+                    learningService.getCourseProgressByCourseIds(courseIds).enqueue(new Callback<ApiResponse<List<com.app.cinx.api.dto.CourseProgressResponse>>>() {
+                        @Override
+                        public void onResponse(Call<ApiResponse<List<com.app.cinx.api.dto.CourseProgressResponse>>> progressCall, Response<ApiResponse<List<com.app.cinx.api.dto.CourseProgressResponse>>> progressResponse) {
+                            if (progressResponse.isSuccessful() && progressResponse.body() != null && progressResponse.body().getData() != null) {
+                                List<com.app.cinx.api.dto.CourseProgressResponse> progresses = progressResponse.body().getData();
+                                
+                                for (CourseResponse cr : enrollments) {
+                                    if (cr == null || cr.getId() == null) continue;
+                                    
+                                    com.app.cinx.api.dto.CourseProgressResponse match = null;
+                                    for (com.app.cinx.api.dto.CourseProgressResponse p : progresses) {
+                                        if (cr.getId().equals(p.getCourseId())) {
+                                            match = p;
+                                            break;
+                                        }
+                                    }
+                                    
+                                    int id = cr.getId().hashCode();
+                                    String title = cr.getTitle();
+                                    String instructor = (cr.getInstructor() != null && cr.getInstructor().getName() != null) ? cr.getInstructor().getName() : "Unknown";
+                                    String thumbnail = (cr.getImages() != null && !cr.getImages().isEmpty()) ? cr.getImages().get(0).getImageUrl() : "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80";
+                                    String category = cr.getCategory();
+                                    
+                                    boolean isCompleted = match != null && Boolean.TRUE.equals(match.getIsCompleted());
+                                    if (isCompleted) {
+                                        String date = match.getCompletionTime() != null ? match.getCompletionTime() : "N/A";
+                                        String grade = match.getAvgScore() != null ? String.valueOf(match.getAvgScore()) : "N/A";
+                                        allCourses.add(EnrolledCourse.completed(id, title, instructor, thumbnail, category, date, grade));
+                                    } else {
+                                        int progressPercent = 0;
+                                        if (match != null && match.getTotalItems() != null && match.getTotalItems() > 0 && match.getCompletedItems() != null) {
+                                            progressPercent = (int) (((double) match.getCompletedItems() / match.getTotalItems()) * 100);
+                                        }
+                                        allCourses.add(EnrolledCourse.progress(id, title, instructor, thumbnail, category, progressPercent));
+                                    }
+                                }
+                                runOnUiThread(() -> {
+                                    setupTabs();
+                                    renderCourses();
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ApiResponse<List<com.app.cinx.api.dto.CourseProgressResponse>>> progressCall, Throwable t) {
+                            Log.e("MyLearning", "Failed to fetch course progress", t);
+                        }
                     });
                 }
             }
@@ -170,8 +215,8 @@ public class MyLearningActivity extends AppCompatActivity
                                 for (CourseResponse course : cr.body().getData()) {
                                     int id = course.getId() != null ? course.getId().hashCode() : 0;
                                     String title = course.getTitle();
-                                    String instructor = course.getDescription(); // fallback
-                                    String thumbnail = "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80";
+                                    String instructor = (course.getInstructor() != null && course.getInstructor().getName() != null) ? course.getInstructor().getName() : "Unknown";
+                                    String thumbnail = (course.getImages() != null && !course.getImages().isEmpty()) ? course.getImages().get(0).getImageUrl() : "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=300&q=80";
                                     String category = course.getCategory();
                                     double rating = course.getRating() != null ? course.getRating() : 0.0;
                                     long price = course.getDiscountedPrice() != null ? course.getDiscountedPrice() : (course.getPrice() != null ? course.getPrice() : 0L);

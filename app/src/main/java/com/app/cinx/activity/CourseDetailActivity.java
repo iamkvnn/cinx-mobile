@@ -5,6 +5,7 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -15,9 +16,12 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import com.app.cinx.R;
 import com.app.cinx.api.dto.LessonResponse;
 import com.app.cinx.api.dto.SectionResponse;
+import com.app.cinx.api.dto.ReviewResponse;
 import com.app.cinx.utils.UserManager;
 import android.widget.Toast;
 import com.app.cinx.adapter.CourseCurriculumAdapter;
@@ -40,8 +44,11 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Locale;
 
 public class CourseDetailActivity extends AppCompatActivity {
 
@@ -202,6 +209,78 @@ public class CourseDetailActivity extends AppCompatActivity {
                 Log.e("CourseDetail", "Failed to fetch details", t);
             }
         });
+        fetchReviews(courseId);
+    }
+
+    private void fetchReviews(String courseId) {
+        RetrofitClient.getInstance().getSocialService().getReviewsByCourseId(courseId).enqueue(new Callback<ApiResponse<List<ReviewResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<ReviewResponse>>> call, Response<ApiResponse<List<ReviewResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    List<ReviewResponse> reviews = response.body().getData();
+                    updateReviewsUI(reviews);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<ReviewResponse>>> call, Throwable t) {
+                Log.e("CourseDetail", "Failed to fetch reviews", t);
+            }
+        });
+    }
+
+    private void updateReviewsUI(List<ReviewResponse> reviews) {
+        TextView tvReview1Name = findViewById(R.id.tvReview1Name);
+        TextView tvReview1Date = findViewById(R.id.tvReview1Date);
+        TextView tvReview1Content = findViewById(R.id.tvReview1Content);
+
+        TextView tvReview2Name = findViewById(R.id.tvReview2Name);
+        TextView tvReview2Date = findViewById(R.id.tvReview2Date);
+        TextView tvReview2Content = findViewById(R.id.tvReview2Content);
+
+        if (reviews == null || reviews.isEmpty()) {
+            if (tvReview1Name != null && tvReview1Name.getParent() != null) {
+                View parent1 = (View) tvReview1Name.getParent().getParent().getParent();
+                if (parent1 != null && parent1 instanceof LinearLayout) {
+                    parent1.setVisibility(View.GONE);
+                }
+            }
+            if (tvReview2Name != null && tvReview2Name.getParent() != null) {
+                View parent2 = (View) tvReview2Name.getParent().getParent().getParent();
+                if (parent2 != null && parent2 instanceof LinearLayout) {
+                    parent2.setVisibility(View.GONE);
+                }
+            }
+            return;
+        }
+
+        if (reviews.size() > 0) {
+            ReviewResponse r1 = reviews.get(0);
+            if (tvReview1Name != null) {
+                tvReview1Name.setText("Học viên");
+            }
+            if (tvReview1Content != null && r1.getContent() != null) {
+                tvReview1Content.setText(r1.getContent());
+            }
+            // Date formatting is optional, I'll set date to empty for now if no creation time is available, or use the string if available
+        }
+        
+        if (reviews.size() > 1) {
+            ReviewResponse r2 = reviews.get(1);
+            if (tvReview2Name != null) {
+                tvReview2Name.setText("Học viên");
+            }
+            if (tvReview2Content != null && r2.getContent() != null) {
+                tvReview2Content.setText(r2.getContent());
+            }
+        } else {
+            if (tvReview2Name != null && tvReview2Name.getParent() != null) {
+                View parent2 = (View) tvReview2Name.getParent().getParent().getParent();
+                if (parent2 != null && parent2 instanceof LinearLayout) {
+                    parent2.setVisibility(View.GONE);
+                }
+            }
+        }
     }
 
     private void updateUIWithCourseDetail(CourseDetailResponse detail) {
@@ -210,8 +289,86 @@ public class CourseDetailActivity extends AppCompatActivity {
             tvCourseTitle.setText(detail.getTitle());
         }
 
+        ImageView ivCourseThumbnail = findViewById(R.id.ivCourseThumbnail);
+        if (ivCourseThumbnail != null && detail.getImages() != null && !detail.getImages().isEmpty()) {
+            String imageUrl = detail.getImages().get(0).getImageUrl();
+            if (imageUrl != null && !imageUrl.isEmpty()) {
+                Glide.with(this).load(imageUrl).into(ivCourseThumbnail);
+            }
+        }
+
         if (tvCourseDescription != null && detail.getDescription() != null) {
             tvCourseDescription.setText(detail.getDescription());
+        }
+
+        TextView tvCourseCategory = findViewById(R.id.tvCourseCategory);
+        if (tvCourseCategory != null && detail.getCategory() != null) {
+            tvCourseCategory.setText(detail.getCategory().toUpperCase());
+        }
+
+        TextView tvCourseRating = findViewById(R.id.tvCourseRating);
+        if (tvCourseRating != null) {
+            if (detail.getRating() != null) {
+                tvCourseRating.setText(String.format(Locale.US, "%.1f", detail.getRating()));
+            } else {
+                tvCourseRating.setText("0.0");
+            }
+        }
+
+        TextView tvCourseReviewCount = findViewById(R.id.tvCourseReviewCount);
+        if (tvCourseReviewCount != null) {
+            // Placeholder since explicit field isn't in DTO yet
+            tvCourseReviewCount.setText("(0 đánh giá)");
+        }
+
+        TextView tvCourseStudents = findViewById(R.id.tvCourseStudents);
+        if (tvCourseStudents != null && detail.getEnrollmentCount() != null) {
+            tvCourseStudents.setText(detail.getEnrollmentCount() + "+");
+        }
+
+        TextView tvCourseDuration = findViewById(R.id.tvCourseDuration);
+        if (tvCourseDuration != null && detail.getDuration() != null) {
+            tvCourseDuration.setText(detail.getDuration() + " Giờ");
+        }
+
+        TextView tvCourseCertificate = findViewById(R.id.tvCourseCertificate);
+        if (tvCourseCertificate != null) {
+            if (detail.getHasCertificate() != null && detail.getHasCertificate()) {
+                 tvCourseCertificate.setText(detail.getCertificateTitle() != null ? detail.getCertificateTitle() : "Cấp sau khóa học");
+            } else {
+                 tvCourseCertificate.setText("Không có chứng chỉ");
+            }
+        }
+
+        TextView tvCourseTabRating = findViewById(R.id.tvCourseTabRating);
+        if (tvCourseTabRating != null) {
+            if (detail.getRating() != null) {
+                tvCourseTabRating.setText(String.format(Locale.US, "%.1f", detail.getRating()));
+            } else {
+                tvCourseTabRating.setText("0.0");
+            }
+        }
+        
+        TextView tvCourseTabReviewCount = findViewById(R.id.tvCourseTabReviewCount);
+        if (tvCourseTabReviewCount != null) {
+            tvCourseTabReviewCount.setText("0 đánh giá");
+        }
+        
+        // Removed whatYouWillLearn binding since the field isn't in DTO yet, 
+        // using static text in XML layout for now.
+
+        TextView tvInstructorName = findViewById(R.id.tvInstructorName);
+        TextView tvInstructorInitials = findViewById(R.id.tvInstructorInitials);
+        if (detail.getInstructor() != null && detail.getInstructor().getName() != null) {
+            String name = detail.getInstructor().getName();
+            if (tvInstructorName != null) tvInstructorName.setText(name);
+            if (tvInstructorInitials != null) {
+                String initials = "";
+                String[] parts = name.split(" ");
+                if (parts.length > 0) initials += parts[0].substring(0, 1).toUpperCase();
+                if (parts.length > 1) initials += parts[parts.length - 1].substring(0, 1).toUpperCase();
+                tvInstructorInitials.setText(initials);
+            }
         }
 
         TextView tvOriginalPrice = findViewById(R.id.tvOriginalPrice);
@@ -241,9 +398,33 @@ public class CourseDetailActivity extends AppCompatActivity {
         // Update curriculum
         if (detail.getSections() != null) {
             chapters = detail.getSections();
+            
+            // Sort chapters by orderIndex
+            Collections.sort(chapters, new Comparator<SectionResponse>() {
+                @Override
+                public int compare(SectionResponse s1, SectionResponse s2) {
+                    Integer o1 = s1.getOrderIndex();
+                    Integer o2 = s2.getOrderIndex();
+                    if (o1 == null) o1 = 0;
+                    if (o2 == null) o2 = 0;
+                    return o1.compareTo(o2);
+                }
+            });
+
             lessons.clear();
             for (SectionResponse sec : chapters) {
                 if (sec.getLessons() != null) {
+                    // Sort lessons in each chapter by orderIndex
+                    Collections.sort(sec.getLessons(), new Comparator<LessonResponse>() {
+                        @Override
+                        public int compare(LessonResponse l1, LessonResponse l2) {
+                            Integer o1 = l1.getOrderIndex();
+                            Integer o2 = l2.getOrderIndex();
+                            if (o1 == null) o1 = 0;
+                            if (o2 == null) o2 = 0;
+                            return o1.compareTo(o2);
+                        }
+                    });
                     lessons.addAll(sec.getLessons());
                 }
             }
