@@ -106,7 +106,7 @@ public class CartActivity extends AppCompatActivity
         EnrollmentService enrollmentService = RetrofitClient.getInstance().getEnrollmentService();
         if (enrollmentService == null) return;
         
-        enrollmentService.getVouchers(null).enqueue(new Callback<PaginatedApiResponseVoucherResponse>() {
+        enrollmentService.getVouchers(1, 20).enqueue(new Callback<PaginatedApiResponseVoucherResponse>() {
             @Override
             public void onResponse(Call<PaginatedApiResponseVoucherResponse> call, Response<PaginatedApiResponseVoucherResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {

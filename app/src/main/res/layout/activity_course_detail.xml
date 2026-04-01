@@ -118,20 +118,6 @@
                     android:layout_height="match_parent"
                     android:background="#33000000" />
 
-                <FrameLayout
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/bg_glass_card"
-                    android:elevation="4dp">
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_play"
-                        app:tint="@color/text_primary" />
-                </FrameLayout>
-
                 <!-- Bookmark button — top-right overlay of the hero image -->
                 <ImageButton
                     android:id="@+id/btnBookmark"

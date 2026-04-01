@@ -79,10 +79,12 @@ public class CourseDetailActivity extends AppCompatActivity {
     private TextView tvCurriculumSummary;
     private TextView tvCurriculumProgress;
     private TextView tvCTT;
+    private TextView tvOriginalPrice;
     private CourseCurriculumAdapter curriculumAdapter;
     // ── Cart badge ──────────────────────────────────────────────────────────────────
     private FrameLayout cartBadgeFrame;
     private TextView     tvCartBadge;
+    private TextView tvCurrentPrice;
     // ── Continue/Start button ─────────────────────────────────────────────
     private AppCompatButton btnStartLearning;
     private AppCompatButton btnRequestCertificate;
@@ -140,30 +142,11 @@ public class CourseDetailActivity extends AppCompatActivity {
         tvCartBadge    = findViewById(R.id.tvCartBadgeDetail);
 
         // Strike-through original price
-        TextView tvOriginalPrice = findViewById(R.id.tvOriginalPrice);
-        TextView tvCurrentPrice = findViewById(R.id.tvCurrentPrice);
+        tvOriginalPrice = findViewById(R.id.tvOriginalPrice);
+        tvCurrentPrice = findViewById(R.id.tvCurrentPrice);
 
         courseIdStr = getIntent().getStringExtra("COURSE_ID");
 
-        long originalPriceVal = getIntent().getLongExtra("COURSE_PRICE", 1200000L);
-        long currentPriceVal = getIntent().getLongExtra("COURSE_DISCOUNTED_PRICE", 599000L);
-        String courseTitle = getIntent().getStringExtra("COURSE_TITLE");
-
-        if (courseTitle != null) {
-            TextView titleView = findViewById(R.id.tvCourseTitle);
-            if (titleView != null) {
-                titleView.setText(courseTitle);
-                tvCTT.setText(courseTitle);
-            }
-        }
-
-        if (tvOriginalPrice != null) {
-            tvOriginalPrice.setText(PriceUtil.formatPrice(originalPriceVal));
-            tvOriginalPrice.setPaintFlags(tvOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-        }
-        if (tvCurrentPrice != null) {
-            tvCurrentPrice.setText(PriceUtil.formatPrice(currentPriceVal));
-        }
 
         if (courseIdStr != null && !courseIdStr.isEmpty()) {
             fetchCourseDetails(courseIdStr);
@@ -301,12 +284,21 @@ public class CourseDetailActivity extends AppCompatActivity {
             tvCourseTitle.setText(detail.getTitle());
         }
 
+        TextView titleView = findViewById(R.id.tvCourseTitle);
+        titleView.setText(detail.getTitle());
+        tvCTT.setText(detail.getTitle());
+
+
+        tvOriginalPrice.setText(PriceUtil.formatPrice(detail.getDiscountedPrice()));
+        tvOriginalPrice.setPaintFlags(tvOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+
+        tvCurrentPrice.setText(PriceUtil.formatPrice(detail.getPrice()));
+
+
         ImageView ivCourseThumbnail = findViewById(R.id.ivCourseThumbnail);
-        if (ivCourseThumbnail != null && detail.getImages() != null && !detail.getImages().isEmpty()) {
-            String imageUrl = detail.getImages().get(0).getImageUrl();
-            if (imageUrl != null && !imageUrl.isEmpty()) {
-                Glide.with(this).load(imageUrl).into(ivCourseThumbnail);
-            }
+        if (ivCourseThumbnail != null) {
+            String imageUrl = "https://img.lovepik.com/photo/40015/9423.jpg_wh860.jpg";
+            Glide.with(this).load(imageUrl).into(ivCourseThumbnail);
         }
 
         if (tvCourseDescription != null && detail.getDescription() != null) {
@@ -329,7 +321,6 @@ public class CourseDetailActivity extends AppCompatActivity {
 
         TextView tvCourseReviewCount = findViewById(R.id.tvCourseReviewCount);
         if (tvCourseReviewCount != null) {
-            // Placeholder since explicit field isn't in DTO yet
             tvCourseReviewCount.setText("(0 đánh giá)");
         }
 

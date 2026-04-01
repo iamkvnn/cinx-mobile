@@ -98,9 +98,9 @@ public class InstructorDashboardActivity extends AppCompatActivity {
 
         com.app.cinx.api.dto.PaginatedApiQuery query = new com.app.cinx.api.dto.PaginatedApiQuery();
         query.setPage(1);
-        query.setSize(20);
+        query.setSize(30);
 
-        courseService.getAllCourses(query, null, instructorId).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
+        courseService.getAllCourses(query.getPage(), query.getSize(), null, null, null, instructorId).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
             @Override
             public void onResponse(Call<PaginatedApiResponseCourseResponse> call, Response<PaginatedApiResponseCourseResponse> response) {
                 pbLoading.setVisibility(View.GONE);

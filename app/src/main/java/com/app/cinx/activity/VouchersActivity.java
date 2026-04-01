@@ -98,7 +98,7 @@ public class VouchersActivity extends AppCompatActivity
         EnrollmentService service = RetrofitClient.getInstance().getEnrollmentService();
         if (service == null) return;
         
-        service.getVouchers(null).enqueue(new Callback<PaginatedApiResponseVoucherResponse>() {
+        service.getVouchers(1, 20).enqueue(new Callback<PaginatedApiResponseVoucherResponse>() {
             @Override
             public void onResponse(Call<PaginatedApiResponseVoucherResponse> call, Response<PaginatedApiResponseVoucherResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {

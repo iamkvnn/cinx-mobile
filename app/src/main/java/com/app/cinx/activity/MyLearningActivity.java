@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.app.cinx.R;
 import com.app.cinx.adapter.MyLearningAdapter;
 import com.app.cinx.api.LearningService;
+import com.app.cinx.api.dto.CertificateRequestResponse;
 import com.app.cinx.model.EnrolledCourse;
 import com.app.cinx.utils.ToastUtil;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -28,6 +29,7 @@ import com.app.cinx.api.RetrofitClient;
 import com.app.cinx.api.dto.ApiResponse;
 import com.app.cinx.api.dto.CourseResponse;
 import com.app.cinx.api.dto.WishlistItemResponse;
+import com.app.cinx.api.dto.CertificateRequestResponse;
 import com.app.cinx.api.CourseService;
 import com.app.cinx.api.dto.PaginatedApiResponseCourseResponse;
 import retrofit2.Call;
@@ -463,7 +465,23 @@ public class MyLearningActivity extends AppCompatActivity
     }
 
     @Override public void onGetCertificate(EnrolledCourse course) {
-        startActivity(new Intent(this, CertificatesActivity.class));
+        LearningService learningService = RetrofitClient.getInstance().getLearningService();
+        learningService.applyForCertificate(course.getCourseId()).enqueue(new Callback<ApiResponse<CertificateRequestResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<CertificateRequestResponse>> call, Response<ApiResponse<CertificateRequestResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    CertificateRequestResponse req = response.body().getData();
+                    ToastUtil.showCustomToast(MyLearningActivity.this, "Đã gửi yêu cầu nhận chứng chỉ! Trạng thái: " + req.getStatus());
+                } else {
+                    ToastUtil.showCustomToast(MyLearningActivity.this, "Yêu cầu đã tồn tại hoặc có lỗi xảy ra");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<CertificateRequestResponse>> call, Throwable t) {
+                ToastUtil.showCustomToast(MyLearningActivity.this, "Lỗi kết nối khi xin chứng chỉ");
+            }
+        });
     }
 
     @Override public void onRateCourse(EnrolledCourse course) {

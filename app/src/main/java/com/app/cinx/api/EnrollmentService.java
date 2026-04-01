@@ -16,7 +16,7 @@ public interface EnrollmentService {
     Call<ApiResponse<Object>> deleteVoucher(@Path("id") String id);
 
     @GET("api/v1/vouchers")
-    Call<PaginatedApiResponseVoucherResponse> getVouchers(@Query("query") PaginatedApiQuery query);
+    Call<PaginatedApiResponseVoucherResponse> getVouchers(@Query("page") int page, @Query("size") int size);
 
     @POST("api/v1/vouchers")
     Call<ApiResponse<Object>> createVoucher(@Body CreateVoucherRequest body);

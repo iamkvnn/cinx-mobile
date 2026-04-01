@@ -153,7 +153,7 @@ public class DiscoveryActivity extends AppCompatActivity {
         bestSellerQuery.setSize(5);
         bestSellerQuery.setSort("{\"enrollmentCount\":\"desc\"}");
         
-        courseService.getAllCourses(bestSellerQuery, null, null).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
+        courseService.getAllCourses(1, 5, null, bestSellerQuery.getSort(), null, null).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
             @Override
             public void onResponse(Call<PaginatedApiResponseCourseResponse> call, Response<PaginatedApiResponseCourseResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
@@ -193,7 +193,7 @@ public class DiscoveryActivity extends AppCompatActivity {
             query = new PaginatedApiQuery();
             query.setQuery(queryStr.trim());
         }
-        courseService.getAllCourses(query, categoryId, null).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
+        courseService.getAllCourses(1, 30, queryStr, null, categoryId, null).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
             @Override
             public void onResponse(Call<PaginatedApiResponseCourseResponse> call, Response<PaginatedApiResponseCourseResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {

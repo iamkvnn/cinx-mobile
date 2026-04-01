@@ -169,7 +169,7 @@ public class CourseListActivity extends AppCompatActivity {
         }
 
         CourseService courseService = RetrofitClient.getInstance().getCourseService();
-        courseService.getAllCourses(query, currentCategoryId, null).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
+        courseService.getAllCourses(1, 30, query.getQuery(), query.getSort(), currentCategoryId, null).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
             @Override
             public void onResponse(Call<PaginatedApiResponseCourseResponse> call, Response<PaginatedApiResponseCourseResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
