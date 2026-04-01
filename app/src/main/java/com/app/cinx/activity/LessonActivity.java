@@ -653,6 +653,7 @@ public class LessonActivity extends AppCompatActivity {
                 showQuestion(currentQuestionIndex);
             } else {
                 SubmitQuizSessionRequest submitReq = new SubmitQuizSessionRequest();
+                submitReq.setAnswers(new ArrayList<>());
                 learningService.submitQuizSession(currentQuizSessionId, submitReq).enqueue(new Callback<ApiResponse<QuizSessionResponse>>() {
                     @Override
                     public void onResponse(Call<ApiResponse<QuizSessionResponse>> call, Response<ApiResponse<QuizSessionResponse>> response) {

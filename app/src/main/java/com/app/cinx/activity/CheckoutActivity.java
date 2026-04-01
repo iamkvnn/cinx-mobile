@@ -1,14 +1,11 @@
 package com.app.cinx.activity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -18,29 +15,32 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.app.cinx.R;
 import com.app.cinx.adapter.CheckoutCourseAdapter;
 import com.app.cinx.adapter.PaymentMethodAdapter;
-import com.app.cinx.api.OrderService;
-import com.app.cinx.api.PaymentService;
-import com.app.cinx.api.RetrofitClient;
-import com.app.cinx.api.dto.ApiResponse;
-import com.app.cinx.api.dto.CartItemDto;
-import com.app.cinx.api.dto.CartItemResponse;
-import com.app.cinx.api.dto.CreateOrderRequest;
-import com.app.cinx.api.dto.OrderDto;
-import com.app.cinx.api.dto.PaymentRequest;
 import com.app.cinx.data.CartRepository;
+import com.app.cinx.api.dto.CartItemResponse;
 import com.app.cinx.model.PaymentMethod;
 import com.app.cinx.utils.Convert;
-import com.app.cinx.utils.TokenManager;
 import com.app.cinx.utils.UserManager;
+
+import com.app.cinx.api.OrderService;
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.dto.ApiResponse;
+import com.app.cinx.api.dto.CreateOrderRequest;
+import com.app.cinx.api.dto.CartItemDto;
+import com.app.cinx.api.dto.OrderDto;
+import com.app.cinx.api.dto.OrderDetailDto;
+import com.app.cinx.api.dto.PaymentRequest;
+import com.app.cinx.api.PaymentService;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import android.util.Log;
+import com.app.cinx.utils.TokenManager;
+import android.widget.Toast;
+import android.net.Uri;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Checkout / Thanh-toán screen.
@@ -85,6 +85,8 @@ public class CheckoutActivity extends AppCompatActivity {
     private PaymentMethodAdapter paymentAdapter;
     private boolean              isProcessing = false;
 
+    private String pendingOrderId = null;
+
     // ─────────────────────────────────────────────────────────────────────
     // Lifecycle
     // ─────────────────────────────────────────────────────────────────────
@@ -100,6 +102,43 @@ public class CheckoutActivity extends AppCompatActivity {
         setupRecyclerViews();
         refreshSummary();
         setupClickListeners();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (pendingOrderId != null && isProcessing) {
+            checkOrderStatus(pendingOrderId);
+        }
+    }
+
+    private void checkOrderStatus(String orderId) {
+        OrderService orderService = RetrofitClient.getInstance().getOrderService();
+        orderService.getOrder(orderId).enqueue(new Callback<ApiResponse<OrderDetailDto>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<OrderDetailDto>> call, Response<ApiResponse<OrderDetailDto>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    OrderDetailDto detail = response.body().getData();
+                    if (detail.getPayment() != null && "SUCCESS".equalsIgnoreCase(detail.getPayment().getStatus())) {
+                        pendingOrderId = null;
+                        launchSuccessScreen(orderId);
+                    } else {
+                        // Payment not completed or failed, user might have cancelled
+                        pendingOrderId = null;
+                        handleError();
+                    }
+                } else {
+                    pendingOrderId = null;
+                    handleError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<OrderDetailDto>> call, Throwable t) {
+                pendingOrderId = null;
+                handleError();
+            }
+        });
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -150,6 +189,7 @@ public class CheckoutActivity extends AppCompatActivity {
         TextView tvEmail = findViewById(R.id.tvReceiverEmail);
 
         UserManager user = UserManager.getInstance();
+        tvName.setText(user.getUserName() != null ? user.getUserName() : "Nguyễn Văn A");
         if (user.isLoggedIn() && user.getUserEmail() != null) {
             tvEmail.setText("Email: " + user.getUserEmail());
         }
@@ -276,7 +316,7 @@ public class CheckoutActivity extends AppCompatActivity {
 
         OrderService orderService = RetrofitClient.getInstance().getOrderService();
         if (orderService == null) {
-            new Handler(Looper.getMainLooper()).postDelayed(this::launchSuccessScreen, 1500);
+            new Handler(Looper.getMainLooper()).postDelayed(() -> launchSuccessScreen(null), 1500);
             return;
         }
 
@@ -285,21 +325,24 @@ public class CheckoutActivity extends AppCompatActivity {
         for (CartItemResponse ci : checkoutItems) {
             CartItemDto dto = new CartItemDto();
             dto.setId(ci.getId());
+            dto.setCourse(ci.getCourse());
             cartItemDtos.add(dto);
         }
         request.setCartItems(cartItemDtos);
         
         PaymentMethod pm = paymentAdapter.getSelectedMethod();
-        request.setPaymentMethod(pm != null ? pm.getName() : "CARD");
+        request.setPaymentMethod("MOMO");
         
         if (voucherTitle != null) {
             request.setVoucherCode(voucherTitle);
         }
+
         orderService.createOrder(request).enqueue(new Callback<ApiResponse<OrderDto>>() {
             @Override
             public void onResponse(Call<ApiResponse<OrderDto>> call, Response<ApiResponse<OrderDto>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
-                    processPayment(response.body().getData().getId(), request.getPaymentMethod());
+                    OrderDto order = response.body().getData();
+                    requestPaymentLink(order.getId());
                 } else {
                     handleError();
                 }
@@ -313,30 +356,25 @@ public class CheckoutActivity extends AppCompatActivity {
         });
     }
 
-    private void processPayment(String orderId, String paymentMethod) {
+    private void requestPaymentLink(String orderId) {
+        pendingOrderId = orderId;
         PaymentService paymentService = RetrofitClient.getInstance().getPaymentService();
-        if (paymentService == null) {
-            launchSuccessScreen();
-            return;
-        }
+        PaymentRequest req = new PaymentRequest();
+        req.setOrderId(orderId);
+        req.setPaymentMethod("MOMO");
 
-        PaymentRequest paymentRequest = new PaymentRequest();
-        paymentRequest.setOrderId(orderId);
-        paymentRequest.setPaymentMethod(paymentMethod);
-
-        paymentService.requestMomoPayment(paymentRequest).enqueue(new Callback<ApiResponse<String>>() {
+        paymentService.requestMomoPayment(req).enqueue(new Callback<ApiResponse<String>>() {
             @Override
             public void onResponse(Call<ApiResponse<String>> call, Response<ApiResponse<String>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    String paymentLink = response.body().getData();
-                    if (paymentLink != null && !paymentLink.isEmpty() && (paymentLink.startsWith("http://") || paymentLink.startsWith("https://"))) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(paymentLink));
-                        startActivity(browserIntent);
-                        // After sending them to the browser, we can assume success or show success screen
-                        // Since they return manually, we can launch the success screen now and let them switch back.
-                        launchSuccessScreen();
-                    } else {
-                        launchSuccessScreen();
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    String payUrl = response.body().getData();
+                    try {
+                        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(payUrl));
+                        startActivity(i);
+                    } catch (Exception e) {
+                        Log.e("Checkout", "Cannot open payment link", e);
+                        Toast.makeText(CheckoutActivity.this, "Không thể mở link thanh toán", Toast.LENGTH_SHORT).show();
+                        handleError();
                     }
                 } else {
                     handleError();
@@ -345,7 +383,7 @@ public class CheckoutActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ApiResponse<String>> call, Throwable t) {
-                Log.e("Checkout", "Failed to get payment link", t);
+                Log.e("Checkout", "Payment API failed", t);
                 handleError();
             }
         });
@@ -360,10 +398,8 @@ public class CheckoutActivity extends AppCompatActivity {
         Toast.makeText(this, "Order failed, please try again", Toast.LENGTH_SHORT).show();
     }
 
-    private void launchSuccessScreen() {
-        // Generate a simple mock order code
-        String orderCode = "EDUF-" + Integer.toHexString((int) (System.currentTimeMillis() % 0xFFFFF))
-                .toUpperCase();
+    private void launchSuccessScreen(String orderId) {
+        String orderCode = orderId != null ? orderId : "EDUF-" + Integer.toHexString((int) (System.currentTimeMillis() % 0xFFFFF)).toUpperCase();
 
         UserManager user = UserManager.getInstance();
         String email = (user.isLoggedIn() && user.getUserEmail() != null)

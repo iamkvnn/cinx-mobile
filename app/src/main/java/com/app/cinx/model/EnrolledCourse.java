@@ -18,6 +18,7 @@ public class EnrolledCourse {
     // ── Shared fields ────────────────────────────────────────────────────────
 
     private final int    id;
+    private final String courseId;
     private final String title;
     private final String instructor;
     private final String imageUrl;
@@ -40,9 +41,10 @@ public class EnrolledCourse {
 
     // ── Private base constructor ─────────────────────────────────────────────
 
-    private EnrolledCourse(int id, String title, String instructor,
+    private EnrolledCourse(int id, String courseId, String title, String instructor,
                            String imageUrl, String category, Status status) {
         this.id         = id;
+        this.courseId   = courseId;
         this.title      = title;
         this.instructor = instructor;
         this.imageUrl   = imageUrl;
@@ -52,29 +54,29 @@ public class EnrolledCourse {
 
     // ── Static factory methods ───────────────────────────────────────────────
 
-    public static EnrolledCourse progress(int id, String title, String instructor,
+    public static EnrolledCourse progress(int id, String courseId, String title, String instructor,
                                           String imageUrl, String category,
                                           int progress) {
-        EnrolledCourse c = new EnrolledCourse(id, title, instructor,
+        EnrolledCourse c = new EnrolledCourse(id, courseId, title, instructor,
                 imageUrl, category, Status.PROGRESS);
         c.progress     = progress;
         return c;
     }
 
-    public static EnrolledCourse completed(int id, String title, String instructor,
+    public static EnrolledCourse completed(int id, String courseId, String title, String instructor,
                                            String imageUrl, String category,
                                            String completionDate, String grade) {
-        EnrolledCourse c = new EnrolledCourse(id, title, instructor,
+        EnrolledCourse c = new EnrolledCourse(id, courseId, title, instructor,
                 imageUrl, category, Status.COMPLETED);
         c.completionDate = completionDate;
         c.grade          = grade;
         return c;
     }
 
-    public static EnrolledCourse saved(int id, String title, String instructor,
+    public static EnrolledCourse saved(int id, String courseId, String title, String instructor,
                                        String imageUrl, String category,
                                        String originalPrice, double rating) {
-        EnrolledCourse c = new EnrolledCourse(id, title, instructor,
+        EnrolledCourse c = new EnrolledCourse(id, courseId, title, instructor,
                 imageUrl, category, Status.SAVED);
         c.originalPrice = originalPrice;
         c.rating        = rating;
@@ -84,6 +86,7 @@ public class EnrolledCourse {
     // ── Getters ──────────────────────────────────────────────────────────────
 
     public int    getId()             { return id; }
+    public String getCourseId()       { return courseId; }
     public String getTitle()          { return title; }
     public String getInstructor()     { return instructor; }
     public String getImageUrl()       { return imageUrl; }

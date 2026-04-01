@@ -221,5 +221,49 @@
     <string name="order_repurchase_toast">Thêm lại khóa học vào giỏ (demo)</string>
     <string name="order_detail_toast">Xem chi tiết đơn %1$s (demo)</string>
     <string name="pm_unlinked_toast">Đã hủy liên kết %1$s</string>
+
+    <!-- Admin dashboard -->
+    <string name="admin_dashboard_title">Bảng điều khiển Admin</string>
+    <string name="admin_dashboard_subtitle">Quản trị hệ thống E-learning</string>
+    <string name="admin_manage_users">Quản lý người dùng</string>
+    <string name="admin_manage_instructors">Quản lý giảng viên</string>
+    <string name="admin_logout">Đăng xuất</string>
+    <string name="admin_menu_users_desc">Xem danh sách học viên và trạng thái tài khoản</string>
+    <string name="admin_menu_instructors_desc">Phê duyệt giảng viên và theo dõi xác minh</string>
+
+    <!-- Manage instructors -->
+    <string name="admin_instructors_title">Quản lý giảng viên</string>
+    <string name="admin_back">Quay lại</string>
+    <string name="admin_verify_action">Duyệt</string>
+    <string name="admin_status_pending">Pending</string>
+    <string name="admin_status_verified">Verified</string>
+    <string name="admin_instructors_empty">Không có giảng viên nào</string>
+    <string name="admin_loading">Đang tải...</string>
+    <string name="admin_verify_loading">Đang duyệt...</string>
+    <string name="admin_verify_success">Duyệt giảng viên thành công</string>
+    <string name="admin_verify_error">Không thể duyệt giảng viên</string>
+    <string name="admin_verify_confirm_title">Xác nhận duyệt</string>
+    <string name="admin_verify_confirm_message">Bạn có chắc muốn duyệt giảng viên %1$s?</string>
+    <string name="admin_verify_confirm_ok">Duyệt ngay</string>
+    <string name="admin_verify_confirm_cancel">Hủy</string>
+    <string name="admin_fetch_error">Không thể tải dữ liệu. Vui lòng thử lại.</string>
+    <string name="admin_network_error">Lỗi kết nối mạng</string>
+    <string name="admin_tab_pending">Chưa duyệt</string>
+    <string name="admin_tab_verified">Đã duyệt</string>
+    <string name="admin_instructors_empty_pending">Không có giảng viên chờ duyệt</string>
+    <string name="admin_instructors_empty_verified">Chưa có giảng viên nào đã duyệt</string>
+
+    <!-- Manage users -->
+    <string name="admin_users_title">Quản lý người dùng</string>
+    <string name="admin_users_empty">Không có người dùng nào</string>
+    <string name="admin_join_date">Ngày tham gia: %1$s</string>
+    <string name="admin_status_active">Active</string>
+    <string name="admin_status_locked">Locked</string>
+    <string name="admin_status_unknown">Unknown</string>
+
+    <!-- Accessibility -->
+    <string name="admin_icon_users">Biểu tượng quản lý người dùng</string>
+    <string name="admin_icon_instructors">Biểu tượng quản lý giảng viên</string>
+    <string name="admin_icon_logout">Biểu tượng đăng xuất</string>
 </resources>
 

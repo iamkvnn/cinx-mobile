@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -132,7 +132,7 @@
                         app:tint="@color/text_primary" />
                 </FrameLayout>
 
-                <!-- Bookmark button â€” top-right overlay of the hero image -->
+                <!-- Bookmark button — top-right overlay of the hero image -->
                 <ImageButton
                     android:id="@+id/btnBookmark"
                     android:layout_width="38dp"
@@ -140,7 +140,6 @@
                     android:layout_gravity="top|end"
                     android:layout_margin="10dp"
                     android:background="@drawable/bg_glass_card"
-                    android:contentDescription="@string/add_to_favorites"
                     android:elevation="6dp"
                     android:padding="8dp"
                     android:src="@drawable/ic_favorite_border"
@@ -160,7 +159,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tiáº¿n Ä‘á»™ khĂ³a há»c: 30%"
+                        android:text="Tiến độ khóa học: 30%"
                         android:textColor="@color/white"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -210,23 +209,15 @@
 
             <!-- COURSE TITLE -->
             <TextView
+                android:id="@+id/tvCourseTitle2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="UI/UX Design Masterclass: Tá»« CÆ¡ Báº£n Äáº¿n NĂ¢ng Cao"
+                android:text="UI/UX Design Masterclass: Từ Cơ Bản Đến Nâng Cao"
                 android:textColor="@color/text_primary"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="10dp" />
 
-            <!-- COURSE DESCRIPTION -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Náº¯m vá»¯ng quy trĂ¬nh thiáº¿t káº¿ sáº£n pháº©m, Figma, Web &amp; Mobile Design, vĂ  táº¡o Portfolio chuyĂªn nghiá»‡p Ä‘á»ƒ xin viá»‡c."
-                android:textColor="@color/text_secondary"
-                android:textSize="14sp"
-                android:lineSpacingExtra="4dp"
-                android:layout_marginBottom="16dp" />
 
             <!-- STATS ROW -->
             <LinearLayout
@@ -275,7 +266,7 @@
                             android:id="@+id/tvCourseReviewCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="(12.5k Ä‘Ă¡nh giĂ¡)"
+                            android:text="(12.5k đánh giá)"
                             android:textColor="@color/text_secondary"
                             android:textSize="11sp" />
                     </LinearLayout>
@@ -320,7 +311,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Há»c viĂªn"
+                            android:text="Học viên"
                             android:textColor="@color/text_secondary"
                             android:textSize="11sp" />
                     </LinearLayout>
@@ -362,14 +353,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Giáº£ng viĂªn"
+                        android:text="Giảng viên"
                         android:textColor="@color/text_secondary"
                         android:textSize="11sp" />
                     <TextView
                         android:id="@+id/tvInstructorName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="HĂ  Linh (Senior UI/UX)"
+                        android:text="Hà Linh (Senior UI/UX)"
                         android:textColor="@color/text_primary"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -400,15 +391,15 @@
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tá»•ng quan" />
+                    android:text="Tổng quan" />
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ná»™i dung" />
+                    android:text="Nội dung" />
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ÄĂ¡nh giĂ¡" />
+                    android:text="Đánh giá" />
             </com.google.android.material.tabs.TabLayout>
 
             <!-- TAB CONTENT -->
@@ -435,7 +426,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Báº¡n sáº½ há»c Ä‘Æ°á»£c gĂ¬?"
+                            android:text="Bạn sẽ học được gì?"
                             android:textColor="@color/text_primary"
                             android:textSize="17sp"
                             android:textStyle="bold"
@@ -449,7 +440,7 @@
                                 app:tint="#22C55E" />
                             <TextView android:id="@+id/tvCourseBenefit1" android:layout_width="0dp" android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Sá»­ dá»¥ng thĂ nh tháº¡o kÄ© nÄƒng cÆ¡ báº£n."
+                                android:text="Sử dụng thành thạo kĩ năng cơ bản."
                                 android:textColor="@color/text_secondary" android:textSize="14sp"
                                 android:lineSpacingExtra="2dp" />
                         </LinearLayout>
@@ -462,7 +453,7 @@
                                 app:tint="#22C55E" />
                             <TextView android:id="@+id/tvCourseBenefit2" android:layout_width="0dp" android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Quy trĂ¬nh thiáº¿t káº¿ chuáº©n chuyĂªn nghiá»‡p."
+                                android:text="Quy trình thiết kế chuẩn chuyên nghiệp."
                                 android:textColor="@color/text_secondary" android:textSize="14sp"
                                 android:lineSpacingExtra="2dp" />
                         </LinearLayout>
@@ -475,7 +466,7 @@
                                 app:tint="#22C55E" />
                             <TextView android:id="@+id/tvCourseBenefit3" android:layout_width="0dp" android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="XĂ¢y dá»±ng Portfolio áº¥n tÆ°á»£ng."
+                                android:text="Xây dựng Portfolio ấn tượng."
                                 android:textColor="@color/text_secondary" android:textSize="14sp"
                                 android:lineSpacingExtra="2dp" />
                         </LinearLayout>
@@ -495,10 +486,10 @@
                                 <ImageView android:layout_width="28dp" android:layout_height="28dp"
                                     android:src="@drawable/ic_clock" android:layout_marginBottom="8dp" />
                                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                    android:text="Thá»i lÆ°á»£ng" android:textColor="@color/text_secondary"
+                                    android:text="Thời lượng" android:textColor="@color/text_secondary"
                                     android:textSize="11sp" android:layout_marginBottom="2dp" />
                                 <TextView android:id="@+id/tvCourseDuration" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                    android:text="24 Giá»" android:textColor="@color/text_primary"
+                                    android:text="24 Giờ" android:textColor="@color/text_primary"
                                     android:textSize="15sp" android:textStyle="bold" />
                             </LinearLayout>
 
@@ -509,10 +500,10 @@
                                 <ImageView android:layout_width="28dp" android:layout_height="28dp"
                                     android:src="@drawable/ic_certificate" android:layout_marginBottom="8dp" />
                                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                    android:text="Chá»©ng chá»‰" android:textColor="@color/text_secondary"
+                                    android:text="Chứng chỉ" android:textColor="@color/text_secondary"
                                     android:textSize="11sp" android:layout_marginBottom="2dp" />
                                 <TextView android:id="@+id/tvCourseCertificate" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                    android:text="Cáº¥p sau khĂ³a há»c" android:textColor="@color/text_primary"
+                                    android:text="Cấp sau khóa học" android:textColor="@color/text_primary"
                                     android:textSize="13sp" android:textStyle="bold" android:gravity="center" />
                             </LinearLayout>
                         </LinearLayout>
@@ -527,10 +518,10 @@
                                 <ImageView android:layout_width="28dp" android:layout_height="28dp"
                                     android:src="@drawable/ic_bar_chart" android:layout_marginBottom="8dp" />
                                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                    android:text="TrĂ¬nh Ä‘á»™" android:textColor="@color/text_secondary"
+                                    android:text="Trình độ" android:textColor="@color/text_secondary"
                                     android:textSize="11sp" android:layout_marginBottom="2dp" />
                                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                    android:text="NgÆ°á»i má»›i báº¯t Ä‘áº§u" android:textColor="@color/text_primary"
+                                    android:text="Người mới bắt đầu" android:textColor="@color/text_primary"
                                     android:textSize="12sp" android:textStyle="bold" android:gravity="center" />
                             </LinearLayout>
 
@@ -541,10 +532,10 @@
                                 <ImageView android:layout_width="28dp" android:layout_height="28dp"
                                     android:src="@drawable/ic_smartphone" android:layout_marginBottom="8dp" />
                                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                    android:text="Truy cáº­p" android:textColor="@color/text_secondary"
+                                    android:text="Truy cập" android:textColor="@color/text_secondary"
                                     android:textSize="11sp" android:layout_marginBottom="2dp" />
                                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                    android:text="Trá»n Ä‘á»i trĂªn&#10;App/Web" android:textColor="@color/text_primary"
+                                    android:text="Trọn đời trên&#10;App/Web" android:textColor="@color/text_primary"
                                     android:textSize="12sp" android:textStyle="bold" android:gravity="center" />
                             </LinearLayout>
                         </LinearLayout>
@@ -556,19 +547,19 @@
                         android:padding="18dp" android:elevation="2dp" android:layout_marginBottom="8dp">
 
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="MĂ´ táº£ khĂ³a há»c" android:textColor="@color/text_primary"
+                            android:text="Mô tả khóa học" android:textColor="@color/text_primary"
                             android:textSize="17sp" android:textStyle="bold" android:layout_marginBottom="12dp" />
 
                         <TextView android:id="@+id/tvCourseDescription"
                             android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:text="ChĂ o má»«ng báº¡n Ä‘áº¿n vá»›i khĂ³a há»c UI/UX Design toĂ n diá»‡n nháº¥t. KhĂ³a há»c nĂ y Ä‘Æ°á»£c thiáº¿t káº¿ Ä‘áº·c biá»‡t cho nhá»¯ng ngÆ°á»i chÆ°a cĂ³ kinh nghiá»‡m, muá»‘n chuyá»ƒn ngĂ nh hoáº·c nĂ¢ng cao ká»¹ nÄƒng thiáº¿t káº¿ giao diá»‡n vĂ  tráº£i nghiá»‡m ngÆ°á»i dĂ¹ng."
+                            android:text="Chào mừng bạn đến với khóa học UI/UX Design toàn diện nhất. Khóa học này được thiết kế đặc biệt cho những người chưa có kinh nghiệm, muốn chuyển ngành hoặc nâng cao kỹ năng thiết kế giao diện và trải nghiệm người dùng."
                             android:textColor="@color/text_secondary" android:textSize="14sp"
                             android:lineSpacingExtra="4dp" android:maxLines="4"
                             android:ellipsize="end" android:layout_marginBottom="10dp" />
 
                         <TextView android:id="@+id/tvExpandDescription"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Xem thĂªm / Thu gá»n" android:textColor="@color/primary"
+                            android:text="Xem thêm / Thu gọn" android:textColor="@color/primary"
                             android:textSize="14sp" android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>
@@ -596,7 +587,7 @@
                             android:layout_weight="1"
                             android:textSize="13sp"
                             android:textColor="@color/text_secondary"
-                            tools:text="8 bĂ i há»c â€¢ 3 chÆ°Æ¡ng" />
+                            tools:text="8 bài học • 3 chương" />
 
                         <TextView
                             android:id="@+id/tvCurriculumProgress"
@@ -608,7 +599,7 @@
                             android:background="@drawable/bg_icon_purple"
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="6dp"
-                            tools:text="2/8 hoĂ n thĂ nh" />
+                            tools:text="2/8 hoàn thành" />
                     </LinearLayout>
 
                     <!-- Dynamic curriculum list driven by SampleCourseData via LessonSheetAdapter -->
@@ -707,10 +698,10 @@
                             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                                 android:layout_weight="1" android:orientation="vertical">
                                 <TextView android:id="@+id/tvReview1Name" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                    android:text="NgÆ°á»i dĂ¹ng" android:textColor="@color/text_primary"
+                                    android:text="Người dùng" android:textColor="@color/text_primary"
                                     android:textSize="14sp" android:textStyle="bold" />
                                 <TextView android:id="@+id/tvReview1Date" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                    android:text="2 ngĂ y trÆ°á»›c" android:textColor="@color/text_secondary"
+                                    android:text="2 ngày trước" android:textColor="@color/text_secondary"
                                     android:textSize="12sp" />
                             </LinearLayout>
                             <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -729,7 +720,7 @@
                             </LinearLayout>
                         </LinearLayout>
                         <TextView android:id="@+id/tvReview1Content" android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:text="KhĂ³a há»c ráº¥t chi tiáº¿t vĂ  dá»… hiá»ƒu. Ráº¥t há»¯u Ă­ch!"
+                            android:text="Khóa học rất chi tiết và dễ hiểu. Rất hữu ích!"
                             android:textColor="@color/text_secondary" android:textSize="14sp" android:lineSpacingExtra="3dp" />
                     </LinearLayout>
 
@@ -745,10 +736,10 @@
                             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                                 android:layout_weight="1" android:orientation="vertical">
                                 <TextView android:id="@+id/tvReview2Name" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                    android:text="Há»c viĂªn" android:textColor="@color/text_primary"
+                                    android:text="Học viên" android:textColor="@color/text_primary"
                                     android:textSize="14sp" android:textStyle="bold" />
                                 <TextView android:id="@+id/tvReview2Date" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                    android:text="1 tuáº§n trÆ°á»›c" android:textColor="@color/text_secondary"
+                                    android:text="1 tuần trước" android:textColor="@color/text_secondary"
                                     android:textSize="12sp" />
                             </LinearLayout>
                             <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -767,7 +758,7 @@
                             </LinearLayout>
                         </LinearLayout>
                         <TextView android:id="@+id/tvReview2Content" android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:text="Ná»™i dung truyá»n Ä‘áº¡t ráº¥t tá»‘t, tuy nhiĂªn á»Ÿ pháº§n sau hÆ¡i lÆ°á»›t nhanh."
+                            android:text="Nội dung truyền đạt rất tốt, tuy nhiên ở phần sau hơi lướt nhanh."
                             android:textColor="@color/text_secondary" android:textSize="14sp" android:lineSpacingExtra="3dp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -801,10 +792,10 @@
                 android:orientation="vertical" android:layout_marginEnd="12dp">
                 <TextView android:id="@+id/tvOriginalPrice"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="1.200.000Ä‘" android:textColor="@color/text_secondary"
+                    android:text="1.200.000đ" android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
                 <TextView android:id="@+id/tvCurrentPrice" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="599.000Ä‘" android:textColor="@color/primary"
+                    android:text="599.000đ" android:textColor="@color/primary"
                     android:textSize="22sp" android:textStyle="bold" />
             </LinearLayout>
 
@@ -843,7 +834,7 @@
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:orientation="horizontal" android:layout_marginBottom="6dp">
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="Tiáº¿n Ä‘á»™ há»c táº­p"
+                        android:layout_weight="1" android:text="Tiến độ học tập"
                         android:textStyle="bold" android:textSize="12sp" android:textColor="@color/text_secondary" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:text="30%" android:textStyle="bold"
@@ -858,7 +849,7 @@
                 android:id="@+id/btnStartLearning"
                 android:layout_width="wrap_content"
                 android:layout_height="52dp"
-                android:text="Tiáº¿p tá»¥c há»c"
+                android:text="Tiếp tục học"
                 android:textAllCaps="false"
                 android:drawableEnd="@drawable/ic_play_circle"
                 android:paddingEnd="16dp"
@@ -873,7 +864,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="52dp"
-                android:text="YĂªu cáº§u cáº¥p chá»©ng chá»‰"
+                android:text="Yêu cầu cấp chứng chỉ"
                 android:textAllCaps="false"
                 android:background="@drawable/bg_gradient_button"
                 android:textColor="@color/white"
@@ -885,4 +876,3 @@
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-

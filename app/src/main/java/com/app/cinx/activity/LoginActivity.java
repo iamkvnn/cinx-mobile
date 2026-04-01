@@ -196,7 +196,8 @@ public class LoginActivity extends AppCompatActivity {
                     btnLogin.setEnabled(true);
                     btnLogin.setText("Đăng nhập");
                     Log.e("LoginActivity", "Login error", t);
-                    Toast.makeText(LoginActivity.this, "Lỗi kết ối", Toast.LENGTH_SHORT).show();
+                    String reason = t.getMessage() != null ? t.getMessage() : "unknown";
+                    Toast.makeText(LoginActivity.this, "Lỗi kết nối: " + reason, Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -248,7 +249,9 @@ public class LoginActivity extends AppCompatActivity {
         
         Intent intent;
         String role = UserManager.getInstance().getUserRole();
-        if ("INSTRUCTOR".equalsIgnoreCase(role)) {
+        if ("ADMIN".equalsIgnoreCase(role)) {
+            intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+        } else if ("INSTRUCTOR".equalsIgnoreCase(role)) {
             intent = new Intent(LoginActivity.this, InstructorDashboardActivity.class);
         } else {
             intent = new Intent(LoginActivity.this, MainActivity.class);

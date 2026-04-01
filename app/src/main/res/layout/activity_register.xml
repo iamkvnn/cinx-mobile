@@ -23,7 +23,7 @@
             android:id="@+id/btn_back"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:src="@drawable/ic_chevron_left" 
+            android:src="@drawable/ic_chevron_left"
             app:tint="@color/text_secondary"
             android:clickable="true"
             android:focusable="true"
@@ -103,86 +103,42 @@
             app:layout_constraintTop_toBottomOf="@id/logo_section">
 
             <!-- Indicator: width 50%, aligned RIGHT for register -->
-             <!-- We use code to animate/set this, but for layout preview, I'll set gravity end -->
+            <!-- We use code to animate/set this, but for layout preview, I'll set gravity end -->
             <View
                 android:id="@+id/switcher_indicator"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/bg_switcher_indicator"
-                android:layout_gravity="end" 
+                android:layout_gravity="end"
                 android:layout_marginStart="150dp" /> <!-- Should be calculated -->
-             
-             <LinearLayout
-                 android:layout_width="match_parent"
-                 android:layout_height="match_parent"
-                 android:orientation="horizontal">
-                 <RadioGroup
-                android:id="@+id/rgRole"
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                android:gravity="center">
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
-                <RadioButton
-                    android:id="@+id/rbUser"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="USER"
-                    android:checked="true"
-                    android:layout_marginEnd="16dp" />
+                <TextView
+                    android:id="@+id/btn_switch_login"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Đăng nhập"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"/>
 
-                <RadioButton
-                    android:id="@+id/rbInstructor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="INSTRUCTOR" />
-            </RadioGroup>
-
-            <TextView
-                     android:id="@+id/btn_switch_login"
-                     android:layout_width="0dp"
-                     android:layout_height="match_parent"
-                     android:layout_weight="1"
-                     android:gravity="center"
-                     android:text="ÄÄƒng nháº­p"
-                     android:textStyle="bold"
-                     android:textColor="@color/text_secondary"
-                     android:textSize="14sp"/>
-                 <RadioGroup
-                android:id="@+id/rgRole"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                android:gravity="center">
-
-                <RadioButton
-                    android:id="@+id/rbUser"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="USER"
-                    android:checked="true"
-                    android:layout_marginEnd="16dp" />
-
-                <RadioButton
-                    android:id="@+id/rbInstructor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="INSTRUCTOR" />
-            </RadioGroup>
-
-            <TextView
-                     android:id="@+id/btn_switch_register"
-                     android:layout_width="0dp"
-                     android:layout_height="match_parent"
-                     android:layout_weight="1"
-                     android:gravity="center"
-                     android:text="ÄÄƒng kĂ½"
-                     android:textStyle="bold"
-                     android:textColor="@color/text_primary"
-                     android:textSize="14sp"/>
-             </LinearLayout>
+                <TextView
+                    android:id="@+id/btn_switch_register"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Đăng ký"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp"/>
+            </LinearLayout>
         </FrameLayout>
 
         <!-- Form -->
@@ -204,7 +160,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_glass_input"
-                    android:hint="Há» vĂ  tĂªn"
+                    android:hint="Họ và tên"
                     android:paddingStart="48dp"
                     android:paddingEnd="16dp"
                     android:paddingTop="16dp"
@@ -262,7 +218,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_glass_input"
-                    android:hint="Táº¡o máº­t kháº©u"
+                    android:hint="Tạo mật khẩu"
                     android:paddingStart="48dp"
                     android:paddingEnd="48dp"
                     android:paddingTop="16dp"
@@ -279,7 +235,7 @@
                     android:layout_marginStart="16dp"
                     android:src="@drawable/ic_lock"
                     app:tint="@color/text_secondary"/>
-                 <ImageView
+                <ImageView
                     android:id="@+id/icon_eye"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
@@ -291,8 +247,8 @@
                     android:focusable="true"/>
             </FrameLayout>
 
-             <!-- Confirm Password Input -->
-             <FrameLayout
+            <!-- Confirm Password Input -->
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp">
@@ -301,7 +257,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_glass_input"
-                    android:hint="Nháº­p láº¡i máº­t kháº©u"
+                    android:hint="Nhập lại mật khẩu"
                     android:paddingStart="48dp"
                     android:paddingEnd="48dp"
                     android:paddingTop="16dp"
@@ -318,7 +274,7 @@
                     android:layout_marginStart="16dp"
                     android:src="@drawable/ic_check_circle"
                     app:tint="@color/text_secondary"/>
-                 <ImageView
+                <ImageView
                     android:id="@+id/icon_eye_re"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
@@ -335,7 +291,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_btn_primary"
-                android:text="Táº¡o tĂ i khoáº£n"
+                android:text="Tạo tài khoản"
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 android:textSize="18sp"
@@ -344,87 +300,6 @@
 
         </LinearLayout>
 
-        <!-- Social -->
-        <LinearLayout
-            android:id="@+id/social_section"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="32dp"
-            app:layout_constraintTop_toBottomOf="@id/form_container">
-            
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp">
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#80CBD5E1"
-                    android:layout_centerVertical="true"/>
-                <RadioGroup
-                android:id="@+id/rgRole"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                android:gravity="center">
-
-                <RadioButton
-                    android:id="@+id/rbUser"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="USER"
-                    android:checked="true"
-                    android:layout_marginEnd="16dp" />
-
-                <RadioButton
-                    android:id="@+id/rbInstructor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="INSTRUCTOR" />
-            </RadioGroup>
-
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Hoáº·c tiáº¿p tá»¥c vá»›i"
-                    android:textSize="12sp"
-                    android:textColor="@color/text_secondary"
-                    android:textStyle="bold"
-                    android:background="@color/glass_background" 
-                    android:paddingHorizontal="16dp"
-                    android:layout_centerInParent="true"/>
-            </RelativeLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-                <!-- Google -->
-                <FrameLayout
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:background="@drawable/bg_btn_social"
-                    android:layout_marginEnd="16dp">
-                </FrameLayout>
-                 <!-- Apple -->
-                <FrameLayout
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:background="@drawable/bg_btn_social"
-                    android:layout_marginEnd="16dp">
-                </FrameLayout>
-                 <!-- FB -->
-                <FrameLayout
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:background="@drawable/bg_btn_social">
-                </FrameLayout>
-            </LinearLayout>
-
-        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
