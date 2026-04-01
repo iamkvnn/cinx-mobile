@@ -33,6 +33,8 @@ import com.app.cinx.api.CourseService;
 import com.app.cinx.api.RetrofitClient;
 import com.app.cinx.api.dto.ApiResponse;
 import com.app.cinx.api.dto.CourseDetailResponse;
+import com.app.cinx.api.dto.AddToWishlistRequest;
+import com.app.cinx.api.dto.WishlistItemResponse;
 import com.app.cinx.api.dto.AddToCartRequest;
 import com.app.cinx.api.dto.LearningItemProgressResponse;
 import com.app.cinx.api.dto.CertificateRequestResponse;
@@ -53,45 +55,47 @@ import java.util.Locale;
 
 public class CourseDetailActivity extends AppCompatActivity {
 
-    // Purchase state — replace with actual API result in production
+    // Purchase state â€” replace with actual API result in production
     private boolean isPurchased = false;
+    private boolean isWishlisted = false;
+    private ImageButton btnBookmarkIcon;
     private boolean isDescriptionExpanded = false;
 
-    // ── Layout views ──────────────────────────────────────────────────────
+    // â”€â”€ Layout views â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private LinearLayout layoutActionUnpurchased;
     private LinearLayout layoutActionPurchased;
     private LinearLayout layoutHeroProgress;
 
-    // ── Description expand ────────────────────────────────────────────────
+    // â”€â”€ Description expand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private TextView tvCourseDescription;
     private TextView tvExpandDescription;
 
-    // ── Tabs ──────────────────────────────────────────────────────────────
+    // â”€â”€ Tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private ViewFlipper viewFlipper;
     private TabLayout tabLayout;
 
-    // ── Curriculum tab (Tab 2) ────────────────────────────────────────────
+    // â”€â”€ Curriculum tab (Tab 2) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private RecyclerView rvCourseCurriculum;
     private TextView tvCurriculumSummary;
     private TextView tvCurriculumProgress;
     private CourseCurriculumAdapter curriculumAdapter;
-    // ── Cart badge ──────────────────────────────────────────────────────────────────
+    // â”€â”€ Cart badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private FrameLayout cartBadgeFrame;
     private TextView     tvCartBadge;
-    // ── Continue/Start button ─────────────────────────────────────────────
+    // â”€â”€ Continue/Start button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private AppCompatButton btnStartLearning;
     private AppCompatButton btnRequestCertificate;
 
-    // ── Data ────────────────────────────────────────────────────────────────────────
+    // â”€â”€ Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private List<SectionResponse> chapters = new ArrayList<>();
     private List<LessonResponse> lessons = new ArrayList<>();
     private String courseIdStr;
     private Set<String> completedLessonIds = new HashSet<>();
     private boolean isAllLocked = true;
 
-    // ──────────────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Lifecycle
-    // ──────────────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,9 +111,9 @@ public class CourseDetailActivity extends AppCompatActivity {
         updatePurchaseState(isPurchased);
     }
 
-    // ──────────────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // View initialisation
-    // ──────────────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private void initViews() {
         layoutActionUnpurchased = findViewById(R.id.layoutActionUnpurchased);
@@ -176,16 +180,16 @@ public class CourseDetailActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
                             if (response.isSuccessful()) {
-                                Toast.makeText(CourseDetailActivity.this, "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(CourseDetailActivity.this, "ÄĂ£ thĂªm vĂ o giá» hĂ ng", Toast.LENGTH_SHORT).show();
                                 refreshCartBadge(); // update badge async if we change it to fetch from API, for now it relies on local state
                             } else {
-                                Toast.makeText(CourseDetailActivity.this, "Lỗi thêm giỏ hàng", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(CourseDetailActivity.this, "Lá»—i thĂªm giá» hĂ ng", Toast.LENGTH_SHORT).show();
                             }
                         }
 
                         @Override
                         public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
-                            Toast.makeText(CourseDetailActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CourseDetailActivity.this, "Lá»—i káº¿t ná»‘i", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -260,7 +264,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         if (reviews.size() > 0) {
             ReviewResponse r1 = reviews.get(0);
             if (tvReview1Name != null) {
-                tvReview1Name.setText("Học viên");
+                tvReview1Name.setText("Há»c viĂªn");
             }
             if (tvReview1Content != null && r1.getContent() != null) {
                 tvReview1Content.setText(r1.getContent());
@@ -271,7 +275,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         if (reviews.size() > 1) {
             ReviewResponse r2 = reviews.get(1);
             if (tvReview2Name != null) {
-                tvReview2Name.setText("Học viên");
+                tvReview2Name.setText("Há»c viĂªn");
             }
             if (tvReview2Content != null && r2.getContent() != null) {
                 tvReview2Content.setText(r2.getContent());
@@ -321,7 +325,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         TextView tvCourseReviewCount = findViewById(R.id.tvCourseReviewCount);
         if (tvCourseReviewCount != null) {
             // Placeholder since explicit field isn't in DTO yet
-            tvCourseReviewCount.setText("(0 đánh giá)");
+            tvCourseReviewCount.setText("(0 Ä‘Ă¡nh giĂ¡)");
         }
 
         TextView tvCourseStudents = findViewById(R.id.tvCourseStudents);
@@ -331,15 +335,15 @@ public class CourseDetailActivity extends AppCompatActivity {
 
         TextView tvCourseDuration = findViewById(R.id.tvCourseDuration);
         if (tvCourseDuration != null && detail.getDuration() != null) {
-            tvCourseDuration.setText(detail.getDuration() + " Giờ");
+            tvCourseDuration.setText(detail.getDuration() + " Giá»");
         }
 
         TextView tvCourseCertificate = findViewById(R.id.tvCourseCertificate);
         if (tvCourseCertificate != null) {
             if (detail.getHasCertificate() != null && detail.getHasCertificate()) {
-                 tvCourseCertificate.setText(detail.getCertificateTitle() != null ? detail.getCertificateTitle() : "Cấp sau khóa học");
+                 tvCourseCertificate.setText(detail.getCertificateTitle() != null ? detail.getCertificateTitle() : "Cáº¥p sau khĂ³a há»c");
             } else {
-                 tvCourseCertificate.setText("Không có chứng chỉ");
+                 tvCourseCertificate.setText("KhĂ´ng cĂ³ chá»©ng chá»‰");
             }
         }
 
@@ -354,7 +358,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         
         TextView tvCourseTabReviewCount = findViewById(R.id.tvCourseTabReviewCount);
         if (tvCourseTabReviewCount != null) {
-            tvCourseTabReviewCount.setText("0 đánh giá");
+            tvCourseTabReviewCount.setText("0 Ä‘Ă¡nh giĂ¡");
         }
         
         // Removed whatYouWillLearn binding since the field isn't in DTO yet, 
@@ -433,6 +437,73 @@ public class CourseDetailActivity extends AppCompatActivity {
             }
             
             checkEnrollmentAndLoadProgress();
+            checkWishlistStatus();
+        }
+    }
+
+    private void checkWishlistStatus() {
+        RetrofitClient.getInstance().getSocialService().getWishlist().enqueue(new Callback<ApiResponse<List<WishlistItemResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<WishlistItemResponse>>> call, Response<ApiResponse<List<WishlistItemResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    for (WishlistItemResponse item : response.body().getData()) {
+                        if (courseIdStr != null && courseIdStr.equals(item.getCourseId())) {
+                            isWishlisted = true;
+                            break;
+                        }
+                    }
+                    updateWishlistIcon();
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<List<WishlistItemResponse>>> call, Throwable t) {}
+        });
+    }
+
+    private void updateWishlistIcon() {
+        if (btnBookmarkIcon != null) {
+            btnBookmarkIcon.setImageResource(isWishlisted ? R.drawable.ic_favorite : R.drawable.ic_favorite_border);
+            if (isWishlisted) {
+                btnBookmarkIcon.setColorFilter(null);
+            } else {
+                btnBookmarkIcon.setColorFilter(getColor(R.color.white));
+            }
+        }
+    }
+
+    private void toggleWishlist() {
+        if (!UserManager.getInstance().isLoggedIn()) {
+            Toast.makeText(this, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (isWishlisted) {
+            RetrofitClient.getInstance().getSocialService().removeFromWishlist(courseIdStr).enqueue(new Callback<ApiResponse<Object>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
+                    if (response.isSuccessful()) {
+                        isWishlisted = false;
+                        updateWishlistIcon();
+                        Toast.makeText(CourseDetailActivity.this, "Đã xoá khỏi wishlist", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {}
+            });
+        } else {
+            AddToWishlistRequest req = new AddToWishlistRequest();
+            req.setCourseId(courseIdStr);
+            RetrofitClient.getInstance().getSocialService().addToWishlist(req).enqueue(new Callback<ApiResponse<Object>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
+                    if (response.isSuccessful()) {
+                        isWishlisted = true;
+                        updateWishlistIcon();
+                        Toast.makeText(CourseDetailActivity.this, "Đã thêm vào wishlist", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {}
+            });
         }
     }
 
@@ -512,13 +583,12 @@ public class CourseDetailActivity extends AppCompatActivity {
         if (btnBack != null) btnBack.setOnClickListener(v -> onBackPressed());
 
         // Bookmark is now an overlay on the hero image; same id, same toggle logic
-        ImageButton btnBookmark = findViewById(R.id.btnBookmark);
-        if (btnBookmark != null) {
-            btnBookmark.setOnClickListener(v ->
-                    btnBookmark.setImageResource(R.drawable.ic_bookmark));
+        btnBookmarkIcon = findViewById(R.id.btnBookmark);
+        if (btnBookmarkIcon != null) {
+            btnBookmarkIcon.setOnClickListener(v -> toggleWishlist());
         }
 
-        // Cart button — navigate to CartActivity
+        // Cart button â€” navigate to CartActivity
         if (cartBadgeFrame != null) {
             cartBadgeFrame.setOnClickListener(v -> {
                 if (!UserManager.getInstance().isLoggedIn()) {
@@ -554,9 +624,9 @@ public class CourseDetailActivity extends AppCompatActivity {
         });
     }
 
-    // ─────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Curriculum tab
-    // ─────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private void setupCurriculum() {
         if (chapters == null || chapters.isEmpty()) return;
@@ -567,10 +637,10 @@ public class CourseDetailActivity extends AppCompatActivity {
 
         if (tvCurriculumSummary != null) {
             tvCurriculumSummary.setText(
-                    totalLessons + " bài học • " + chapters.size() + " chương");
+                    totalLessons + " bĂ i há»c â€¢ " + chapters.size() + " chÆ°Æ¡ng");
         }
         if (tvCurriculumProgress != null) {
-            tvCurriculumProgress.setText(completedLessons + "/" + totalLessons + " hoàn thành");
+            tvCurriculumProgress.setText(completedLessons + "/" + totalLessons + " hoĂ n thĂ nh");
         }
 
         // Update progress bar and text in hero overlay and floating bar
@@ -591,7 +661,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         if (layoutHeroProgress != null) {
             TextView tvHeroProgress = (TextView) layoutHeroProgress.getChildAt(0);
             android.widget.ProgressBar pbHero = (android.widget.ProgressBar) layoutHeroProgress.getChildAt(1);
-            if (tvHeroProgress != null) tvHeroProgress.setText("Tiến độ khóa học: " + progressPercent + "%");
+            if (tvHeroProgress != null) tvHeroProgress.setText("Tiáº¿n Ä‘á»™ khĂ³a há»c: " + progressPercent + "%");
             if (pbHero != null) pbHero.setProgress(progressPercent);
         }
 
@@ -639,11 +709,11 @@ public class CourseDetailActivity extends AppCompatActivity {
                     if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                         CertificateRequestResponse cert = response.body().getData();
                         if ("PENDING".equalsIgnoreCase(cert.getStatus())) {
-                            btnRequestCertificate.setText("Chờ xác nhận");
+                            btnRequestCertificate.setText("Chá» xĂ¡c nháº­n");
                             btnRequestCertificate.setEnabled(false);
                             btnRequestCertificate.setBackgroundResource(R.drawable.bg_white_card);
                         } else if ("APPROVED".equalsIgnoreCase(cert.getStatus())) {
-                            btnRequestCertificate.setText("Đã cấp chứng chỉ");
+                            btnRequestCertificate.setText("ÄĂ£ cáº¥p chá»©ng chá»‰");
                             btnRequestCertificate.setEnabled(false);
                             btnRequestCertificate.setBackgroundResource(R.drawable.bg_white_card);
                         } else {
@@ -663,41 +733,41 @@ public class CourseDetailActivity extends AppCompatActivity {
 
     private void setupRequestCertificateClick() {
         btnRequestCertificate.setEnabled(true);
-        btnRequestCertificate.setText("Yêu cầu cấp chứng chỉ");
+        btnRequestCertificate.setText("YĂªu cáº§u cáº¥p chá»©ng chá»‰");
         btnRequestCertificate.setBackgroundResource(R.drawable.bg_gradient_button);
         btnRequestCertificate.setOnClickListener(v -> {
             btnRequestCertificate.setEnabled(false);
-            btnRequestCertificate.setText("Đang yêu cầu...");
+            btnRequestCertificate.setText("Äang yĂªu cáº§u...");
             RetrofitClient.getInstance().getLearningService().applyForCertificate(courseIdStr).enqueue(new Callback<ApiResponse<CertificateRequestResponse>>() {
                 @Override
                 public void onResponse(Call<ApiResponse<CertificateRequestResponse>> call, Response<ApiResponse<CertificateRequestResponse>> response) {
                     if (response.isSuccessful()) {
-                        ToastUtil.showCustomToast(CourseDetailActivity.this, "Đã gửi yêu cầu cấp chứng chỉ");
-                        btnRequestCertificate.setText("Chờ xác nhận");
+                        ToastUtil.showCustomToast(CourseDetailActivity.this, "ÄĂ£ gá»­i yĂªu cáº§u cáº¥p chá»©ng chá»‰");
+                        btnRequestCertificate.setText("Chá» xĂ¡c nháº­n");
                         btnRequestCertificate.setBackgroundResource(R.drawable.bg_white_card);
                     } else {
-                        ToastUtil.showCustomToast(CourseDetailActivity.this, "Yêu cầu thất bại");
+                        ToastUtil.showCustomToast(CourseDetailActivity.this, "YĂªu cáº§u tháº¥t báº¡i");
                         setupRequestCertificateClick();
                     }
                 }
                 @Override
                 public void onFailure(Call<ApiResponse<CertificateRequestResponse>> call, Throwable t) {
-                    ToastUtil.showCustomToast(CourseDetailActivity.this, "Lỗi kết nối");
+                    ToastUtil.showCustomToast(CourseDetailActivity.this, "Lá»—i káº¿t ná»‘i");
                     setupRequestCertificateClick();
                 }
             });
         });
     }
 
-    // ─────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Start / Continue button
-    // ─────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private void setupStartButton() {
         if (btnStartLearning == null) return;
         btnStartLearning.setOnClickListener(v -> {
             if (isAllLocked) {
-                ToastUtil.showCustomToast(this, "Vui lòng đăng nhập để học");
+                ToastUtil.showCustomToast(this, "Vui lĂ²ng Ä‘Äƒng nháº­p Ä‘á»ƒ há»c");
                 return;
             }
             
@@ -708,7 +778,7 @@ public class CourseDetailActivity extends AppCompatActivity {
                     return; 
                 }
             }
-            // All done or all locked — restart from lesson 1
+            // All done or all locked â€” restart from lesson 1
             if (!lessons.isEmpty()) openLesson(lessons.get(0).getId());
         });
     }
@@ -718,7 +788,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         for (LessonResponse l : lessons) {
             if (l.getId().equals(lessonId)) {
                 if (isAllLocked) {
-                    ToastUtil.showCustomToast(this, "Bài học chưa mở khóa!");
+                    ToastUtil.showCustomToast(this, "BĂ i há»c chÆ°a má»Ÿ khĂ³a!");
                     return;
                 }
                 startActivity(LessonActivity.newIntent(this, courseIdStr, lessonId));
@@ -727,7 +797,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         }
     }
 
-    // ── Cart badge refresh ───────────────────────────────────────────────────────────
+    // â”€â”€ Cart badge refresh â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Override
     protected void onResume() {
@@ -746,8 +816,8 @@ public class CourseDetailActivity extends AppCompatActivity {
         }
     }
 
-    // ───────────────────────────────────────────────────────────────────    // Purchase state
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€    // Purchase state
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Toggle UI between purchased and non-purchased states.
@@ -764,3 +834,5 @@ public class CourseDetailActivity extends AppCompatActivity {
         }
     }
 }
+
+

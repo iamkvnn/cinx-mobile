@@ -28,6 +28,12 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
         void onFavoriteClick(CourseResponse course);
     }
 
+    public void updateData(List<CourseResponse> newCourses) {
+        this.courses.clear();
+        if (newCourses != null) this.courses.addAll(newCourses);
+        notifyDataSetChanged();
+    }
+
     public CourseAdapter(List<CourseResponse> courses, OnCourseClickListener listener) {
         this.courses = courses;
         this.listener = listener;
@@ -80,12 +86,12 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
         }
 
         public void bind(CourseResponse course, OnCourseClickListener listener) {
-            categoryBadge.setText(course.getCategory() != null ? course.getCategory() : "Khóa học");
+            categoryBadge.setText(course.getCategory() != null ? course.getCategory() : "KhĂ³a há»c");
             courseRating.setText(String.valueOf(course.getRating() != null ? course.getRating() : 0.0));
             long students = course.getEnrollmentCount() != null ? course.getEnrollmentCount() : 0L;
             courseStudents.setText("(" + students + ")");
             courseTitle.setText(course.getTitle());
-            instructorName.setText(course.getInstructor().getName() != null ? course.getInstructor().getName() : "Giảng viên"); // fallback instructor
+            instructorName.setText(course.getInstructor().getName() != null ? course.getInstructor().getName() : "Giáº£ng viĂªn"); // fallback instructor
 
             long price = course.getPrice() != null ? course.getPrice() : 0L;
             long discountedPriceObj = course.getDiscountedPrice() != null ? course.getDiscountedPrice() : price;
@@ -136,3 +142,4 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
         }
     }
 }
+

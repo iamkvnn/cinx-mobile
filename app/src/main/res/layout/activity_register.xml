@@ -60,6 +60,29 @@
                     app:tint="@color/white" />
             </FrameLayout>
 
+            <RadioGroup
+                android:id="@+id/rgRole"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp"
+                android:gravity="center">
+
+                <RadioButton
+                    android:id="@+id/rbUser"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="USER"
+                    android:checked="true"
+                    android:layout_marginEnd="16dp" />
+
+                <RadioButton
+                    android:id="@+id/rbInstructor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="INSTRUCTOR" />
+            </RadioGroup>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -93,23 +116,69 @@
                  android:layout_width="match_parent"
                  android:layout_height="match_parent"
                  android:orientation="horizontal">
-                 <TextView
+                 <RadioGroup
+                android:id="@+id/rgRole"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp"
+                android:gravity="center">
+
+                <RadioButton
+                    android:id="@+id/rbUser"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="USER"
+                    android:checked="true"
+                    android:layout_marginEnd="16dp" />
+
+                <RadioButton
+                    android:id="@+id/rbInstructor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="INSTRUCTOR" />
+            </RadioGroup>
+
+            <TextView
                      android:id="@+id/btn_switch_login"
                      android:layout_width="0dp"
                      android:layout_height="match_parent"
                      android:layout_weight="1"
                      android:gravity="center"
-                     android:text="Đăng nhập"
+                     android:text="ÄÄƒng nháº­p"
                      android:textStyle="bold"
                      android:textColor="@color/text_secondary"
                      android:textSize="14sp"/>
-                 <TextView
+                 <RadioGroup
+                android:id="@+id/rgRole"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp"
+                android:gravity="center">
+
+                <RadioButton
+                    android:id="@+id/rbUser"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="USER"
+                    android:checked="true"
+                    android:layout_marginEnd="16dp" />
+
+                <RadioButton
+                    android:id="@+id/rbInstructor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="INSTRUCTOR" />
+            </RadioGroup>
+
+            <TextView
                      android:id="@+id/btn_switch_register"
                      android:layout_width="0dp"
                      android:layout_height="match_parent"
                      android:layout_weight="1"
                      android:gravity="center"
-                     android:text="Đăng ký"
+                     android:text="ÄÄƒng kĂ½"
                      android:textStyle="bold"
                      android:textColor="@color/text_primary"
                      android:textSize="14sp"/>
@@ -135,7 +204,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_glass_input"
-                    android:hint="Họ và tên"
+                    android:hint="Há» vĂ  tĂªn"
                     android:paddingStart="48dp"
                     android:paddingEnd="16dp"
                     android:paddingTop="16dp"
@@ -193,7 +262,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_glass_input"
-                    android:hint="Tạo mật khẩu"
+                    android:hint="Táº¡o máº­t kháº©u"
                     android:paddingStart="48dp"
                     android:paddingEnd="48dp"
                     android:paddingTop="16dp"
@@ -232,7 +301,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_glass_input"
-                    android:hint="Nhập lại mật khẩu"
+                    android:hint="Nháº­p láº¡i máº­t kháº©u"
                     android:paddingStart="48dp"
                     android:paddingEnd="48dp"
                     android:paddingTop="16dp"
@@ -266,7 +335,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_btn_primary"
-                android:text="Tạo tài khoản"
+                android:text="Táº¡o tĂ i khoáº£n"
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 android:textSize="18sp"
@@ -293,10 +362,33 @@
                     android:layout_height="1dp"
                     android:background="#80CBD5E1"
                     android:layout_centerVertical="true"/>
-                <TextView
+                <RadioGroup
+                android:id="@+id/rgRole"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp"
+                android:gravity="center">
+
+                <RadioButton
+                    android:id="@+id/rbUser"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Hoặc tiếp tục với"
+                    android:text="USER"
+                    android:checked="true"
+                    android:layout_marginEnd="16dp" />
+
+                <RadioButton
+                    android:id="@+id/rbInstructor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="INSTRUCTOR" />
+            </RadioGroup>
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hoáº·c tiáº¿p tá»¥c vá»›i"
                     android:textSize="12sp"
                     android:textColor="@color/text_secondary"
                     android:textStyle="bold"

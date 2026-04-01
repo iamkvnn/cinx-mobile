@@ -76,35 +76,6 @@
     </LinearLayout>
 
     <!-- Stats Tab -->
-    <LinearLayout
-        android:id="@+id/navInstStats"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="6dp"
-        android:minHeight="48dp"
-        android:background="@android:color/transparent">
-
-        <ImageView
-            android:id="@+id/navInstStatsIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_bar_chart"
-            app:tint="@color/text_secondary" />
-
-        <TextView
-            android:id="@+id/navInstStatsText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Thống kê"
-            android:textColor="@color/primary"
-            android:textSize="11sp"
-            android:textStyle="bold"
-            android:layout_marginTop="4dp"
-            android:visibility="gone" />
-    </LinearLayout>
 
     <!-- Profile Tab -->
     <LinearLayout

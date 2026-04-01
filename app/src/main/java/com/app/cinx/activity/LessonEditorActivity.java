@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -25,6 +26,7 @@ import com.app.cinx.api.RetrofitClient;
 import com.app.cinx.api.dto.ApiResponse;
 import com.app.cinx.api.dto.ArticleLessonResponse;
 import com.app.cinx.api.dto.CreateArticleLessonRequest;
+import com.app.cinx.api.dto.CreateQuizLessonRequest;
 import com.app.cinx.api.dto.CreateVideoLessonRequest;
 import com.app.cinx.api.dto.PresignedUrlResponse;
 import com.app.cinx.api.dto.VideoLessonResponse;
@@ -44,8 +46,9 @@ public class LessonEditorActivity extends AppCompatActivity {
     private String lessonType;
     private String lessonTitle;
 
-    private LinearLayout llArticleEditor, llVideoEditor;
-    private EditText etArticleContent;
+    private LinearLayout llArticleEditor, llVideoEditor, llQuizEditor;
+    private EditText etArticleContent, etQuizDuration, etQuizMaxAttempt;
+    private CheckBox cbIsReviewAllowed;
     private TextView tvCurrentVideo, tvUploadStatus;
     private Button btnPickVideo, btnSaveContent;
     private ProgressBar pbVideoUpload;
@@ -72,7 +75,11 @@ public class LessonEditorActivity extends AppCompatActivity {
 
         llArticleEditor = findViewById(R.id.llArticleEditor);
         llVideoEditor = findViewById(R.id.llVideoEditor);
+        llQuizEditor = findViewById(R.id.llQuizEditor);
         etArticleContent = findViewById(R.id.etArticleContent);
+        etQuizDuration = findViewById(R.id.etQuizDuration);
+        etQuizMaxAttempt = findViewById(R.id.etQuizMaxAttempt);
+        cbIsReviewAllowed = findViewById(R.id.cbIsReviewAllowed);
         tvCurrentVideo = findViewById(R.id.tvCurrentVideo);
         tvUploadStatus = findViewById(R.id.tvUploadStatus);
         btnPickVideo = findViewById(R.id.btnPickVideo);
@@ -91,6 +98,9 @@ public class LessonEditorActivity extends AppCompatActivity {
             llVideoEditor.setVisibility(View.VISIBLE);
             loadVideoData();
             btnPickVideo.setOnClickListener(v -> pickVideo());
+        } else if ("QUIZ".equalsIgnoreCase(lessonType)) {
+            llQuizEditor.setVisibility(View.VISIBLE);
+            // Optionally load quiz data if exist
         } else {
             Toast.makeText(this, "Type not supported yet", Toast.LENGTH_SHORT).show();
         }
@@ -179,6 +189,34 @@ public class LessonEditorActivity extends AppCompatActivity {
                 return;
             }
             uploadVideoToPresignedUrl();
+        } else if ("QUIZ".equalsIgnoreCase(lessonType)) {
+            CreateQuizLessonRequest req = new CreateQuizLessonRequest();
+            try {
+                req.setDuration(Integer.parseInt(etQuizDuration.getText().toString()));
+                req.setMaxAttempt(Integer.parseInt(etQuizMaxAttempt.getText().toString()));
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Vui long nhap so hop le", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            req.setIsReviewAllowed(cbIsReviewAllowed.isChecked());
+            req.setIsShowAnswersOnReview(true); // Default to true or add checkbox
+
+            CourseService service = RetrofitClient.getInstance().getCourseService();
+            service.createQuizLesson(lessonId, req).enqueue(new Callback<ApiResponse<Object>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(LessonEditorActivity.this, "Luu quiz thanh cong", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(LessonEditorActivity.this, "Loi luu quiz", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
+                    Toast.makeText(LessonEditorActivity.this, "Network Error", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
@@ -241,24 +279,9 @@ public class LessonEditorActivity extends AppCompatActivity {
                     @Override public void onResponse(okhttp3.Call call, okhttp3.Response response) throws java.io.IOException { 
                         if(response.isSuccessful()){ runOnUiThread(() -> saveVideoLessonData(pUrl.getFileKey(), service)); }
                         else { runOnUiThread(() -> { Toast.makeText(LessonEditorActivity.this, "Upload that bai", Toast.LENGTH_SHORT).show(); resetUploadState(); }); }
+                        response.close();
                     } 
                 });
-                if(false) service.getCourseById("").enqueue(new Callback<ApiResponse<com.app.cinx.api.dto.CourseDetailResponse>>() {
-                @Override
-                public void onResponse(Call<ApiResponse<com.app.cinx.api.dto.CourseDetailResponse>> call, Response<ApiResponse<com.app.cinx.api.dto.CourseDetailResponse>> response) {
-                    if (response.isSuccessful()) {
-                        saveVideoLessonData(pUrl.getFileKey(), service);
-                    } else {
-                        Toast.makeText(LessonEditorActivity.this, "Upload that bai", Toast.LENGTH_SHORT).show();
-                        resetUploadState();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ApiResponse<com.app.cinx.api.dto.CourseDetailResponse>> call, Throwable t) {
-                    resetUploadState();
-                }
-            });
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -51,16 +51,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Cart screen — lets the user review selected courses, apply vouchers,
- * and proceed to checkout.
- *
- * Architecture notes:
- *  - Sample data is defined inline; swap with a ViewModel/Repository later.
- *  - All price math is kept in {@link #refreshSummary()} — one source of truth.
- *  - Swipe-to-delete uses {@link ItemTouchHelper} with a custom paint callback
- *    so no extra library dependency is required.
- */
 public class CartActivity extends AppCompatActivity
         implements CartAdapter.OnCartInteractionListener {
 

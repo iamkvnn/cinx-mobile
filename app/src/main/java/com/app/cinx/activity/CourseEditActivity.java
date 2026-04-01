@@ -360,6 +360,7 @@ public class CourseEditActivity extends AppCompatActivity {
                 UpdateLessonRequest ulr = new UpdateLessonRequest();
                 ulr.setId(less.id); // null if new
                 ulr.setTitle(less.title);
+                ulr.setLessonType(less.lessonType);
                 ulr.setDuration(less.duration);
                 ulr.setOrderIndex(j);
                 ulrList.add(ulr);

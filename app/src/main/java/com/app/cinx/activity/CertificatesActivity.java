@@ -27,15 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * CertificatesActivity
- *
- * Displays the user's earned certificates as gold shimmer cards.
- * Each card provides:
- *  - Course name, issue date, grade badge
- *  - "Download PDF" action (simulated; hook into real backend later)
- *  - "Add to LinkedIn" action (opens LinkedIn share flow)
- */
 public class CertificatesActivity extends AppCompatActivity
         implements CertificateAdapter.CertificateListener {
 
@@ -90,7 +81,7 @@ public class CertificatesActivity extends AppCompatActivity
                                 "Gần đây", // Should be actual issued date
                                 100, // Should be actual score if available
                                 Certificate.Grade.EXCELLENT,
-                                "" // Should be URL if available
+                                res.getCertificateUrl()
                             ));
                         }
                     }

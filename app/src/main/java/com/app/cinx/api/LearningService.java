@@ -120,6 +120,9 @@ public interface LearningService {
     @GET("api/v1/certificates/requests/{courseId}")
     Call<PaginatedApiResponseCertificateRequestResponse> getRequestsByCourse(@Path("courseId") String courseId, @Query("status") String status, @Query("page") Integer page, @Query("size") Integer size);
 
+    @GET("api/v1/certificates/requests")
+    Call<PaginatedApiResponseCertificateRequestResponse> getRequestsByCourse(@Query("status") String status, @Query("page") Integer page, @Query("size") Integer size);
+
     @GET("api/v1/certificates/my-certificates")
     Call<ApiResponse<List<CertificateRequestResponse>>> getMyCertificates();
 

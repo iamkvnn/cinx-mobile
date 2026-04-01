@@ -2,6 +2,8 @@ package com.app.cinx.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import com.app.cinx.api.dto.DeviceTokenRequest;
+import com.google.firebase.messaging.FirebaseMessaging;
 import android.text.InputType;
 import android.view.View;
 import android.view.animation.Animation;
@@ -135,6 +137,19 @@ public class LoginActivity extends AppCompatActivity {
                     
                     if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                         TokenResponseDto tokens = response.body().getData();
+                        // Sync FCM
+                        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+                            if (!task.isSuccessful() || task.getResult() == null) return;
+                            DeviceTokenRequest freq = new DeviceTokenRequest();
+                            freq.setFcmToken(task.getResult());
+                            RetrofitClient.getInstance().getUserService().saveDeviceToken(freq).enqueue(new retrofit2.Callback<com.app.cinx.api.dto.ApiResponse<Void>>() {
+                                @Override
+                                public void onResponse(retrofit2.Call<com.app.cinx.api.dto.ApiResponse<Void>> call, retrofit2.Response<com.app.cinx.api.dto.ApiResponse<Void>> res) {}
+                                @Override
+                                public void onFailure(retrofit2.Call<com.app.cinx.api.dto.ApiResponse<Void>> call, Throwable th) {}
+                            });
+                        });
+
                         TokenManager.getInstance().saveTokens(
                                 tokens.getAccessToken(),
                                 tokens.getRefreshToken()
@@ -181,7 +196,7 @@ public class LoginActivity extends AppCompatActivity {
                     btnLogin.setEnabled(true);
                     btnLogin.setText("Đăng nhập");
                     Log.e("LoginActivity", "Login error", t);
-                    Toast.makeText(LoginActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Lỗi kết ối", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -244,3 +259,6 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 }
+
+
+

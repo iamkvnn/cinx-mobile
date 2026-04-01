@@ -9,6 +9,8 @@ import android.view.animation.TranslateAnimation;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.RadioGroup;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,6 +33,7 @@ public class RegisterActivity extends AppCompatActivity {
     private ImageView iconEye, iconEyeRe;
     private boolean isPasswordVisible = false;
     private boolean isRepasswordVisible = false;
+    private RadioGroup rgRole;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,7 @@ public class RegisterActivity extends AppCompatActivity {
         inputEmail = findViewById(R.id.input_email);
         inputPassword = findViewById(R.id.input_password);
         inputRepassword = findViewById(R.id.input_repassword);
+        rgRole = findViewById(R.id.rgRole);
         iconEye = findViewById(R.id.icon_eye);
         iconEyeRe = findViewById(R.id.icon_eye_re);
         AppCompatButton btnRegister = findViewById(R.id.btn_register);
@@ -111,7 +115,7 @@ public class RegisterActivity extends AppCompatActivity {
         if (pass.isEmpty()) { shakeView(inputPassword); isValid = false; }
         if (repass.isEmpty()) { shakeView(inputRepassword); isValid = false; }
         if (!pass.equals(repass)) {
-            inputRepassword.setError("Mật khẩu không khớp");
+            inputRepassword.setError("Máº­t kháº©u khĂ´ng khá»›p");
             shakeView(inputRepassword);
             isValid = false;
         }
@@ -119,12 +123,12 @@ public class RegisterActivity extends AppCompatActivity {
         if (isValid) {
             AppCompatButton btnRegister = findViewById(R.id.btn_register);
             btnRegister.setEnabled(false);
-            btnRegister.setText("Đang đăng ký...");
+            btnRegister.setText("Äang Ä‘Äƒng kĂ½...");
 
             AuthService authService = RetrofitClient.getInstance().getAuthService();
             if (authService == null) {
                 btnRegister.setEnabled(true);
-                btnRegister.setText("Đăng ký");
+                btnRegister.setText("ÄÄƒng kĂ½");
                 return;
             }
 
@@ -132,28 +136,34 @@ public class RegisterActivity extends AppCompatActivity {
             req.setName(name);
             req.setEmail(email);
             req.setPassword(pass);
-            // Default role is USER or handled by backend
+                        // Get selected role
+            int selectedId = rgRole.getCheckedRadioButtonId();
+            if (selectedId == R.id.rbInstructor) {
+                req.setRole("INSTRUCTOR");
+            } else {
+                req.setRole("USER");
+            }
 
             authService.register(req).enqueue(new Callback<ApiResponse<Object>>() {
                 @Override
                 public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
                     btnRegister.setEnabled(true);
-                    btnRegister.setText("Đăng ký");
+                    btnRegister.setText("ÄÄƒng kĂ½");
                     if (response.isSuccessful()) {
-                        Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RegisterActivity.this, "ÄÄƒng kĂ½ thĂ nh cĂ´ng!", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                         finish();
                     } else {
-                        Toast.makeText(RegisterActivity.this, "Đăng ký thất bại", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RegisterActivity.this, "ÄÄƒng kĂ½ tháº¥t báº¡i", Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
                     btnRegister.setEnabled(true);
-                    btnRegister.setText("Đăng ký");
+                    btnRegister.setText("ÄÄƒng kĂ½");
                     Log.e("RegisterActivity", "Register error", t);
-                    Toast.makeText(RegisterActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "Lá»—i káº¿t ná»‘i", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -166,3 +176,4 @@ public class RegisterActivity extends AppCompatActivity {
         view.startAnimation(shake);
     }
 }
+

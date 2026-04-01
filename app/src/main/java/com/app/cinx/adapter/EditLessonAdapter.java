@@ -64,6 +64,18 @@ public class EditLessonAdapter extends RecyclerView.Adapter<EditLessonAdapter.Le
             lessonList.remove(position);
             notifyItemRemoved(position);
         });
+
+        holder.itemView.setOnClickListener(v -> {
+            if (lesson.id == null || lesson.id.isEmpty()) {
+                Toast.makeText(context, "Vui lòng lưu khóa học trước khi thêm nội dung", Toast.LENGTH_SHORT).show();
+            } else {
+                android.content.Intent intent = new android.content.Intent(context, com.app.cinx.activity.LessonEditorActivity.class);
+                intent.putExtra("LESSON_ID", lesson.id);
+                intent.putExtra("LESSON_TYPE", lesson.lessonType);
+                intent.putExtra("LESSON_TITLE", lesson.title);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

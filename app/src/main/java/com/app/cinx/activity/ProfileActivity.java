@@ -47,17 +47,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import android.util.Log;
 
-/**
- * ProfileActivity
- *
- * Displays the user's profile:
- *  - Personal info card (avatar, name, email, membership badge, quick stats)
- *  - Grouped settings menus (iOS-style)
- *  - Floating bottom navigation bar
- */
 public class ProfileActivity extends AppCompatActivity {
-
-    // ── Profile Card ──────────────────────────────────────────────────
     private ImageView ivAvatar;
     private View btnEditProfile;
     private TextView  tvProfileName;
@@ -67,15 +57,14 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView  tvXp;
     private TextView  tvHours;
 
-    // ── Menu Rows ─────────────────────────────────────────────────────
     private LinearLayout btnLearningPaths;
     private LinearLayout rowCertificates;
+    private LinearLayout rowNotifications;
+    private LinearLayout rowWishlist;
     private LinearLayout rowOrderHistory;
     private LinearLayout rowVouchers;
     private LinearLayout rowPaymentMethods;
     private LinearLayout rowLogout;
-
-    // ── Demo stat data ─────────────────────────────────────────────────
     private static final int LEARN_HOURS  = 0;
 
     private UserDto currentUserDto;
@@ -129,10 +118,6 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────
-    // View binding
-    // ─────────────────────────────────────────────────────────────────
-
     private void bindViews() {
         ivAvatar          = findViewById(R.id.ivAvatar);
         btnEditProfile = findViewById(R.id.btnEditProfile);
@@ -145,15 +130,13 @@ public class ProfileActivity extends AppCompatActivity {
 
         btnLearningPaths  = findViewById(R.id.btnLearningPaths);
         rowCertificates  = findViewById(R.id.rowCertificates);
+        rowNotifications = findViewById(R.id.rowNotifications);
+        rowWishlist = findViewById(R.id.rowWishlist);
         rowOrderHistory  = findViewById(R.id.rowOrderHistory);
         rowVouchers      = findViewById(R.id.rowVouchers);
         rowPaymentMethods = findViewById(R.id.rowPaymentMethods);
         rowLogout        = findViewById(R.id.rowLogout);
     }
-
-    // ─────────────────────────────────────────────────────────────────
-    // Populate with real / demo data
-    // ─────────────────────────────────────────────────────────────────
 
     private void populateUserData() {
         UserManager user = UserManager.getInstance();
@@ -264,10 +247,6 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────
-    // Menu click listeners
-    // ─────────────────────────────────────────────────────────────────
-
         private void setupEditProfileListener() {
         if (btnEditProfile != null) {
             btnEditProfile.setOnClickListener(v -> showEditProfileDialog());
@@ -332,11 +311,11 @@ public class ProfileActivity extends AppCompatActivity {
                                 UserManager.getInstance().setUserXp(currentUserDto.getXp() != null ? currentUserDto.getXp() : 0);
                                 runOnUiThread(() -> {
                                     updateProfileUI(currentUserDto);
-                                    ToastUtil.showCustomToast(ProfileActivity.this, "Cập nhật hồ sơ thành công");
+                                    ToastUtil.showCustomToast(ProfileActivity.this, "Cap nhat ho so thanh cong");
                                     dialog.dismiss();
                                 });
                             } else {
-                                ToastUtil.showCustomToast(ProfileActivity.this, "Cập nhật thất bại");
+                                ToastUtil.showCustomToast(ProfileActivity.this, "Cap nhat ho so that bai");
                             }
                         }
 
@@ -352,7 +331,7 @@ public class ProfileActivity extends AppCompatActivity {
                     dialog.dismiss();
                 }
             } else {
-                ToastUtil.showCustomToast(this, "Tên không được để trống");
+                ToastUtil.showCustomToast(this, "TÄ‚Âªn khÄ‚Â´ng Ă„â€˜Ă†Â°Ă¡Â»Â£c Ă„â€˜Ă¡Â»Æ’ trĂ¡Â»â€˜ng");
             }
         });
         
@@ -383,11 +362,17 @@ public class ProfileActivity extends AppCompatActivity {
         return null;
     }
 
-    // ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
-    // Menu click listeners
-    // ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
-
     private void setupMenuListeners() {
+        if (rowNotifications != null) {
+            rowNotifications.setOnClickListener(v -> {
+                startActivity(new Intent(ProfileActivity.this, NotificationActivity.class));
+            });
+        }
+        if (rowWishlist != null) {
+            rowWishlist.setOnClickListener(v -> {
+                startActivity(new Intent(ProfileActivity.this, WishlistActivity.class));
+            });
+        }
         if (btnLearningPaths != null) {
             btnLearningPaths.setOnClickListener(v -> {
                 Intent intent = new Intent(ProfileActivity.this, LearningPathManagementActivity.class);
@@ -421,10 +406,6 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    // ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
-    // Logout
-    // ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
-
     private void showLogoutConfirmDialog() {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.profile_logout)
@@ -443,3 +424,5 @@ public class ProfileActivity extends AppCompatActivity {
         finish();
     }
 }
+
+

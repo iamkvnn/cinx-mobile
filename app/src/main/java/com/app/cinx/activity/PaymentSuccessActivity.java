@@ -16,15 +16,6 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.app.cinx.R;
 import com.app.cinx.utils.ToastUtil;
 
-/**
- * Payment-success / "Thank you" screen.
- *
- * Launched from {@link CheckoutActivity} after the simulated payment processing.
- * Plays a Lottie confetti burst + check-mark animation, then shows order details.
- *
- * The screen is intentionally one-way: pressing Back leads to MainActivity
- * (the back stack is cleared by {@link CheckoutActivity#launchSuccessScreen()}).
- */
 public class PaymentSuccessActivity extends AppCompatActivity {
 
     // ── Intent extras ─────────────────────────────────────────────────────
