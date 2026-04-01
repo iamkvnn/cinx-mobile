@@ -67,7 +67,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         if (UserManager.getInstance().isLoggedIn()) {
-            if ("INSTRUCTOR".equalsIgnoreCase(UserManager.getInstance().getUserRole())) {
+            String role = UserManager.getInstance().getUserRole();
+            if ("ADMIN".equalsIgnoreCase(role)) {
+                android.content.Intent intent = new android.content.Intent(MainActivity.this, AdminDashboardActivity.class);
+                intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+                return;
+            }
+            if ("INSTRUCTOR".equalsIgnoreCase(role)) {
                 android.content.Intent intent = new android.content.Intent(MainActivity.this, InstructorDashboardActivity.class);
                 intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);

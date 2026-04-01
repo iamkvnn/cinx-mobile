@@ -182,10 +182,10 @@ public class ManageInstructorsActivity extends AppCompatActivity implements Admi
     private void updateTabUi() {
         boolean pendingActive = selectedTab == TAB_PENDING;
 
-        tabPending.setBackgroundColor(pendingActive ? getColor(R.color.primary) : getColor(android.R.color.transparent));
+        tabPending.setSelected(pendingActive);
         tabPending.setTextColor(getColor(pendingActive ? R.color.white : R.color.text_secondary));
 
-        tabVerified.setBackgroundColor(!pendingActive ? getColor(R.color.primary) : getColor(android.R.color.transparent));
+        tabVerified.setSelected(!pendingActive);
         tabVerified.setTextColor(getColor(!pendingActive ? R.color.white : R.color.text_secondary));
     }
 
