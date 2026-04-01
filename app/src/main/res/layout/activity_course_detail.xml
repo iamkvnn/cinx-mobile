@@ -867,6 +867,19 @@
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 android:textSize="14sp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnRequestCertificate"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="52dp"
+                android:text="Yêu cầu cấp chứng chỉ"
+                android:textAllCaps="false"
+                android:background="@drawable/bg_gradient_button"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:visibility="gone" />
         </LinearLayout>
 
     </LinearLayout>

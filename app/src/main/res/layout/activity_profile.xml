@@ -347,6 +347,53 @@
                 android:background="@drawable/bg_glass_card"
                 android:layout_marginBottom="20dp">
 
+                <!-- Row: Lộ trình học tập -->
+                <LinearLayout
+                    android:id="@+id/btnLearningPaths"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <FrameLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_container"
+                        android:backgroundTint="#F0F9FF">
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_search"
+                            app:tint="#0EA5E9" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Quản lý lộ trình học tập"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_primary"
+                        android:layout_marginStart="16dp" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/text_secondary" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider"
+                    android:layout_marginStart="52dp" />
+
                 <!-- Row: Chứng chỉ -->
                 <LinearLayout
                     android:id="@+id/rowCertificates"
@@ -390,47 +437,6 @@
 
                 <View android:layout_width="match_parent" android:layout_height="1dp"
                     android:background="@color/divider" android:layout_marginStart="64dp" />
-
-                <!-- Row: Tài liệu đã tải -->
-                <LinearLayout
-                    android:id="@+id/rowDownloads"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="16dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground">
-
-                    <LinearLayout
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:background="@drawable/bg_icon_indigo"
-                        android:gravity="center"
-                        android:layout_marginEnd="12dp">
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/ic_document"
-                            app:tint="#4338CA" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/profile_downloads"
-                        android:textSize="15sp"
-                        android:textColor="@color/text_primary" />
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/ic_chevron_right"
-                        app:tint="@color/text_secondary" />
-                </LinearLayout>
             </LinearLayout>
 
             <!-- ══════════════════════════════════════════════════════ -->
@@ -586,111 +592,6 @@
             </LinearLayout>
 
             <!-- ══════════════════════════════════════════════════════ -->
-            <!-- GROUP: Cài đặt                                         -->
-            <!-- ══════════════════════════════════════════════════════ -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/profile_group_settings"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                android:textColor="@color/text_secondary"
-                android:letterSpacing="0.07"
-                android:layout_marginStart="4dp"
-                android:layout_marginBottom="8dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_glass_card"
-                android:layout_marginBottom="20dp">
-
-                <!-- Row: Thông báo (toggle) -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="16dp">
-
-                    <LinearLayout
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:background="@drawable/bg_icon_indigo"
-                        android:gravity="center"
-                        android:layout_marginEnd="12dp">
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/ic_smartphone"
-                            app:tint="#4338CA" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/profile_notifications"
-                        android:textSize="15sp"
-                        android:textColor="@color/text_primary" />
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/switchNotifications"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="true"
-                        app:thumbTint="@android:color/white"
-                        app:trackTint="@color/switch_track_selector" />
-                </LinearLayout>
-
-                <View android:layout_width="match_parent" android:layout_height="1dp"
-                    android:background="@color/divider" android:layout_marginStart="64dp" />
-
-                <!-- Row: Giao diện tối (toggle) -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="16dp">
-
-                    <LinearLayout
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:background="@drawable/bg_icon_gray"
-                        android:gravity="center"
-                        android:layout_marginEnd="12dp">
-
-                        <ImageView
-                            android:id="@+id/ivDarkModeIcon"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/ic_eye_off"
-                            app:tint="@color/text_secondary" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/profile_dark_mode"
-                        android:textSize="15sp"
-                        android:textColor="@color/text_primary" />
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/switchDarkMode"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="false"
-                        app:thumbTint="@android:color/white"
-                        app:trackTint="@color/switch_track_selector" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- ══════════════════════════════════════════════════════ -->
             <!-- GROUP: Hỗ trợ                                          -->
             <!-- ══════════════════════════════════════════════════════ -->
             <TextView
@@ -711,50 +612,6 @@
                 android:orientation="vertical"
                 android:background="@drawable/bg_glass_card"
                 android:layout_marginBottom="8dp">
-
-                <!-- Row: Trung tâm trợ giúp -->
-                <LinearLayout
-                    android:id="@+id/rowHelpCenter"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="16dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground">
-
-                    <LinearLayout
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:background="@drawable/bg_icon_gray"
-                        android:gravity="center"
-                        android:layout_marginEnd="12dp">
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/ic_circle_outline"
-                            app:tint="@color/text_secondary" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/profile_help_center"
-                        android:textSize="15sp"
-                        android:textColor="@color/text_primary" />
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/ic_chevron_right"
-                        app:tint="@color/text_secondary" />
-                </LinearLayout>
-
-                <View android:layout_width="match_parent" android:layout_height="1dp"
-                    android:background="@color/divider" android:layout_marginStart="64dp" />
 
                 <!-- Row: Đăng xuất (red) -->
                 <LinearLayout

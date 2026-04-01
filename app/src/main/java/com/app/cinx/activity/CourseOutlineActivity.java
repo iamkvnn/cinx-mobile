@@ -1,5 +1,6 @@
 package com.app.cinx.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,7 +36,7 @@ public class CourseOutlineActivity extends AppCompatActivity {
     private String courseId;
     private Toolbar toolbarOutline;
     private RecyclerView rvSections;
-    private Button btnAddSection;
+    private Button btnAddSection, btnEditCourseInfo;
     private InstructorSectionAdapter sectionAdapter;
 
     private CourseDetailResponse currentCourseData;
@@ -50,6 +51,7 @@ public class CourseOutlineActivity extends AppCompatActivity {
         toolbarOutline = findViewById(R.id.toolbarOutline);
         rvSections = findViewById(R.id.rvSections);
         btnAddSection = findViewById(R.id.btnAddSection);
+        btnEditCourseInfo = findViewById(R.id.btnEditCourseInfo);
 
         setSupportActionBar(toolbarOutline);
         toolbarOutline.setNavigationOnClickListener(v -> finish());
@@ -57,6 +59,11 @@ public class CourseOutlineActivity extends AppCompatActivity {
         setupRecyclerView();
 
         btnAddSection.setOnClickListener(v -> showAddSectionDialog());
+        btnEditCourseInfo.setOnClickListener(v -> {
+            Intent intent = new Intent(CourseOutlineActivity.this, CourseEditActivity.class);
+            intent.putExtra("COURSE_ID", courseId);
+            startActivity(intent);
+        });
 
         loadCourseData();
     }
@@ -172,10 +179,10 @@ public class CourseOutlineActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ApiResponse<com.app.cinx.api.dto.CourseResponse>> call, Response<ApiResponse<com.app.cinx.api.dto.CourseResponse>> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(CourseOutlineActivity.this, "�? l�u", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CourseOutlineActivity.this, "Đã lưu", Toast.LENGTH_SHORT).show();
                     loadCourseData();
                 } else {
-                    Toast.makeText(CourseOutlineActivity.this, "L?i khi l�u", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CourseOutlineActivity.this, "Lỗi khi lưu", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -189,11 +196,11 @@ public class CourseOutlineActivity extends AppCompatActivity {
     private void showAddSectionDialog() {
         if (currentCourseData == null) return;
         EditText input = new EditText(this);
-        input.setHint("T�n ch��ng");
+        input.setHint("Tên chương");
         new AlertDialog.Builder(this)
-                .setTitle("Them ch��ng m?i")
+                .setTitle("Them chương mới")
                 .setView(input)
-                .setPositiveButton("Them", (dialog, which) -> {
+                .setPositiveButton("Thêm", (dialog, which) -> {
                     String title = input.getText().toString().trim();
                     if (!title.isEmpty()) {
                         UpdateCourseRequest req = buildUpdateReq();
@@ -218,9 +225,9 @@ public class CourseOutlineActivity extends AppCompatActivity {
         EditText input = new EditText(this);
         input.setText(section.getTitle());
         new AlertDialog.Builder(this)
-                .setTitle("S?a t�n ch��ng")
+                .setTitle("Sửa tên chương")
                 .setView(input)
-                .setPositiveButton("L�u", (dialog, which) -> {
+                .setPositiveButton("Lưu", (dialog, which) -> {
                     String title = input.getText().toString().trim();
                     if (!title.isEmpty()) {
                         UpdateCourseRequest req = buildUpdateReq();
@@ -232,13 +239,13 @@ public class CourseOutlineActivity extends AppCompatActivity {
                         saveToServer(req);
                     }
                 })
-                .setNegativeButton("H?y", null)
+                .setNegativeButton("Hủy", null)
                 .show();
     }
 
     private void confirmDeleteSection(SectionResponse section) {
         new AlertDialog.Builder(this)
-                .setTitle("X�a ch��ng n�y?")
+                .setTitle("Xóa chươnng này?")
                 .setMessage("T?t c? b�i h?c trong ch��ng c?ng s? b? x�a.")
                 .setPositiveButton("X�a", (dialog, which) -> {
                     UpdateCourseRequest req = buildUpdateReq();
@@ -275,7 +282,7 @@ public class CourseOutlineActivity extends AppCompatActivity {
                                         if (us.getId() != null && us.getId().equals(section.getId())) {
                                             UpdateLessonRequest newLess = new UpdateLessonRequest();
                                             newLess.setTitle(title);
-                                            newLess.setLessonType(finalSelectedType);
+//                                            newLess.setLessonType(finalSelectedType);
                                             newLess.setOrderIndex(us.getLessons() == null ? 0 : us.getLessons().size());
                                             if (us.getLessons() == null) {
                                                 us.setLessons(new java.util.ArrayList<>());

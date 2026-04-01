@@ -114,7 +114,14 @@
 
         <activity android:name=".activity.InstructorDashboardActivity" android:exported="false" android:screenOrientation="portrait" />
 
-    <activity android:name=".activity.CourseOutlineActivity" android:exported="false" android:screenOrientation="portrait" />    <activity android:name=".activity.LessonEditorActivity" android:exported="false" android:screenOrientation="portrait" />
+    <activity android:name=".activity.CourseOutlineActivity" android:exported="false" android:screenOrientation="portrait" />
+    <activity android:name=".activity.LessonEditorActivity" android:exported="false" android:screenOrientation="portrait" />
+    <activity android:name=".activity.CourseEditActivity" android:exported="false" android:screenOrientation="portrait" />
+    
+    <!-- Learning Path -->
+    <activity android:name=".activity.LearningPathManagementActivity" android:exported="false" android:screenOrientation="portrait" />
+    <activity android:name=".activity.LearningPathDetailActivity" android:exported="false" android:screenOrientation="portrait" />
+    <activity android:name=".activity.GenerateLearningPathActivity" android:exported="false" android:screenOrientation="portrait" />
 </application>
 
 </manifest>

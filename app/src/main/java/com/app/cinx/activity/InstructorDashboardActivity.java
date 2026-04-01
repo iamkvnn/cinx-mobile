@@ -84,7 +84,7 @@ public class InstructorDashboardActivity extends AppCompatActivity {
 
     private void setupActions() {
         tvCreateCourse.setOnClickListener(v -> {
-            showCreateCourseDialog();
+            startActivity(new Intent(InstructorDashboardActivity.this, CourseEditActivity.class));
         });
     }
 
@@ -191,7 +191,7 @@ public class InstructorDashboardActivity extends AppCompatActivity {
                 pbLoading.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                     List<CourseResponse> courses = response.body().getData();
-                    tvTotalCourses.setText(String.valueOf(courses.size()));
+                    tvTotalCourses.setText(String.valueOf(response.body().getMeta().getTotalElements()));
 
                     if (courses.isEmpty()) {
                         tvEmptyState.setVisibility(View.VISIBLE);

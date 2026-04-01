@@ -24,6 +24,14 @@
         android:clipToPadding="false"/>
 
     <Button
+        android:id="@+id/btnEditCourseInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:text="Edit Course General Info"
+        android:backgroundTint="#ff5555" />
+
+    <Button
         android:id="@+id/btnAddSection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

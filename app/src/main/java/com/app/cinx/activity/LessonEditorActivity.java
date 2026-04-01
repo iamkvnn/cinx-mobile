@@ -97,7 +97,7 @@ public class LessonEditorActivity extends AppCompatActivity {
     }
 
     private void loadArticleData() {
-        CourseService service = RetrofitClient.getInstance().create(CourseService.class);
+        CourseService service = RetrofitClient.getInstance().getCourseService();
         service.getArticleByLessonId(lessonId).enqueue(new Callback<ApiResponse<ArticleLessonResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<ArticleLessonResponse>> call, Response<ApiResponse<ArticleLessonResponse>> response) {
@@ -112,7 +112,7 @@ public class LessonEditorActivity extends AppCompatActivity {
     }
 
     private void loadVideoData() {
-        CourseService service = RetrofitClient.getInstance().create(CourseService.class);
+        CourseService service = RetrofitClient.getInstance().getCourseService();
         service.getVideoByLessonId(lessonId).enqueue(new Callback<ApiResponse<VideoLessonResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<VideoLessonResponse>> call, Response<ApiResponse<VideoLessonResponse>> response) {
@@ -157,7 +157,7 @@ public class LessonEditorActivity extends AppCompatActivity {
         if ("ARTICLE".equalsIgnoreCase(lessonType)) {
             CreateArticleLessonRequest req = new CreateArticleLessonRequest();
             req.setContent(etArticleContent.getText().toString());
-            CourseService service = RetrofitClient.getInstance().create(CourseService.class);
+            CourseService service = RetrofitClient.getInstance().getCourseService();
             service.createArticleLesson(lessonId, req).enqueue(new Callback<ApiResponse<Object>>() {
                 @Override
                 public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
@@ -188,7 +188,7 @@ public class LessonEditorActivity extends AppCompatActivity {
         tvUploadStatus.setVisibility(View.VISIBLE);
         tvUploadStatus.setText("Dang lay link upload...");
 
-        CourseService service = RetrofitClient.getInstance().create(CourseService.class);
+        CourseService service = RetrofitClient.getInstance().getCourseService();
         service.getPresignedUrl(selectedFileName, "video/mp4").enqueue(new Callback<ApiResponse<PresignedUrlResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<PresignedUrlResponse>> call, Response<ApiResponse<PresignedUrlResponse>> response) {
@@ -232,9 +232,20 @@ public class LessonEditorActivity extends AppCompatActivity {
                 }
             };
 
-            service.uploadFileToPresignedUrl(pUrl.getPresignedUrl(), requestBody).enqueue(new Callback<Void>() {
+                okhttp3.OkHttpClient client = RetrofitClient.getInstance().getHttpClient();
+                okhttp3.Request request = new okhttp3.Request.Builder().url(pUrl.getPresignedUrl()).put(requestBody).build();
+                client.newCall(request).enqueue(new okhttp3.Callback() {
+                    @Override public void onFailure(okhttp3.Call call, java.io.IOException e) {
+                        runOnUiThread(() -> resetUploadState());
+                    }
+                    @Override public void onResponse(okhttp3.Call call, okhttp3.Response response) throws java.io.IOException { 
+                        if(response.isSuccessful()){ runOnUiThread(() -> saveVideoLessonData(pUrl.getFileKey(), service)); }
+                        else { runOnUiThread(() -> { Toast.makeText(LessonEditorActivity.this, "Upload that bai", Toast.LENGTH_SHORT).show(); resetUploadState(); }); }
+                    } 
+                });
+                if(false) service.getCourseById("").enqueue(new Callback<ApiResponse<com.app.cinx.api.dto.CourseDetailResponse>>() {
                 @Override
-                public void onResponse(Call<Void> call, Response<Void> response) {
+                public void onResponse(Call<ApiResponse<com.app.cinx.api.dto.CourseDetailResponse>> call, Response<ApiResponse<com.app.cinx.api.dto.CourseDetailResponse>> response) {
                     if (response.isSuccessful()) {
                         saveVideoLessonData(pUrl.getFileKey(), service);
                     } else {
@@ -244,7 +255,7 @@ public class LessonEditorActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(Call<Void> call, Throwable t) {
+                public void onFailure(Call<ApiResponse<com.app.cinx.api.dto.CourseDetailResponse>> call, Throwable t) {
                     resetUploadState();
                 }
             });

@@ -31,15 +31,20 @@ import com.app.cinx.api.CourseService;
 import com.app.cinx.api.RecommendationService;
 import com.app.cinx.api.RetrofitClient;
 import com.app.cinx.api.dto.CourseResponse;
+import com.app.cinx.api.dto.DailyGoalResponse;
 import com.app.cinx.api.dto.PaginatedApiResponseCourseResponse;
 import com.app.cinx.api.dto.RecommendationResponse;
 import com.app.cinx.api.dto.RecommendedCourse;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -62,6 +67,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         if (UserManager.getInstance().isLoggedIn()) {
+            if ("INSTRUCTOR".equalsIgnoreCase(UserManager.getInstance().getUserRole())) {
+                android.content.Intent intent = new android.content.Intent(MainActivity.this, InstructorDashboardActivity.class);
+                intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+                return;
+            }
+
             Log.i("MainActivity", "User is logged in");
             setContentView(R.layout.activity_main_logged_in);
             initLoggedInViews();
@@ -111,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
         continueLearningRecyclerView = findViewById(R.id.continueLearningRecyclerView);
         recommendedRecyclerView = findViewById(R.id.recommendedRecyclerView);
         TextView tvUserName = findViewById(R.id.tvUserName);
+        View continueLearningHeader = findViewById(R.id.continueLearningHeader);
         
         if (tvUserName != null && UserManager.getInstance().getUserName() != null) {
             tvUserName.setText(UserManager.getInstance().getUserName() + " 👋");
@@ -132,32 +146,79 @@ public class MainActivity extends AppCompatActivity {
         continueLearningRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         // Placeholder for active courses until we have API for it, for now load everything
         
+        com.app.cinx.api.EnrollmentService enrollmentService = RetrofitClient.getInstance().getEnrollmentService();
+        if (enrollmentService != null) {
+            enrollmentService.getEnrolledCourses(null, null).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
+                @Override
+                public void onResponse(Call<PaginatedApiResponseCourseResponse> call, Response<PaginatedApiResponseCourseResponse> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                        List<CourseResponse> courseResponses = response.body().getData();
+                        if (courseResponses != null && !courseResponses.isEmpty()) {
+                            if (continueLearningHeader != null) continueLearningHeader.setVisibility(View.VISIBLE);
+                            if (continueLearningRecyclerView != null) continueLearningRecyclerView.setVisibility(View.VISIBLE);
+                            
+                            ContinueLearningAdapter continueAdapter = new ContinueLearningAdapter(courseResponses);
+                            continueLearningRecyclerView.setAdapter(continueAdapter);
+                        } else {
+                            if (continueLearningHeader != null) continueLearningHeader.setVisibility(View.GONE);
+                            if (continueLearningRecyclerView != null) continueLearningRecyclerView.setVisibility(View.GONE);
+                        }
+                    } else {
+                        if (continueLearningHeader != null) continueLearningHeader.setVisibility(View.GONE);
+                        if (continueLearningRecyclerView != null) continueLearningRecyclerView.setVisibility(View.GONE);
+                    }
+                }
+                @Override
+                public void onFailure(Call<PaginatedApiResponseCourseResponse> call, Throwable t) {
+                    Log.e("MainActivity", "Failed to load enrolled courses", t);
+                    if (continueLearningHeader != null) continueLearningHeader.setVisibility(View.GONE);
+                    if (continueLearningRecyclerView != null) continueLearningRecyclerView.setVisibility(View.GONE);
+                }
+            });
+        }
+        
+        // Setup Daily Goal
+        View dailyGoalContainer = findViewById(R.id.dailyGoalContainer);
+        TextView tvNoGoal = findViewById(R.id.tvNoGoal);
+        TextView tvCurrentGoalsXp = findViewById(R.id.tvCurrentGoalsXp);
+        TextView tvTargetGoalsXp = findViewById(R.id.tvTargetGoalsXp);
+        android.widget.ProgressBar pbGoalProgress = findViewById(R.id.pbGoalProgress);
+        
+        com.app.cinx.api.LearningService learningService = RetrofitClient.getInstance().getLearningService();
+        if (learningService != null && dailyGoalContainer != null && tvNoGoal != null) {
+            String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+            learningService.getDailyGoal(todayDate).enqueue(new Callback<com.app.cinx.api.dto.ApiResponse<DailyGoalResponse>>() {
+                @Override
+                public void onResponse(Call<com.app.cinx.api.dto.ApiResponse<DailyGoalResponse>> call, Response<com.app.cinx.api.dto.ApiResponse<DailyGoalResponse>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                        DailyGoalResponse goal = response.body().getData();
+                        dailyGoalContainer.setVisibility(View.VISIBLE);
+                        tvNoGoal.setVisibility(View.GONE);
+                        
+                        int current = goal.getCurrentXp() != null ? goal.getCurrentXp() : 0;
+                        int target = goal.getTargetXp() != null ? goal.getTargetXp() : 1; // avoid / 0
+                        int progress = (int) (((float) current / target) * 100);
+                        
+                        if (tvCurrentGoalsXp != null) tvCurrentGoalsXp.setText(String.valueOf(current));
+                        if (tvTargetGoalsXp != null) tvTargetGoalsXp.setText("Mục tiêu: " + target + " XP");
+                        if (pbGoalProgress != null) pbGoalProgress.setProgress(progress);
+                    } else {
+                        dailyGoalContainer.setVisibility(View.GONE);
+                        tvNoGoal.setVisibility(View.VISIBLE);
+                    }
+                }
+                
+                @Override
+                public void onFailure(Call<com.app.cinx.api.dto.ApiResponse<DailyGoalResponse>> call, Throwable t) {
+                    dailyGoalContainer.setVisibility(View.GONE);
+                    tvNoGoal.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+        
         // Setup Recommended
         recommendedRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         
-        CourseService courseService = RetrofitClient.getInstance().getCourseService();
-        courseService.getAllCourses(null, null, null).enqueue(new Callback<PaginatedApiResponseCourseResponse>() {
-            @Override
-            public void onResponse(Call<PaginatedApiResponseCourseResponse> call, Response<PaginatedApiResponseCourseResponse> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
-                    List<CourseResponse> courseResponses = response.body().getData();
-                    
-                    if (courseResponses.size() >= 2) {
-                        List<CourseResponse> activeCourses = courseResponses.subList(0, 2); 
-                        ContinueLearningAdapter continueAdapter = new ContinueLearningAdapter(activeCourses);
-                        continueLearningRecyclerView.setAdapter(continueAdapter);
-                    } else {
-                        ContinueLearningAdapter continueAdapter = new ContinueLearningAdapter(courseResponses);
-                        continueLearningRecyclerView.setAdapter(continueAdapter);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<PaginatedApiResponseCourseResponse> call, Throwable t) {
-                Log.e("MainActivity", "Failed to load courses", t);
-            }
-        });
 
         // Load Recommended Courses
         RecommendationService recommendationService = RetrofitClient.getInstance().getRecommendationService();
@@ -211,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
         partnersRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         
         // Courses
-        coursesRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        coursesRecyclerView.setLayoutManager(new GridLayoutManager(this, 1));
 
 
         // Testimonials Row 1
@@ -306,11 +367,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             });
         }
-    }
-
-    private List<CourseResponse> getCoursesList() {
-        List<CourseResponse> courses = new ArrayList<>();
-        return courses;
     }
 
     private List<Testimonial> getTestimonialsList() {

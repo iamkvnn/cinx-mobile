@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/bg_rounded_gray"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/imgLessonDragHandle"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_drag_handle" />
+
+    <TextView
+        android:id="@+id/tvLessonType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:background="#E0E0E0"
+        android:paddingHorizontal="4dp"
+        android:paddingVertical="2dp"
+        android:text="Video"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tvLessonTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="8dp"
+        android:text="Bài học 1"
+        android:textSize="14sp"
+        android:textColor="@color/black" />
+
+    <ImageView
+        android:id="@+id/btnEditLesson"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:padding="4dp"
+        android:src="@drawable/ic_edit" />
+
+    <ImageView
+        android:id="@+id/btnDeleteLesson"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:padding="4dp"
+        android:src="@drawable/ic_delete"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:tint="@android:color/holo_red_dark" />
+
+</LinearLayout>

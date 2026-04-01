@@ -35,6 +35,7 @@ import com.app.cinx.api.dto.ApiResponse;
 import com.app.cinx.api.dto.CourseDetailResponse;
 import com.app.cinx.api.dto.AddToCartRequest;
 import com.app.cinx.api.dto.LearningItemProgressResponse;
+import com.app.cinx.api.dto.CertificateRequestResponse;
 import com.app.cinx.api.dto.CheckEnrollmentStatus;
 import com.app.cinx.utils.PriceUtil;
 import retrofit2.Call;
@@ -79,6 +80,7 @@ public class CourseDetailActivity extends AppCompatActivity {
     private TextView     tvCartBadge;
     // ── Continue/Start button ─────────────────────────────────────────────
     private AppCompatButton btnStartLearning;
+    private AppCompatButton btnRequestCertificate;
 
     // ── Data ────────────────────────────────────────────────────────────────────────
     private List<SectionResponse> chapters = new ArrayList<>();
@@ -125,6 +127,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         tvCurriculumProgress= findViewById(R.id.tvCurriculumProgress);
 
         btnStartLearning = findViewById(R.id.btnStartLearning);
+        btnRequestCertificate = findViewById(R.id.btnRequestCertificate);
 
         // Cart badge
         cartBadgeFrame = findViewById(R.id.btnCartBadgeDetail);
@@ -570,6 +573,37 @@ public class CourseDetailActivity extends AppCompatActivity {
             tvCurriculumProgress.setText(completedLessons + "/" + totalLessons + " hoàn thành");
         }
 
+        // Update progress bar and text in hero overlay and floating bar
+        int progressPercent = totalLessons > 0 ? (int) ((completedLessons * 100.0f) / totalLessons) : 0;
+        
+        TextView tvFloatingProgress = findViewById(R.id.layoutActionPurchased).findViewById(R.id.layoutActionPurchased).findViewWithTag("tvFloatingProgress"); // Update logic later if needed
+        android.widget.ProgressBar progressBarFloating = findViewById(R.id.layoutActionPurchased).findViewById(R.id.layoutActionPurchased).findViewWithTag("pbFloatingProgress");
+        
+        // This relies on ID match logic
+        LinearLayout actionPurchased = findViewById(R.id.layoutActionPurchased);
+        if (actionPurchased != null) {
+            TextView progressTextFloating = (TextView) ((LinearLayout)((LinearLayout)actionPurchased.getChildAt(0)).getChildAt(0)).getChildAt(1);
+            android.widget.ProgressBar pbFloating = (android.widget.ProgressBar) ((LinearLayout)actionPurchased.getChildAt(0)).getChildAt(1);
+            if (progressTextFloating != null) progressTextFloating.setText(progressPercent + "%");
+            if (pbFloating != null) pbFloating.setProgress(progressPercent);
+        }
+
+        if (layoutHeroProgress != null) {
+            TextView tvHeroProgress = (TextView) layoutHeroProgress.getChildAt(0);
+            android.widget.ProgressBar pbHero = (android.widget.ProgressBar) layoutHeroProgress.getChildAt(1);
+            if (tvHeroProgress != null) tvHeroProgress.setText("Tiến độ khóa học: " + progressPercent + "%");
+            if (pbHero != null) pbHero.setProgress(progressPercent);
+        }
+
+        if (isPurchased && totalLessons > 0 && completedLessons >= totalLessons && btnRequestCertificate != null && btnStartLearning != null) {
+            btnStartLearning.setVisibility(View.GONE);
+            btnRequestCertificate.setVisibility(View.VISIBLE);
+            checkCertificateStatus();
+        } else if (btnStartLearning != null && btnRequestCertificate != null) {
+            btnStartLearning.setVisibility(View.VISIBLE);
+            btnRequestCertificate.setVisibility(View.GONE);
+        }
+
         // Build adapter
         curriculumAdapter = new CourseCurriculumAdapter(this, chapters);
         curriculumAdapter.setLockState(isAllLocked);
@@ -594,6 +628,65 @@ public class CourseDetailActivity extends AppCompatActivity {
         rvCourseCurriculum.setLayoutManager(new LinearLayoutManager(this));
         rvCourseCurriculum.setAdapter(curriculumAdapter);
         rvCourseCurriculum.setNestedScrollingEnabled(false);
+    }
+
+    private void checkCertificateStatus() {
+        if (courseIdStr == null || !UserManager.getInstance().isLoggedIn()) return;
+        RetrofitClient.getInstance().getLearningService().getMyCertificate(courseIdStr)
+            .enqueue(new Callback<ApiResponse<CertificateRequestResponse>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<CertificateRequestResponse>> call, Response<ApiResponse<CertificateRequestResponse>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                        CertificateRequestResponse cert = response.body().getData();
+                        if ("PENDING".equalsIgnoreCase(cert.getStatus())) {
+                            btnRequestCertificate.setText("Chờ xác nhận");
+                            btnRequestCertificate.setEnabled(false);
+                            btnRequestCertificate.setBackgroundResource(R.drawable.bg_white_card);
+                        } else if ("APPROVED".equalsIgnoreCase(cert.getStatus())) {
+                            btnRequestCertificate.setText("Đã cấp chứng chỉ");
+                            btnRequestCertificate.setEnabled(false);
+                            btnRequestCertificate.setBackgroundResource(R.drawable.bg_white_card);
+                        } else {
+                            setupRequestCertificateClick();
+                        }
+                    } else {
+                        setupRequestCertificateClick();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<CertificateRequestResponse>> call, Throwable t) {
+                    setupRequestCertificateClick();
+                }
+            });
+    }
+
+    private void setupRequestCertificateClick() {
+        btnRequestCertificate.setEnabled(true);
+        btnRequestCertificate.setText("Yêu cầu cấp chứng chỉ");
+        btnRequestCertificate.setBackgroundResource(R.drawable.bg_gradient_button);
+        btnRequestCertificate.setOnClickListener(v -> {
+            btnRequestCertificate.setEnabled(false);
+            btnRequestCertificate.setText("Đang yêu cầu...");
+            RetrofitClient.getInstance().getLearningService().applyForCertificate(courseIdStr).enqueue(new Callback<ApiResponse<CertificateRequestResponse>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<CertificateRequestResponse>> call, Response<ApiResponse<CertificateRequestResponse>> response) {
+                    if (response.isSuccessful()) {
+                        ToastUtil.showCustomToast(CourseDetailActivity.this, "Đã gửi yêu cầu cấp chứng chỉ");
+                        btnRequestCertificate.setText("Chờ xác nhận");
+                        btnRequestCertificate.setBackgroundResource(R.drawable.bg_white_card);
+                    } else {
+                        ToastUtil.showCustomToast(CourseDetailActivity.this, "Yêu cầu thất bại");
+                        setupRequestCertificateClick();
+                    }
+                }
+                @Override
+                public void onFailure(Call<ApiResponse<CertificateRequestResponse>> call, Throwable t) {
+                    ToastUtil.showCustomToast(CourseDetailActivity.this, "Lỗi kết nối");
+                    setupRequestCertificateClick();
+                }
+            });
+        });
     }
 
     // ─────────────────────────────────────────────────────────────────

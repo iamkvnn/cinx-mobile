@@ -15,7 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RetrofitClient {
 
-    private static final String BASE_URL = "http://api.shinyjewelry.shop/";
+    private static final String BASE_URL = "https://api.shinyjewelry.shop/";
 
     private static RetrofitClient instance;
 
@@ -43,6 +43,9 @@ public class RetrofitClient {
                 .addInterceptor(new AuthInterceptor())
                 .authenticator(new TokenAuthenticator())
                 .addInterceptor(logging)
+                .connectTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
+                .writeTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
                 .build();
 
         GsonConverterFactory gsonFactory = GsonConverterFactory.create();

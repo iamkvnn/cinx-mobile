@@ -23,7 +23,8 @@ public class InstructorLessonAdapter extends RecyclerView.Adapter<InstructorLess
 
     public interface OnLessonClickListener {
         void onEditClick(LessonResponse lesson);
-        void onDeleteClick(LessonResponse lesson);`n        void onLessonItemClick(LessonResponse lesson);
+        void onDeleteClick(LessonResponse lesson);
+        void onLessonItemClick(LessonResponse lesson);
     }
 
     public InstructorLessonAdapter(Context context, List<LessonResponse> lessonList, OnLessonClickListener listener) {
@@ -58,7 +59,11 @@ public class InstructorLessonAdapter extends RecyclerView.Adapter<InstructorLess
             if (listener != null) listener.onEditClick(lesson);
         });
 
-        holder.itemView.setOnClickListener(v -> {`n            if (listener != null) listener.onLessonItemClick(lesson);`n        });`n`n        holder.imgDeleteLesson.setOnClickListener(v -> {
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onLessonItemClick(lesson);
+        });
+
+        holder.imgDeleteLesson.setOnClickListener(v -> {
             if (listener != null) listener.onDeleteClick(lesson);
         });
     }

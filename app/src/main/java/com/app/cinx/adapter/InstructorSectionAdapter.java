@@ -29,7 +29,8 @@ public class InstructorSectionAdapter extends RecyclerView.Adapter<InstructorSec
         void onDeleteSection(SectionResponse section);
         void onAddLesson(SectionResponse section);
         void onEditLesson(SectionResponse section, com.app.cinx.api.dto.LessonResponse lesson);
-        void onDeleteLesson(SectionResponse section, com.app.cinx.api.dto.LessonResponse lesson);`n        void onLessonItemClick(SectionResponse section, com.app.cinx.api.dto.LessonResponse lesson);
+        void onDeleteLesson(SectionResponse section, com.app.cinx.api.dto.LessonResponse lesson);
+        void onLessonItemClick(SectionResponse section, com.app.cinx.api.dto.LessonResponse lesson);
     }
 
     public InstructorSectionAdapter(Context context, List<SectionResponse> sectionList, OnSectionClickListener listener) {
@@ -76,6 +77,11 @@ public class InstructorSectionAdapter extends RecyclerView.Adapter<InstructorSec
                 @Override
                 public void onEditClick(com.app.cinx.api.dto.LessonResponse lesson) {
                     if (listener != null) listener.onEditLesson(section, lesson);
+                }
+
+                @Override
+                public void onLessonItemClick(com.app.cinx.api.dto.LessonResponse lesson) {
+                    if (listener != null) listener.onLessonItemClick(section, lesson);
                 }
 
                 @Override

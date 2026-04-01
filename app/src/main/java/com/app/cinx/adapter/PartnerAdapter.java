@@ -1,6 +1,5 @@
 package com.app.cinx.adapter;
 
-import android.graphics.drawable.PictureDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

@@ -85,7 +85,7 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
             long students = course.getEnrollmentCount() != null ? course.getEnrollmentCount() : 0L;
             courseStudents.setText("(" + students + ")");
             courseTitle.setText(course.getTitle());
-            instructorName.setText(course.getDescription() != null ? course.getDescription() : "Giảng viên"); // fallback instructor
+            instructorName.setText(course.getInstructor().getName() != null ? course.getInstructor().getName() : "Giảng viên"); // fallback instructor
 
             long price = course.getPrice() != null ? course.getPrice() : 0L;
             long discountedPriceObj = course.getDiscountedPrice() != null ? course.getDiscountedPrice() : price;

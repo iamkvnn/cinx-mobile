@@ -59,7 +59,7 @@ public class InstructorCourseAdapter extends RecyclerView.Adapter<InstructorCour
         }
 
         holder.itemView.setOnClickListener(v -> {
-            android.content.Intent intent = new android.content.Intent(context, com.app.cinx.activity.CourseOutlineActivity.class);
+            android.content.Intent intent = new android.content.Intent(context, com.app.cinx.activity.CourseEditActivity.class);
             intent.putExtra("COURSE_ID", course.getId());
             context.startActivity(intent);
             android.widget.Toast.makeText(context, "Mở quản lý khóa " + course.getTitle(), android.widget.Toast.LENGTH_SHORT).show();

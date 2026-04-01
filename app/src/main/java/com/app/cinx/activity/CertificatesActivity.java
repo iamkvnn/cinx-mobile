@@ -15,7 +15,15 @@ import com.app.cinx.R;
 import com.app.cinx.adapter.CertificateAdapter;
 import com.app.cinx.model.Certificate;
 import com.app.cinx.utils.ToastUtil;
+import com.app.cinx.api.RetrofitClient;
+import com.app.cinx.api.LearningService;
+import com.app.cinx.api.dto.ApiResponse;
+import com.app.cinx.api.dto.CertificateRequestResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -68,8 +76,38 @@ public class CertificatesActivity extends AppCompatActivity
     }
 
     private void loadCertificates() {
-        List<Certificate> certs = buildSampleCertificates();
+        LearningService service = RetrofitClient.getInstance().getLearningService();
+        service.getMyCertificates().enqueue(new Callback<ApiResponse<List<CertificateRequestResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<CertificateRequestResponse>>> call, Response<ApiResponse<List<CertificateRequestResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    List<Certificate> certs = new ArrayList<>();
+                    for (CertificateRequestResponse res : response.body().getData()) {
+                        if ("APPROVED".equalsIgnoreCase(res.getStatus())) {
+                            certs.add(new Certificate(
+                                res.getId(),
+                                "Khóa học ID: " + res.getCourseId(), // Need real course name ideally
+                                "Gần đây", // Should be actual issued date
+                                100, // Should be actual score if available
+                                Certificate.Grade.EXCELLENT,
+                                "" // Should be URL if available
+                            ));
+                        }
+                    }
+                    updateCertificatesUI(certs);
+                } else {
+                    updateCertificatesUI(buildSampleCertificates());
+                }
+            }
 
+            @Override
+            public void onFailure(Call<ApiResponse<List<CertificateRequestResponse>>> call, Throwable t) {
+                updateCertificatesUI(buildSampleCertificates());
+            }
+        });
+    }
+
+    private void updateCertificatesUI(List<Certificate> certs) {
         if (certs.isEmpty()) {
             rvCertificates.setVisibility(View.GONE);
             emptyState.setVisibility(View.VISIBLE);
@@ -79,6 +117,8 @@ public class CertificatesActivity extends AppCompatActivity
         CertificateAdapter adapter = new CertificateAdapter(certs, this);
         rvCertificates.setLayoutManager(new LinearLayoutManager(this));
         rvCertificates.setAdapter(adapter);
+        rvCertificates.setVisibility(View.VISIBLE);
+        emptyState.setVisibility(View.GONE);
     }
 
     // ─────────────────────────────────────────────────────────────────

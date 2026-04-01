@@ -3,6 +3,7 @@ package com.app.cinx.activity;
 import android.content.Intent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import android.os.Bundle;
@@ -14,7 +15,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
+
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.app.Activity;
@@ -67,22 +68,15 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView  tvHours;
 
     // ── Menu Rows ─────────────────────────────────────────────────────
+    private LinearLayout btnLearningPaths;
     private LinearLayout rowCertificates;
-    private LinearLayout rowDownloads;
     private LinearLayout rowOrderHistory;
     private LinearLayout rowVouchers;
     private LinearLayout rowPaymentMethods;
-    private LinearLayout rowHelpCenter;
     private LinearLayout rowLogout;
 
-    // ── Toggles ───────────────────────────────────────────────────────
-    private SwitchCompat switchNotifications;
-    private SwitchCompat switchDarkMode;
-
     // ── Demo stat data ─────────────────────────────────────────────────
-    private static final int STREAK_DAYS  = 14;
-    private static final int XP_POINTS    = 2_450;
-    private static final int LEARN_HOURS  = 38;
+    private static final int LEARN_HOURS  = 0;
 
     private UserDto currentUserDto;
     
@@ -117,7 +111,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         setupMenuListeners();
         setupEditProfileListener();
-        setupToggles();
 
         boolean isInstructorView = getIntent().getBooleanExtra("IS_INSTRUCTOR_VIEW", false);
         View navStudent = findViewById(R.id.navStudent);
@@ -150,16 +143,12 @@ public class ProfileActivity extends AppCompatActivity {
         tvXp              = findViewById(R.id.tvXp);
         tvHours           = findViewById(R.id.tvHours);
 
+        btnLearningPaths  = findViewById(R.id.btnLearningPaths);
         rowCertificates  = findViewById(R.id.rowCertificates);
-        rowDownloads     = findViewById(R.id.rowDownloads);
         rowOrderHistory  = findViewById(R.id.rowOrderHistory);
         rowVouchers      = findViewById(R.id.rowVouchers);
         rowPaymentMethods = findViewById(R.id.rowPaymentMethods);
-        rowHelpCenter    = findViewById(R.id.rowHelpCenter);
         rowLogout        = findViewById(R.id.rowLogout);
-
-        switchNotifications = findViewById(R.id.switchNotifications);
-        switchDarkMode      = findViewById(R.id.switchDarkMode);
     }
 
     // ─────────────────────────────────────────────────────────────────
@@ -199,9 +188,9 @@ public class ProfileActivity extends AppCompatActivity {
         boolean isPro = "PRO".equalsIgnoreCase(user.getUserRole()); // Assuming role string
         tvMembershipLabel.setText(isPro ? R.string.profile_badge_pro : R.string.profile_badge_basic);
 
-        // Quick stats
-        tvStreak.setText(String.valueOf(STREAK_DAYS));
-        tvXp.setText(String.valueOf(XP_POINTS));
+        // API fallback initial stat data
+        tvXp.setText(String.valueOf(user.getUserXp()));
+        tvStreak.setText("0");
         tvHours.setText(String.valueOf(LEARN_HOURS));
     }
 
@@ -231,6 +220,28 @@ public class ProfileActivity extends AppCompatActivity {
                 Log.e("ProfileActivity", "Failed to fetch user profile", t);
             }
         });
+
+        // Fetch User Streak
+        com.app.cinx.api.LearningService learningService = RetrofitClient.getInstance().getLearningService();
+        if (learningService != null) {
+            learningService.getMyStreak().enqueue(new Callback<ApiResponse<com.app.cinx.api.dto.UserStreakResponse>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<com.app.cinx.api.dto.UserStreakResponse>> call, Response<ApiResponse<com.app.cinx.api.dto.UserStreakResponse>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                        int streak = response.body().getData().getCurrentStreak() != null ? response.body().getData().getCurrentStreak() : 0;
+                        runOnUiThread(() -> {
+                            if (tvStreak != null) {
+                                tvStreak.setText(String.valueOf(streak));
+                            }
+                        });
+                    }
+                }
+                @Override
+                public void onFailure(Call<ApiResponse<com.app.cinx.api.dto.UserStreakResponse>> call, Throwable t) {
+                    Log.e("ProfileActivity", "Failed to fetch user streak", t);
+                }
+            });
+        }
     }
 
     private void updateProfileUI(UserDto userDto) {
@@ -247,6 +258,9 @@ public class ProfileActivity extends AppCompatActivity {
                     .circleCrop()
                     .placeholder(R.drawable.ic_profile_placeholder)
                     .into(ivAvatar);
+        }
+        if (userDto.getXp() != null) {
+            tvXp.setText(String.valueOf(userDto.getXp()));
         }
     }
 
@@ -369,24 +383,28 @@ public class ProfileActivity extends AppCompatActivity {
         return null;
     }
 
+    // ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
+    // Menu click listeners
+    // ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
+
     private void setupMenuListeners() {
-        // Learning group
-        rowCertificates.setOnClickListener(v -> {
-            Intent intent = new Intent(this, CertificatesActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            startActivity(intent);
-        });
-
-        rowDownloads.setOnClickListener(v ->
-                ToastUtil.showCustomToast(this, getString(R.string.profile_coming_soon)));
-
-        // Transactions group
+        if (btnLearningPaths != null) {
+            btnLearningPaths.setOnClickListener(v -> {
+                Intent intent = new Intent(ProfileActivity.this, LearningPathManagementActivity.class);
+                startActivity(intent);
+            });
+        }
+        if (rowCertificates != null) {
+            rowCertificates.setOnClickListener(v -> {
+                Intent intent = new Intent(ProfileActivity.this, CertificatesActivity.class);
+                startActivity(intent);
+            });
+        }
         rowOrderHistory.setOnClickListener(v -> {
             Intent intent = new Intent(this, PurchaseHistoryActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivity(intent);
         });
-
         rowVouchers.setOnClickListener(v -> {
             Intent intent = new Intent(this, VouchersActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -398,38 +416,14 @@ public class ProfileActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivity(intent);
         });
-
-        // Support group
-        rowHelpCenter.setOnClickListener(v ->
-                ToastUtil.showCustomToast(this, getString(R.string.profile_coming_soon)));
-
-        rowLogout.setOnClickListener(v -> showLogoutConfirmDialog());
+        if (rowLogout != null) {
+            rowLogout.setOnClickListener(v -> showLogoutConfirmDialog());
+        }
     }
 
-    // ─────────────────────────────────────────────────────────────────
-    // Toggle listeners
-    // ─────────────────────────────────────────────────────────────────
-
-    private void setupToggles() {
-        switchNotifications.setOnCheckedChangeListener((btn, isChecked) -> {
-            String msg = isChecked
-                    ? getString(R.string.profile_notifications_on)
-                    : getString(R.string.profile_notifications_off);
-            ToastUtil.showCustomToast(this, msg);
-        });
-
-        switchDarkMode.setOnCheckedChangeListener((btn, isChecked) -> {
-            String msg = isChecked
-                    ? getString(R.string.profile_dark_mode_on)
-                    : getString(R.string.profile_dark_mode_off);
-            ToastUtil.showCustomToast(this, msg);
-            // TODO: apply AppCompatDelegate.setDefaultNightMode() when dark theme assets are ready
-        });
-    }
-
-    // ─────────────────────────────────────────────────────────────────
+    // ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
     // Logout
-    // ─────────────────────────────────────────────────────────────────
+    // ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
 
     private void showLogoutConfirmDialog() {
         new AlertDialog.Builder(this)
