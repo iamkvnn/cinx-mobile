@@ -113,6 +113,9 @@
         <activity android:name=".activity.CourseListActivity" android:exported="false" android:screenOrientation="portrait" />
 
         <activity android:name=".activity.InstructorDashboardActivity" android:exported="false" android:screenOrientation="portrait" />
+        <activity android:name=".activity.AdminDashboardActivity" android:exported="false" android:screenOrientation="portrait" />
+        <activity android:name=".activity.ManageInstructorsActivity" android:exported="false" android:screenOrientation="portrait" />
+        <activity android:name=".activity.ManageUsersActivity" android:exported="false" android:screenOrientation="portrait" />
 
     <activity android:name=".activity.CourseOutlineActivity" android:exported="false" android:screenOrientation="portrait" />
     <activity android:name=".activity.LessonEditorActivity" android:exported="false" android:screenOrientation="portrait" />

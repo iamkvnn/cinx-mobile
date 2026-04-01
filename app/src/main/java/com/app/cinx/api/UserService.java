@@ -22,6 +22,12 @@ public interface UserService {
     @GET("api/v1/users")
     Call<PaginatedApiResponseUserDto> getAllUsers(@Query("page") Integer page, @Query("size") Integer size);
 
+    @GET("api/v1/users")
+    Call<PaginatedApiResponseUserDto> getUsersByRole(@Query("page") Integer page, @Query("size") Integer size, @Query("role") String role);
+
+    @GET("api/v1/instructors")
+    Call<PaginatedApiResponseUserDto> getInstructors(@Query("page") Integer page, @Query("size") Integer size);
+
     @POST("api/v1/users")
     Call<ApiResponse<UserDto>> createUser(@Body CreateUserRequest body);
 
@@ -30,6 +36,9 @@ public interface UserService {
 
     @POST("api/v1/users/{id}/verify-instructor")
     Call<ApiResponse<Object>> verifyInstructor(@Path("id") String id);
+
+    @PUT("api/v1/instructors/{id}/verify")
+    Call<ApiResponse<Object>> verifyInstructorByPut(@Path("id") String id, @Body VerifyInstructorRequest body);
 
     @POST("api/v1/users/device-tokens")
     Call<ApiResponse<Void>> saveDeviceToken(@Body DeviceTokenRequest body);
