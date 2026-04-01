@@ -1,11 +1,14 @@
 package com.app.cinx.activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -15,27 +18,29 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.app.cinx.R;
 import com.app.cinx.adapter.CheckoutCourseAdapter;
 import com.app.cinx.adapter.PaymentMethodAdapter;
-import com.app.cinx.data.CartRepository;
-import com.app.cinx.api.dto.CartItemResponse;
-import com.app.cinx.model.PaymentMethod;
-import com.app.cinx.utils.Convert;
-import com.app.cinx.utils.UserManager;
-
 import com.app.cinx.api.OrderService;
+import com.app.cinx.api.PaymentService;
 import com.app.cinx.api.RetrofitClient;
 import com.app.cinx.api.dto.ApiResponse;
-import com.app.cinx.api.dto.CreateOrderRequest;
 import com.app.cinx.api.dto.CartItemDto;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import android.util.Log;
+import com.app.cinx.api.dto.CartItemResponse;
+import com.app.cinx.api.dto.CreateOrderRequest;
+import com.app.cinx.api.dto.OrderDto;
+import com.app.cinx.api.dto.PaymentRequest;
+import com.app.cinx.data.CartRepository;
+import com.app.cinx.model.PaymentMethod;
+import com.app.cinx.utils.Convert;
 import com.app.cinx.utils.TokenManager;
-import android.widget.Toast;
+import com.app.cinx.utils.UserManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Checkout / Thanh-toán screen.
@@ -290,21 +295,57 @@ public class CheckoutActivity extends AppCompatActivity {
         if (voucherTitle != null) {
             request.setVoucherCode(voucherTitle);
         }
-
-        String token = TokenManager.getInstance().getBearerToken();
-        orderService.createOrder(token, request).enqueue(new Callback<ApiResponse<Void>>() {
+        orderService.createOrder(request).enqueue(new Callback<ApiResponse<OrderDto>>() {
             @Override
-            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
-                if (response.isSuccessful()) {
-                    launchSuccessScreen();
+            public void onResponse(Call<ApiResponse<OrderDto>> call, Response<ApiResponse<OrderDto>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    processPayment(response.body().getData().getId(), request.getPaymentMethod());
                 } else {
                     handleError();
                 }
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<OrderDto>> call, Throwable t) {
                 Log.e("Checkout", "Failed to place order", t);
+                handleError();
+            }
+        });
+    }
+
+    private void processPayment(String orderId, String paymentMethod) {
+        PaymentService paymentService = RetrofitClient.getInstance().getPaymentService();
+        if (paymentService == null) {
+            launchSuccessScreen();
+            return;
+        }
+
+        PaymentRequest paymentRequest = new PaymentRequest();
+        paymentRequest.setOrderId(orderId);
+        paymentRequest.setPaymentMethod(paymentMethod);
+
+        paymentService.requestMomoPayment(paymentRequest).enqueue(new Callback<ApiResponse<String>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<String>> call, Response<ApiResponse<String>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    String paymentLink = response.body().getData();
+                    if (paymentLink != null && !paymentLink.isEmpty() && (paymentLink.startsWith("http://") || paymentLink.startsWith("https://"))) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(paymentLink));
+                        startActivity(browserIntent);
+                        // After sending them to the browser, we can assume success or show success screen
+                        // Since they return manually, we can launch the success screen now and let them switch back.
+                        launchSuccessScreen();
+                    } else {
+                        launchSuccessScreen();
+                    }
+                } else {
+                    handleError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<String>> call, Throwable t) {
+                Log.e("Checkout", "Failed to get payment link", t);
                 handleError();
             }
         });

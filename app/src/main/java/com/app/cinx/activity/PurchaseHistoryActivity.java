@@ -83,9 +83,8 @@ public class PurchaseHistoryActivity extends AppCompatActivity
     }
 
     private void fetchOrders() {
-        String token = TokenManager.getInstance().getBearerToken();
         OrderService service = RetrofitClient.getInstance().getOrderService();
-        service.getOrders(token).enqueue(new Callback<ApiListResponse<OrderDto>>() {
+        service.getOrders().enqueue(new Callback<ApiListResponse<OrderDto>>() {
             @Override
             public void onResponse(Call<ApiListResponse<OrderDto>> call, Response<ApiListResponse<OrderDto>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {

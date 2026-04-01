@@ -17,16 +17,13 @@ import retrofit2.http.Path;
 public interface OrderService {
 
     @POST("api/v1/orders")
-    Call<ApiResponse<Void>> createOrder(
-            @Header("Authorization") String bearerToken,
+    Call<ApiResponse<OrderDto>> createOrder(
             @Body CreateOrderRequest request);
 
     @GET("api/v1/orders")
-    Call<ApiListResponse<OrderDto>> getOrders(
-            @Header("Authorization") String bearerToken);
+    Call<ApiListResponse<OrderDto>> getOrders();
 
     @GET("api/v1/orders/{id}")
     Call<ApiResponse<OrderDetailDto>> getOrder(
-            @Header("Authorization") String bearerToken,
             @Path("id") String orderId);
 }
